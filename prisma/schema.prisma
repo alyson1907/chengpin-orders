@@ -17,8 +17,8 @@ model Category {
 
 model Product {
   id          String                @id @default(auto()) @map("_id") @db.ObjectId
-  description String?
   name        String                @unique
+  description String?
   coverImg    String
   imgs        String[]
   availables  ProductAvailability[]
@@ -41,11 +41,13 @@ model CategoryProduct {
 
 model ProductAvailability {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String    @unique
+  name      String
   productId String?   @db.ObjectId
   price     Float
   qty       Float
   product   Product?  @relation(fields: [productId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  @@unique([productId, name])
 }

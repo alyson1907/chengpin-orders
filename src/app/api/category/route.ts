@@ -1,13 +1,21 @@
 import { NextResponse, NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
 import { ResponseBuilder } from '../ResponseBuilder'
-import { HttpStatus } from '../enum/HttpStatus.enum'
-import { ErrorKey } from '../enum/Errors.enum'
-import { z } from 'zod'
+import { HttpStatus } from '../enum/http-status.enum'
+import { ErrorKey } from '../enum/errors.enum'
+import { createCategoryBodySchema } from './validation-schemas'
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
+  const json = await req.json()
+  const validated = createCategoryBodySchema.safeParse(json)
+  if (!validated.success)
+    return new ResponseBuilder()
+      .status(HttpStatus.BAD_REQUEST)
+      .errorKey(ErrorKey.VALIDATION_ERROR_JSON_BODY)
+      .data(validated.error)
+      .build()
 
+  const { data: body } = validated
   const exists = await prisma.category.findFirst({ where: { name: { equals: body.name } } })
   if (exists)
     return new ResponseBuilder()
