@@ -1,4 +1,4 @@
-import { Group, Burger, Image, useMantineColorScheme, Box, Tooltip } from '@mantine/core'
+import { Group, Burger, Image, useMantineColorScheme, Tooltip } from '@mantine/core'
 import { IconMoonStars, IconSun } from '@tabler/icons-react'
 import ButtonSquareIcon from '../../ButtonSquareIcon'
 

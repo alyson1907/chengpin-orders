@@ -1,0 +1,44 @@
+import { Paper, Title, Image, Text, Skeleton, Group, Badge, Stack } from '@mantine/core'
+import styles from './ProductCard.module.css'
+import React, { useState } from 'react'
+import { BRL } from '@/app/helpers/NumberFormatter.helper'
+
+type IProps = {
+  product: any
+  onClick: () => void
+}
+
+const renderAvailableBadges = (available) => {
+  return available.map(({ name }, idx) => <Badge key={idx}>{name}</Badge>)
+}
+
+export default function ProductCard({ product, onClick }: IProps) {
+  console.log(product.available.length)
+  const [isImgLoaded, setIsImgLoaded] = useState(false)
+  const prices = product.available.map(({ price }) => price)
+  const lowestPrice = Math.min(...prices)
+  return (
+    <Skeleton visible={!isImgLoaded}>
+      <Paper onClick={onClick} className={styles.paper} shadow="xl" p="md" m={0} withBorder>
+        <Image
+          src={product.coverImg}
+          w="100%"
+          h={{ base: 350, md: 250, lg: 300 }}
+          onLoad={() => setIsImgLoaded(true)}
+        />
+        <Stack justify="space-between">
+          <Group justify="space-between" mt="sm">
+            <Title order={5}>{product.name}</Title>
+            <Text size="md" fw={500}>
+              {BRL.format(lowestPrice)}
+            </Text>
+          </Group>
+          <Text size="sm">{product.description}</Text>
+          <Group justify="flex-start" mt="sm">
+            {renderAvailableBadges(product.available)}
+          </Group>
+        </Stack>
+      </Paper>
+    </Skeleton>
+  )
+}

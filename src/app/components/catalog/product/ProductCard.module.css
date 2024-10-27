@@ -1,0 +1,11 @@
+.paper {
+  &:hover {
+    transition: 200ms;
+    transform: scale(1.05);
+    cursor: pointer;
+  }
+  &:not(:hover) {
+    transition: 200ms;
+    transform: scale(1);
+  }
+}

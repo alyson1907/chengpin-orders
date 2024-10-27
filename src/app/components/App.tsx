@@ -1,10 +1,10 @@
 'use client'
 import '@mantine/core/styles.css'
-import { AppShell } from '@mantine/core'
+import { AppShell, Modal } from '@mantine/core'
 import { Navbar } from './catalog/navbar/Navbar'
 import { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import ProductGrid from './catalog/product-grid/ProductGrid'
+import ProductGrid from './catalog/product/ProductGrid'
 import Header from './catalog/header/Header'
 
 export default function App() {
@@ -18,7 +18,7 @@ export default function App() {
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
+      navbar={{ width: { sm: 200, md: 250 }, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
       padding={'md'}
     >
       <AppShell.Header>
