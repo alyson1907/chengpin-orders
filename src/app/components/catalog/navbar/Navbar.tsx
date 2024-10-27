@@ -2,8 +2,8 @@ import { Dispatch } from 'react'
 import { Title, Skeleton, Stack, Anchor } from '@mantine/core'
 import styles from './Navbar.module.css'
 import useSWR from 'swr'
-import { Category } from '@prisma/client'
 import { notifications } from '@mantine/notifications'
+import { Category } from '@prisma/client'
 
 type IProps = {
   activeCategory: Category

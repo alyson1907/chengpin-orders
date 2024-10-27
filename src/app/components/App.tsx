@@ -1,15 +1,21 @@
 'use client'
 import '@mantine/core/styles.css'
-import { AppShell, Modal } from '@mantine/core'
+import { AppShell } from '@mantine/core'
 import { Navbar } from './catalog/navbar/Navbar'
 import { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import ProductGrid from './catalog/product/ProductGrid'
 import Header from './catalog/header/Header'
+import { Category } from '@prisma/client'
 
 export default function App() {
   const [isBurgerOpen, { toggle, close }] = useDisclosure()
-  const [activeCategory, setActiveCategory] = useState({ id: '', name: '', createdAt: new Date() })
+  const [activeCategory, setActiveCategory] = useState<Category>({
+    id: '',
+    name: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  })
 
   useEffect(() => {
     close()
