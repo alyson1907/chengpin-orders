@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { HttpStatus } from './enum/http-status.enum'
-import { ErrorKey, ErrorMsg } from './enum/errors.enum'
+import { HttpStatus } from '../enum/http-status.enum'
+import { ErrorKey, ErrorMsg } from '../enum/errors.enum'
 
 type ResponseBody = {
   data?: any

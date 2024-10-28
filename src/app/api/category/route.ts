@@ -1,12 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
-import { ResponseBuilder } from '../ResponseBuilder'
-import { HttpStatus } from '../enum/http-status.enum'
-import { ErrorKey } from '../enum/errors.enum'
+import { ResponseBuilder } from '../lib/helpers/ResponseBuilder'
+import { HttpStatus } from '../lib/enum/http-status.enum'
+import { ErrorKey } from '../lib/enum/errors.enum'
 import { createCategoryBodySchema } from './validation-schemas'
+import { parseReq } from '@/app/api/lib/helpers/request-helper'
 
 export async function POST(req: NextRequest) {
-  const json = await req.json()
+  const { body: json } = await parseReq(req)
   const validated = createCategoryBodySchema.safeParse(json)
   if (!validated.success)
     return new ResponseBuilder()
@@ -38,6 +39,7 @@ export async function GET() {
     orderBy: {
       name: 'asc',
     },
+    include: { products: { include: { product: true } } },
   })
   return NextResponse.json(categories)
 }

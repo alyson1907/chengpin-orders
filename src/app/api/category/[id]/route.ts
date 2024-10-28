@@ -1,13 +1,14 @@
 import { NextRequest } from 'next/server'
-import { HttpStatus } from '@/app/api/enum/http-status.enum'
+import { HttpStatus } from '@/app/api/lib/enum/http-status.enum'
 import prisma from '../../../../../prisma/prisma'
 import { deleteCategoryParamSchema } from '@/app/api/category/validation-schemas'
-import { ErrorKey } from '@/app/api/enum/errors.enum'
-import { ResponseBuilder } from '@/app/api/ResponseBuilder'
+import { ErrorKey } from '@/app/api/lib/enum/errors.enum'
+import { ResponseBuilder } from '@/app/api/lib/helpers/ResponseBuilder'
+import { parseReq } from '@/app/api/lib/helpers/request-helper'
 
 export async function DELETE(req: NextRequest, info) {
-  const receivedParams = await info.params
-  const validated = deleteCategoryParamSchema.safeParse(receivedParams)
+  const { params: pathParams } = await parseReq(req, info)
+  const validated = deleteCategoryParamSchema.safeParse(pathParams)
   if (!validated.success)
     return new ResponseBuilder()
       .status(HttpStatus.BAD_REQUEST)

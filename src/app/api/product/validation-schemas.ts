@@ -22,4 +22,11 @@ export const createProductBodySchema = z.object({
   ),
 })
 
+export const getProductQuerySchema = z.object({
+  keywords: z.object({
+    skip: z.number().int().gte(0),
+    take: z.number().int().gte(0),
+  }),
+})
+
 export type CreateProductBody = z.infer<typeof createProductBodySchema>
