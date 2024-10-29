@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { HttpStatus } from '../enum/http-status.enum'
-import { ErrorKey, ErrorMsg } from '../enum/errors.enum'
+import { ErrorKey, ErrorMsg } from '../error/errors.enum'
 
 type ResponseBody = {
   data?: any
@@ -17,8 +17,8 @@ export class ResponseBuilder {
     return this
   }
 
-  message(message: string) {
-    this.body.message = message
+  message(message?: string) {
+    if (message) this.body.message = message
     return this
   }
 

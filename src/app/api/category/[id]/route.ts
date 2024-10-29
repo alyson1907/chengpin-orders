@@ -2,11 +2,12 @@ import { NextRequest } from 'next/server'
 import { HttpStatus } from '@/app/api/lib/enum/http-status.enum'
 import prisma from '../../../../../prisma/prisma'
 import { deleteCategoryParamSchema } from '@/app/api/category/validation-schemas'
-import { ErrorKey } from '@/app/api/lib/enum/errors.enum'
-import { ResponseBuilder } from '@/app/api/lib/helpers/ResponseBuilder'
+import { ErrorKey } from '@/app/api/lib/error/errors.enum'
+import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
 import { parseReq } from '@/app/api/lib/helpers/request-helper'
+import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
 
-export async function DELETE(req: NextRequest, info) {
+const deleteCategory = async (req: NextRequest, info) => {
   const { params: pathParams } = await parseReq(req, info)
   const validated = deleteCategoryParamSchema.safeParse(pathParams)
   if (!validated.success)
@@ -22,3 +23,5 @@ export async function DELETE(req: NextRequest, info) {
     return new ResponseBuilder().status(HttpStatus.NOT_FOUND).message(`Not Found category with id ${params.id}`).build()
   return new ResponseBuilder().data(deleted).build()
 }
+
+export const DELETE = errorsMiddleware(deleteCategory)

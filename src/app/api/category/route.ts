@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
-import { ResponseBuilder } from '../lib/helpers/ResponseBuilder'
+import { ResponseBuilder } from '../lib/helpers/response-builder'
 import { HttpStatus } from '../lib/enum/http-status.enum'
-import { ErrorKey } from '../lib/enum/errors.enum'
+import { ErrorKey } from '../lib/error/errors.enum'
 import { createCategoryBodySchema } from './validation-schemas'
 import { parseReq } from '@/app/api/lib/helpers/request-helper'
 
