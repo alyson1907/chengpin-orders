@@ -20,7 +20,8 @@ const products = [
       { name: 'Unidade', price: 12.99, qty: 25 },
       { name: 'Pote 14', price: 14.99, qty: 25 },
     ],
-    coverImg: 'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',
+    coverImg:
+      'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGl4Ym02MTU0N2ZtYWQydm53azM4d3NvMnIxNDl0MGZleTE0aGg1YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nAELLSB7jV0wVejr1h/giphy.webp',
     imgs: [
       'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg',
       'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',

@@ -9,7 +9,11 @@ type IProps = {
 }
 
 const renderAvailableBadges = (availables) => {
-  return availables.map(({ name }, idx) => <Badge key={idx}>{name}</Badge>)
+  return availables.map(({ name }, idx) => (
+    <Badge key={idx} visibleFrom="sm">
+      {name}
+    </Badge>
+  ))
 }
 
 export default function ProductCard({ product, onClick }: IProps) {
@@ -19,11 +23,11 @@ export default function ProductCard({ product, onClick }: IProps) {
   const lowestPrice = Math.min(...prices)
   return (
     <Skeleton visible={!isImgLoaded}>
-      <Paper onClick={onClick} className={styles.paper} shadow="xl" p="md" m={0} withBorder>
+      <Paper onClick={onClick} className={styles.paper} shadow="xl" p="md" m={0} w="100%" h="100%" withBorder>
         <Image
           src={product.coverImg}
           w="100%"
-          h={{ base: 350, md: 250, lg: 300 }}
+          h={{ base: 230, sm: 250, md: 250, lg: 300 }}
           onLoad={() => setIsImgLoaded(true)}
         />
         <Stack justify="space-between">

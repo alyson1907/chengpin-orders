@@ -3,9 +3,8 @@ import { HttpStatus } from '@/app/api/lib/enum/http-status.enum'
 import { ResponseBuilder } from '@/app/api/lib/helpers/ResponseBuilder'
 import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
-import { CreateProductBody, createProductBodySchema, getProductQuerySchema } from '@/app/api/product/validation-schemas'
-import { parseReq } from '@/app/api/lib/helpers/request-helper'
-import { baseQueryStringSchema } from '@/app/api/lib/validation-schemas/base-request-validation-schemas'
+import { CreateProductBody, createProductBodySchema } from '@/app/api/product/validation-schemas'
+import { buildPrismaFilter, parseReq } from '@/app/api/lib/helpers/request-helper'
 
 const getCategoriesByName = async (categories: CreateProductBody['categories']) => {
   const categoryNames = categories.map(({ name }) => name)
@@ -65,21 +64,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { qs } = await parseReq(req)
-  console.log('\n\n\n\n', qs)
-  const { success, data, error } = baseQueryStringSchema.safeParse(qs)
-  if (!success)
-    return new ResponseBuilder()
-      .status(HttpStatus.BAD_REQUEST)
-      .errorKey(ErrorKey.VALIDATION_ERROR_QUERY_STRING)
-      .data(error)
-      .build()
-
-  const { keywords, others: filters } = qs
-
-  const products = await prisma.product.findMany({
-    ...keywords,
-    where: { categories: { some: { categoryId: filters.categoryId } } },
-  })
-
+  const filter = buildPrismaFilter(qs)
+  const products = await prisma.product.findMany(filter)
   return new ResponseBuilder().data(products).build()
 }

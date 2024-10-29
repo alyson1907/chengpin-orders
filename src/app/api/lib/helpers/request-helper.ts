@@ -1,72 +1,104 @@
+import { Prisma } from '@prisma/client'
 import { NextRequest } from 'next/server'
+import * as _ from 'lodash'
 
 type ParsedRequest = {
   body: any
   params: Record<string, string>
-  qs: Record<string, any | Array<any>>
+  qs: Record<string, any>
 }
 
 export const parseReq = async (req: NextRequest, info?): Promise<ParsedRequest> => {
-  const tempQs = {}
-  const parsed = {
+  const parsed: ParsedRequest = {
     body: undefined,
     params: {},
     qs: {},
   }
-
+  // Body
   try {
     parsed.body = await req.json()
   } catch (e) {}
-  if (info) parsed.params = await info?.params
-  req.nextUrl.searchParams.entries().forEach(([key, value]) => {
-    console.log(`\n\n\n\n\n\n\n [key, value]`, [key, value])
-    const primitiveValue = toPrimitive(value)
-    console.log(`\n\n\n\n\n\n\n primitiveValue`, primitiveValue)
-    const currentQs = tempQs[key]
 
-    if (!currentQs) return (tempQs[key] = primitiveValue)
-    if (Array.isArray(currentQs)) return (tempQs[key] = [...currentQs, primitiveValue])
-    return (tempQs[key] = [currentQs, primitiveValue])
-  })
-  parsed.qs = captureKeywords(tempQs)
+  // Params
+  if (info) parsed.params = await info?.params
+
+  // Querystrings
+  for (const entry of req.nextUrl.searchParams.entries()) {
+    const [key, value] = entry
+    const primitiveValue = toPrimitive(value)
+    const current = parsed.qs[key]
+
+    if (!current) parsed.qs[key] = primitiveValue
+    else if (Array.isArray(current)) parsed.qs[key] = [...current, primitiveValue]
+    else parsed.qs[key] = [current, primitiveValue]
+  }
   return parsed
 }
 
-const captureKeywords = (qs: Record<string, any | Array<any>>) => {
-  const collectOrderBy = (keywords: Record<string, any | Array<any>>) => {
-    const copy = { ...keywords }
-    const containsOrderBy = Object.keys(copy).some((key) => key === 'orderByField' || key === 'orderByDirection')
-    if (!containsOrderBy) return copy
-    copy.orderBy = {
-      [copy['orderByField']]: copy.orderByDirection,
-    }
-    delete copy.orderByField
-    delete copy.orderByDirection
-    return copy
+const groupFilterClauses = (prismaFilter: Record<string, any>) => {
+  const rootKeys = ['skip', 'take', 'orderBy']
+  // All filters that are not "root" are grouped in the `where` clause
+  const groupedWhere = Object.entries(prismaFilter).reduce(
+    (acc, [field, value]) => {
+      if (rootKeys.includes(field)) return { ...acc, [field]: value }
+      const prevWhere = _.pick(acc, ['where'])
+      acc.where = { ...prevWhere.where, [field]: value }
+      return acc
+    },
+    { where: {} }
+  )
+  return groupedWhere
+}
+
+export const buildPrismaFilter = (qs: Record<string, any>) => {
+  const nestedKey = '.'
+  const prismaFilter = {}
+  for (const key in qs) {
+    const keyParts = key.split(nestedKey)
+    assignNestedFilter(prismaFilter, keyParts, qs[key])
   }
+  return groupFilterClauses(prismaFilter)
+}
 
-  const keywordsToCapture = ['skip', 'take', 'orderByField', 'orderByDirection']
-  const unformattedKeywords = Object.entries(qs)
-    .filter(([key, _]) => keywordsToCapture.includes(key))
-    .reduce((acc, [key, value]) => {
-      acc[key] = value
-      return acc
-    }, {})
-  const others = Object.entries(qs)
-    .filter(([key, _]) => !Object.keys(unformattedKeywords).includes(key))
-    .reduce((acc, [key, value]) => {
-      acc[key] = value
-      return acc
-    }, {})
-
-  const keywords = collectOrderBy(unformattedKeywords)
-  return {
-    keywords,
-    others,
+function assignNestedFilter(currentFilter: any, keyParts: string[], value: any) {
+  const splitKey = '__'
+  const [field, operator] = keyParts[0].split(splitKey)
+  const prismaOperators = [
+    'gte',
+    'lte',
+    'equals',
+    'contains',
+    'startsWith',
+    'endsWith',
+    'in',
+    'notIn',
+    'skip',
+    'take',
+    'orderBy',
+  ]
+  if (field === 'orderBy') currentFilter.orderBy = { [value]: operator }
+  else if (keyParts.length === 1) {
+    // If it's the last part, assign the filter value directly
+    if (operator && prismaOperators.includes(operator)) {
+      currentFilter[field] = {
+        ...currentFilter[field],
+        [operator]: value,
+      }
+    } else {
+      // Direct match: if value is an array, use "in" filter automatically
+      currentFilter[field] = Array.isArray(value) ? { in: value } : value
+    }
+  } else {
+    // Recursively assign nested fields
+    if (!currentFilter[field]) {
+      currentFilter[field] = {}
+    }
+    // Recur into the next part
+    assignNestedFilter(currentFilter[field], keyParts.slice(1), value)
   }
 }
 
-function toPrimitive(value: string): unknown {
+const toPrimitive = (value: string) => {
   // Handle "null" and "undefined"
   if (value.toLowerCase() === 'null') return null
   if (value.toLowerCase() === 'undefined') return undefined
