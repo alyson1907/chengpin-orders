@@ -12,7 +12,6 @@ import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
 import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-errors'
 import { Product } from '@prisma/client'
 import { PaginationDto } from '@/app/api/lib/types/common-response'
-import * as _ from 'lodash'
 
 const getCategoriesByName = async (categories: CreateProductBody['categories']) => {
   const categoryNames = categories.map(({ name }) => name)
