@@ -8,8 +8,8 @@ type IProps = {
   onClick: () => void
 }
 
-const renderAvailableBadges = (availables) => {
-  return availables.map(({ name }, idx) => (
+const renderAvailableBadges = (availability) => {
+  return availability.map(({ name }, idx) => (
     <Badge key={idx} visibleFrom="sm">
       {name}
     </Badge>
@@ -17,9 +17,8 @@ const renderAvailableBadges = (availables) => {
 }
 
 export default function ProductCard({ product, onClick }: IProps) {
-  console.log(product.availables.length)
   const [isImgLoaded, setIsImgLoaded] = useState(false)
-  const prices = product.availables.map(({ price }) => price)
+  const prices = product.availability.map(({ price }) => price)
   const lowestPrice = Math.min(...prices)
   return (
     <Skeleton visible={!isImgLoaded}>
@@ -39,7 +38,7 @@ export default function ProductCard({ product, onClick }: IProps) {
           </Group>
           <Text size="sm">{product.description}</Text>
           <Group justify="flex-start" mt="sm">
-            {renderAvailableBadges(product.availables)}
+            {renderAvailableBadges(product.availability)}
           </Group>
         </Stack>
       </Paper>

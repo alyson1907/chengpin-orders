@@ -4,7 +4,7 @@ import prisma from '../../../../../prisma/prisma'
 import { deleteCategoryParamSchema } from '@/app/api/category/validation-schemas'
 import { ErrorKey } from '@/app/api/lib/error/errors.enum'
 import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
-import { parseReq } from '@/app/api/lib/helpers/request-helper'
+import { parseReq } from '@/app/api/lib/helpers/request-parser'
 import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
 
 const deleteCategory = async (req: NextRequest, info) => {

@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import * as _ from 'lodash'
 

@@ -1,32 +1,25 @@
+import { productAvailabilitySchema } from '@/app/api/availability/validation-schemas'
+import { categorySchema } from '@/app/api/category/validation-schemas'
 import { z } from 'zod'
 
-export const createProductBodySchema = z.object({
-  name: z.string(),
+const productSchema = z.object({
+  name: z.string().min(1),
   description: z.string(),
-  coverImg: z.string().url(),
-  imgs: z.array(z.string().url()),
-  availables: z.array(
-    z.object({
-      name: z.string(),
-      price: z.number().gte(0),
-      qty: z.number().int().gte(0),
-    })
-  ),
-  categories: z.array(
-    z.object({
-      id: z.string().length(24),
-      name: z.string(),
-      createdAt: z.string().datetime(),
-      updatedAt: z.string().datetime().nullable(),
-    })
-  ),
+  coverImg: z.string().url().min(1),
+  imgs: z.array(z.string().url()).min(1),
 })
 
-export const getProductQuerySchema = z.object({
-  keywords: z.object({
-    skip: z.number().int().gte(0),
-    take: z.number().int().gte(0),
-  }),
+export const createProductBodySchema = productSchema.extend({
+  availability: z.array(productAvailabilitySchema),
+  categories: z.array(categorySchema.extend({ id: z.string().length(24) })),
+})
+
+export const updateProductsBodySchema = z.object({
+  data: z.array(productSchema.partial().extend({ id: z.string().length(24) })),
+})
+
+export const deleteProductsBodySchema = z.object({
+  data: z.array(z.object({ id: z.string().length(24) })),
 })
 
 export type CreateProductBody = z.infer<typeof createProductBodySchema>

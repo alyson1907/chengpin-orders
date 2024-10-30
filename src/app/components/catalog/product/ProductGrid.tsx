@@ -13,7 +13,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Variado',
     description: 'Várias plantinhas que vem em camada 10x8',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 8.99, qty: 12 },
       { name: 'Pote 15', price: 9.99, qty: 25 },
       { name: 'Camada 10x8', price: 10.99, qty: 25 },
@@ -35,7 +35,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Black Velvet',
     description: 'Black Velvet individual',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 12.99, qty: 12 },
       { name: 'Pote 15', price: 14.99, qty: 25 },
     ],
@@ -54,7 +54,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Variado',
     description: 'Várias plantinhas que vem em camada 10x8',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 9.8, qty: 12 },
       { name: 'Pote 15', price: 14.99, qty: 25 },
     ],
@@ -72,7 +72,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Black Velvet',
     description: 'Black Velvet individual',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 12.99, qty: 12 },
       { name: 'Pote 15', price: 14.99, qty: 25 },
     ],
@@ -91,7 +91,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Variado',
     description: 'Várias plantinhas que vem em camada 10x8',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 9.8, qty: 12 },
       { name: 'Pote 15', price: 14.99, qty: 25 },
     ],
@@ -110,7 +110,7 @@ const products = [
     id: uuid(),
     name: 'Alocasia Black Velvet',
     description: 'Black Velvet individual',
-    availables: [
+    availability: [
       { name: 'Pote 9', price: 12.99, qty: 12 },
       { name: 'Pote 15', price: 14.99, qty: 25 },
     ],

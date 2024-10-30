@@ -4,7 +4,7 @@ import { ResponseBuilder } from '../lib/helpers/response-builder'
 import { HttpStatus } from '../lib/enum/http-status.enum'
 import { ErrorKey } from '../lib/error/errors.enum'
 import { createCategoryBodySchema } from './validation-schemas'
-import { parseReq } from '@/app/api/lib/helpers/request-helper'
+import { parseReq } from '@/app/api/lib/helpers/request-parser'
 
 export async function POST(req: NextRequest) {
   const { body: json } = await parseReq(req)
@@ -39,7 +39,7 @@ export async function GET() {
     orderBy: {
       name: 'asc',
     },
-    include: { products: { include: { product: true } } },
+    include: { categoryProduct: { include: { product: true } } },
   })
   return NextResponse.json(categories)
 }
