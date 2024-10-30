@@ -7,7 +7,7 @@ import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
 import { parseReq } from '@/app/api/lib/helpers/request-parser'
 import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
 
-const deleteCategory = async (req: NextRequest, info) => {
+const deleteCategory = async (req: NextRequest, info: any) => {
   const { params: pathParams } = await parseReq(req, info)
   const validated = deleteCategoryParamSchema.safeParse(pathParams)
   if (!validated.success)

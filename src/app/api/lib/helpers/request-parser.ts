@@ -14,9 +14,7 @@ export const parseReq = async (req: NextRequest, info?): Promise<ParsedRequest> 
     qs: {},
   }
   // Body
-  try {
-    parsed.body = await req.json()
-  } catch (e) {}
+  parsed.body = await req.json().catch(() => {})
 
   // Params
   if (info) parsed.params = await info?.params
@@ -117,7 +115,7 @@ const toPrimitive = (value: string) => {
   try {
     const jsonParsed = JSON.parse(value)
     return jsonParsed
-  } catch (e) {
+  } catch {
     // Continue parsing if not valid JSON
   }
 
@@ -127,7 +125,7 @@ const toPrimitive = (value: string) => {
       const mapContent = value.slice(4, -1) // Remove "Map(" and ")"
       const parsedMap = new Map(JSON.parse(mapContent))
       return parsedMap
-    } catch (e) {
+    } catch {
       // If parsing fails, skip to return as string
     }
   } else if (value.startsWith('Set(') && value.endsWith(')')) {
@@ -135,7 +133,7 @@ const toPrimitive = (value: string) => {
       const setContent = value.slice(4, -1) // Remove "Set(" and ")"
       const parsedSet = new Set(JSON.parse(setContent))
       return parsedSet
-    } catch (e) {
+    } catch {
       // If parsing fails, skip to return as string
     }
   }

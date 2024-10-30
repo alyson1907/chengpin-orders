@@ -1,4 +1,4 @@
-import { Skeleton, Stack, Group } from '@mantine/core'
+import { Skeleton } from '@mantine/core'
 
 type IProps = {
   visible: boolean
