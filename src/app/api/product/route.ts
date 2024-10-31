@@ -14,12 +14,14 @@ import { Product } from '@prisma/client'
 import { PaginationDto } from '@/app/api/lib/types/common-response'
 
 const getCategoriesByName = async (categories: CreateProductBody['categories']) => {
-  const categoryNames = categories.map(({ name }) => name)
+  const categoryIds = categories.map(({ id }) => id)
   const existant = await prisma.category.findMany({
-    where: { name: { in: categoryNames } },
+    where: { id: { in: categoryIds } },
   })
   return {
-    notFoundCategories: categoryNames.filter((c) => !existant.some((e) => e.name.toLowerCase() === c.toLowerCase())),
+    notFoundCategories: categoryIds.filter(
+      (catId) => !existant.some((e) => e.id.toLowerCase() === catId.toLowerCase())
+    ),
     foundCategories: existant,
   }
 }

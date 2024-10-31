@@ -1,4 +1,4 @@
-import { Paper, Title, Image, Text, Skeleton, Group, Badge, Stack } from '@mantine/core'
+import { Paper, Title, Image, Text, Skeleton, Group, Badge, Stack, Box } from '@mantine/core'
 import styles from './ProductCard.module.css'
 import React, { useState } from 'react'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -23,20 +23,24 @@ export default function ProductCard({ product, onClick }: IProps) {
   return (
     <Skeleton visible={!isImgLoaded}>
       <Paper onClick={onClick} className={styles.paper} shadow="xl" p="md" m={0} w="100%" h="100%" withBorder>
-        <Image
-          src={product.coverImg}
-          w="100%"
-          h={{ base: 230, sm: 250, md: 250, lg: 300 }}
-          onLoad={() => setIsImgLoaded(true)}
-        />
-        <Stack justify="space-between">
-          <Group justify="space-between" mt="sm">
-            <Title order={5}>{product.name}</Title>
-            <Text size="md" fw={500}>
-              {BRL.format(lowestPrice)}
+        <Stack h="100%" justify="space-between">
+          <Box h="auto">
+            <Image
+              src={product.coverImg}
+              h={{ base: 230, sm: 250, md: 250, lg: 300 }}
+              onLoad={() => setIsImgLoaded(true)}
+              alt={product.name}
+            />
+            <Group justify="space-between" mt="sm">
+              <Title order={5}>{product.name}</Title>
+              <Text size="md" fw={500}>
+                {BRL.format(lowestPrice)}
+              </Text>
+            </Group>
+            <Text size="sm" mt="sm">
+              {product.description}
             </Text>
-          </Group>
-          <Text size="sm">{product.description}</Text>
+          </Box>
           <Group justify="flex-start" mt="sm">
             {renderAvailableBadges(product.availability)}
           </Group>

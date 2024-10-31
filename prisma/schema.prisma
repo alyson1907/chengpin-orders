@@ -10,6 +10,7 @@ datasource db {
 model Category {
   id              String            @id @default(auto()) @map("_id") @db.ObjectId
   name            String            @unique
+  visible         Boolean           @default(true)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime?         @updatedAt
   categoryProduct CategoryProduct[]
