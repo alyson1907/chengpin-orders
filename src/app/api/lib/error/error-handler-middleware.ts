@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { PrismaClientValidationError } from '@prisma/client/runtime/library'
 
-export const errorsMiddleware = (handler: (req: NextRequest, res: NextResponse) => Promise<any> | undefined) => {
-  return async (req: NextRequest, res: NextResponse) => {
+export const errorsMiddleware = (handler: (req: NextRequest, context: any) => Promise<any> | undefined) => {
+  return async (req: NextRequest, context: any) => {
     try {
-      const result = await handler(req, res)
+      const result = await handler(req, context)
       if (result instanceof NextResponse) return result
       return new ResponseBuilder().data(result).build()
     } catch (error) {

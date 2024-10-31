@@ -6,9 +6,13 @@ import { ErrorKey } from '@/app/api/lib/error/errors.enum'
 import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
 import { parseReq } from '@/app/api/lib/helpers/request-parser'
 import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
+import { RequestContext } from '@/app/api/lib/types/request-context'
 
-const deleteCategory = async (req: NextRequest, info: any) => {
-  const { params: pathParams } = await parseReq(req, info)
+const deleteCategory = async (req: NextRequest, context: RequestContext) => {
+  console.log(context)
+  console.log(context.constructor.name)
+
+  const { params: pathParams } = await parseReq(req, context)
   const validated = deleteCategoryParamSchema.safeParse(pathParams)
   if (!validated.success)
     return new ResponseBuilder()

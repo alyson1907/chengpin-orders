@@ -4,7 +4,6 @@ import ProductCard from './ProductCard'
 import { Category } from '@prisma/client'
 import useSWR from 'swr'
 import { useDisclosure } from '@mantine/hooks'
-import { useState } from 'react'
 import ProductDetails from './ProductDetails'
 import GridSkeleton from './GridSkeleton'
 
@@ -128,9 +127,11 @@ const products = [
 ]
 
 const fetcher = ([url, category]: [string, Category]) => {
-  // Logic to fetch all products from the received category
-  // return fetch(url, {}).then((res) => res.json())
-  return products
+  if (url)
+    if (category)
+      // Logic to fetch all products from the received category
+      // return fetch(url, {}).then((res) => res.json())
+      return products
 }
 
 type IProps = {
@@ -140,8 +141,11 @@ type IProps = {
 export default function ProductGrid({ productCategory }: IProps) {
   const { data: products = [], error, isLoading } = useSWR(['/api/product/:category', productCategory], fetcher)
   const [isProductModalOpen, { toggle: toggleProductModal, close: closeProductModal }] = useDisclosure()
-  const [productDetails, setProductDetails] = useState<any>(products[0])
+  // const [productDetails, setProductDetails] = useState<any>(products[0])
+  if (error) {
+  }
   if (isLoading) return <GridSkeleton visible={isLoading} />
+
   return (
     <>
       <ProductDetails isOpen={isProductModalOpen} onClose={closeProductModal} />

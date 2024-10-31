@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import * as _ from 'lodash'
+import { RequestContext } from '@/app/api/lib/types/request-context'
 
 type ParsedRequest = {
   body: any
@@ -7,7 +8,7 @@ type ParsedRequest = {
   qs: Record<string, any>
 }
 
-export const parseReq = async (req: NextRequest, info?): Promise<ParsedRequest> => {
+export const parseReq = async (req: NextRequest, context?: RequestContext): Promise<ParsedRequest> => {
   const parsed: ParsedRequest = {
     body: undefined,
     params: {},
@@ -17,7 +18,7 @@ export const parseReq = async (req: NextRequest, info?): Promise<ParsedRequest> 
   parsed.body = await req.json().catch(() => {})
 
   // Params
-  if (info) parsed.params = await info?.params
+  if (context) parsed.params = await context?.params
 
   // Querystrings
   for (const entry of req.nextUrl.searchParams.entries()) {
