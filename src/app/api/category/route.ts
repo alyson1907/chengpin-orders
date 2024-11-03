@@ -1,10 +1,12 @@
-import { NextResponse, NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
 import { ErrorKey } from '../lib/error/errors.enum'
 import { createCategoryBodySchema, updateCategoryBodySchema } from './validation-schemas'
 import { buildPrismaFilter, parseReq } from '@/app/api/lib/helpers/request-parser'
 import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
 import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-errors'
+import { PaginationDto } from '@/app/api/lib/types/common-response'
+import { Category } from '@prisma/client'
 
 const createCategories = async (req: NextRequest) => {
   const { body } = await parseReq(req)
@@ -22,14 +24,19 @@ const createCategories = async (req: NextRequest) => {
   return created
 }
 
-const getCategories = async (req: NextRequest) => {
+const getCategories = async (req: NextRequest): Promise<PaginationDto<Category>> => {
   const { qs } = await parseReq(req)
   const filter = buildPrismaFilter(qs)
+  const total = await prisma.category.count(filter)
   const categories = await prisma.category.findMany({
     ...filter,
     include: { categoryProduct: { include: { product: true } } },
   })
-  return NextResponse.json(categories)
+  return {
+    entries: categories,
+    total,
+    totalFiltered: categories.length,
+  }
 }
 
 const updateCategories = async (req: NextRequest) => {

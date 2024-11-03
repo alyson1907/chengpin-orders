@@ -1,10 +1,38 @@
 import { Button, createTheme } from '@mantine/core'
 
+/*Overriding light/dark color schemas
+@see https://stackoverflow.com/questions/78279141/how-to-change-body-bg-color-for-light-and-dark-mode-mantine-ui */
+
 const theme = createTheme({
   fontFamilyMonospace: 'Greycliff CF, Monaco, Courier, monospace',
-  headings: { fontFamily: 'Greycliff CF, sans-serif' },
-  primaryColor: 'blue',
+  headings: { fontFamily: 'Greycliff CF, sans-serif', textWrap: 'wrap' },
+  primaryColor: 'matcha',
+  // white: '#f0e9df',
   colors: {
+    matcha: [
+      '#edf9ec',
+      '#e1ece0',
+      '#c5d6c4',
+      '#a7bea5',
+      '#8eaa8b',
+      '#7d9d7a',
+      '#749770',
+      '#62845e',
+      '#557552',
+      '#466643',
+    ],
+    earth: [
+      '#fbf5ec',
+      '#f0e9df',
+      '#ded2be',
+      '#ccb99a',
+      '#bda47b',
+      '#b49667',
+      '#af905b',
+      '#9a7c4b',
+      '#896e40',
+      '#785e32',
+    ],
     transparent: [
       '#00000000',
       '#00000000',
@@ -45,9 +73,40 @@ const theme = createTheme({
   components: {
     Button: Button.extend({
       defaultProps: {
-        variant: 'outline',
+        variant: 'filled',
       },
     }),
+    // Paper: Paper.extend({
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // }),
+    // Divider: Divider.extend({
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // }),
+    // AppShell: {
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // },
+
+    // AppShellHeader: {
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // },
+    // AppShellMain: {
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // },
+    // AppShellFooter: {
+    //   defaultProps: {
+    //     bd: '1 solid var(--mantine-color-matcha-2)',
+    //   },
+    // },
   },
 })
 

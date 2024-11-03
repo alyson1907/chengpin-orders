@@ -3,40 +3,35 @@ import '@mantine/core/styles.css'
 import { AppShell } from '@mantine/core'
 import { Navbar } from './catalog/navbar/Navbar'
 import { useEffect, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
+import { useDisclosure, useHeadroom } from '@mantine/hooks'
 import ProductGrid from './catalog/product/ProductGrid'
 import Header from './catalog/header/Header'
-import { Category } from '@prisma/client'
 
 export default function App() {
   const [isBurgerOpen, { toggle, close }] = useDisclosure()
-  const [activeCategory, setActiveCategory] = useState<Category>({
-    id: '',
-    name: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  })
+  const pinned = useHeadroom({ fixedAt: 120 })
+  const [activeCategoryId, setActiveCategoryId] = useState('')
 
   useEffect(() => {
     close()
-  }, [activeCategory])
+  }, [activeCategoryId, close])
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 80, collapsed: !pinned, offset: true }}
       navbar={{ width: { sm: 200, md: 250 }, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
       padding={'md'}
     >
       <AppShell.Header>
-        <Header onBurgerClick={toggle} isBurgerOpen={isBurgerOpen} />
+        <Header onBurgerClick={toggle} isBurgerOpen={isBurgerOpen} showBurger={true} />
       </AppShell.Header>
 
       <AppShell.Navbar>
-        <Navbar activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+        <Navbar activeCategoryId={activeCategoryId} setActiveCategoryId={setActiveCategoryId} />
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <ProductGrid productCategory={activeCategory} />
+        <ProductGrid activeCategoryId={activeCategoryId} />
       </AppShell.Main>
     </AppShell>
   )

@@ -31,6 +31,7 @@
     "@tiptap/react": "^2.9.1",
     "@tiptap/starter-kit": "^2.9.1",
     "dayjs": "^1.11.13",
+    "embla-carousel-autoplay": "^7.1.0",
     "embla-carousel-react": "^7.1.0",
     "lodash": "^4.17.21",
     "next": "15.0.1",

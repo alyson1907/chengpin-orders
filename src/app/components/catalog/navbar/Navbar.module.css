@@ -1,5 +1,6 @@
 .navbar {
-  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+  background-color: var(--mantine-color-matcha-filled);
+  background-color: light-dark(lighten(var(--mantine-color-body)), var(--mantine-color-body));
 }
 
 .title {
@@ -11,15 +12,17 @@
 }
 
 .category {
-  display: block;
+  /* display: block; */
+  display: flex;
+  align-items: center;
   border-top-right-radius: var(--mantine-radius-md);
   border-top-left-radius: var(--mantine-radius-md);
   color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
   padding: 0 var(--mantine-spacing-md);
   font-size: var(--mantine-font-size-sm);
   margin-right: var(--mantine-spacing-md);
-  font-weight: 500;
-  height: rem(44px);
+  min-height: rem(44px);
+  max-height: rem(150);
   line-height: rem(44px);
 
   &:hover {
@@ -32,8 +35,8 @@
     &,
     &:hover {
       transition: 300ms;
-      border-left-color: var(--mantine-color-blue-filled);
-      background-color: var(--mantine-color-blue-filled);
+      border-left-color: var(--mantine-color-matcha-filled);
+      background-color: var(--mantine-color-matcha-filled);
       color: var(--mantine-color-white);
     }
   }

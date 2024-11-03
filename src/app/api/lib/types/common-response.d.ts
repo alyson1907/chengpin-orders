@@ -1,5 +1,5 @@
 export type PaginationDto<T> = {
-  entries: T
+  entries: T[]
   total: number
   totalFiltered: number
 }

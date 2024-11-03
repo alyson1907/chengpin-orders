@@ -1,34 +1,47 @@
-import { Dispatch } from 'react'
-import { Title, Skeleton, Stack, Anchor } from '@mantine/core'
+import { Dispatch, useEffect } from 'react'
+import { Title, Skeleton, Stack, Anchor, Text } from '@mantine/core'
 import styles from './Navbar.module.css'
 import useSWR from 'swr'
 import { notifications } from '@mantine/notifications'
 import { Category } from '@prisma/client'
 
 type IProps = {
-  activeCategory: Category
-  setActiveCategory: Dispatch<any>
+  activeCategoryId: string
+  setActiveCategoryId: Dispatch<string>
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) =>
+  fetch(`${url}?orderBy__asc=name`)
+    .then((res) => res.json())
+    .then((body) => body?.data?.entries)
 
-export function Navbar({ activeCategory, setActiveCategory }: IProps) {
-  const { data: categories = [], error, isLoading } = useSWR<Category[]>('/api/category', fetcher)
-  const navButtons = categories.map((category) => (
-    <Anchor
-      className={styles.category}
-      data-active={activeCategory.id === category.id || undefined}
-      href="#"
-      onClick={(event) => {
-        event.preventDefault()
-        setActiveCategory(category)
-      }}
-      key={category.name}
-    >
-      {category.name}
-    </Anchor>
-  ))
+const renderNavButtons = (data: any = [], activeCategoryId: string, setActiveCategoryId: Dispatch<string>) => {
+  const navButtons = data.map((category: Category & { categoryProduct: Array<any> }) => {
+    if (!category.visible || !category?.categoryProduct.length) return
+    return (
+      <Anchor
+        className={styles.category}
+        data-active={activeCategoryId === category.id || undefined}
+        onClick={(event) => {
+          event.preventDefault()
+          setActiveCategoryId(category.id)
+        }}
+        href="#"
+        key={category.name}
+      >
+        <Text fw={500}>{category.name}</Text>
+      </Anchor>
+    )
+  })
+  return navButtons
+}
+export function Navbar({ activeCategoryId, setActiveCategoryId }: IProps) {
+  const { data, error, isLoading } = useSWR('/api/category', fetcher)
 
+  useEffect(() => {
+    if (isLoading || activeCategoryId) return
+    setActiveCategoryId(data[0]?.id)
+  }, [data, setActiveCategoryId, isLoading])
   if (error) {
     notifications.show({
       title: 'Problema ao solicitar categorias',
@@ -42,7 +55,7 @@ export function Navbar({ activeCategory, setActiveCategory }: IProps) {
         <Title order={4} className={styles.title}>
           Catálogo
         </Title>
-        {navButtons}
+        {renderNavButtons(data, activeCategoryId, setActiveCategoryId)}
       </Stack>
     </Skeleton>
   )

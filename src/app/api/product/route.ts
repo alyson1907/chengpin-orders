@@ -61,16 +61,15 @@ const createProduct = async (req: NextRequest): Promise<Product> => {
   return created
 }
 
-const getProducts = async (req: NextRequest): Promise<PaginationDto<Product[]>> => {
+const getProducts = async (req: NextRequest): Promise<PaginationDto<Product>> => {
   const { qs } = await parseReq(req)
   const filter = buildPrismaFilter(qs)
   const total = await prisma.product.count()
-  const totalFiltered = await prisma.product.count(filter)
-  const products = await prisma.product.findMany(filter)
+  const products = await prisma.product.findMany({ ...filter, include: { availability: true } })
   return {
     entries: products,
     total,
-    totalFiltered,
+    totalFiltered: products.length,
   }
 }
 
