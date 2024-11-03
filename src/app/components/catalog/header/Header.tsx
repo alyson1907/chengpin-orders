@@ -2,8 +2,8 @@ import { Group, Burger, Image, useMantineColorScheme, Tooltip, Title, TitleOrder
 import { Parisienne } from 'next/font/google'
 import { IconMoonStars, IconPlant, IconSun } from '@tabler/icons-react'
 import ButtonSquareIcon from '../../ButtonSquareIcon'
-import { isScreenLarger, useBreakpoint } from '@/app/helpers/hooks'
-import { useMemo } from 'react'
+import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
+import { useRouter } from 'next/navigation'
 
 type IProps = {
   isBurgerOpen?: boolean
@@ -26,14 +26,19 @@ const resolveSizes = (breakpoint: number) => {
 export default function Header({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const isDark = colorScheme == 'dark'
-  const bp = useBreakpoint()
-  const sizes = useMemo(() => {
-    return resolveSizes(bp)
-  }, [bp])
+  const sizes = useResolveSizes(resolveSizes)
+  const router = useRouter()
   return (
     <Group flex={sizes.title} justify="space-between" h="100%" px="md">
       {showBurger && <Burger opened={isBurgerOpen} onClick={onBurgerClick} hiddenFrom="sm" size="sm" />}
-      <Image src={'/assets/img/company-logo.png'} h={sizes.logo.height} fit="contain" alt="header-logo" />
+      <Image
+        src={'/assets/img/company-logo.png'}
+        onClick={() => router.push('/')}
+        style={{ cursor: 'pointer' }}
+        h={sizes.logo.height}
+        fit="contain"
+        alt="header-logo"
+      />
 
       <Group>
         <Title order={sizes.title} className={headerFont.className} style={{ display: 'flex', alignItems: 'center' }}>

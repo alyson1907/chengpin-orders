@@ -20,7 +20,7 @@ export default function App() {
 
   return (
     <AppShell
-      header={{ height: 60, collapsed: !pinned, offset: true }}
+      header={{ height: 80, collapsed: !pinned, offset: true }}
       navbar={{ width: { sm: 200, md: 250 }, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
       padding={'md'}
     >
