@@ -13,11 +13,12 @@ import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-error
 import { Product } from '@prisma/client'
 import { PaginationDto } from '@/app/api/lib/types/common-response'
 
-const getCategoriesByName = async (categories: CreateProductBody['categories']) => {
+const fetchCategories = async (categories: CreateProductBody['categories']) => {
   const categoryIds = categories.map(({ id }) => id)
   const existant = await prisma.category.findMany({
     where: { id: { in: categoryIds } },
   })
+  console.log(existant)
   return {
     notFoundCategories: categoryIds.filter(
       (catId) => !existant.some((e) => e.id.toLowerCase() === catId.toLowerCase())
@@ -30,7 +31,7 @@ const createProduct = async (req: NextRequest): Promise<Product> => {
   const { body } = await parseReq(req)
   const data = createProductBodySchema.parse(body)
   const { availability, categories, ...product } = data
-  const { notFoundCategories, foundCategories } = await getCategoriesByName(categories)
+  const { notFoundCategories, foundCategories } = await fetchCategories(categories)
   if (notFoundCategories.length)
     throw new BadRequestError(ErrorKey.MISSING_ENTITIES, {
       notFoundCategories,

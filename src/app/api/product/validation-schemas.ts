@@ -1,5 +1,4 @@
 import { productAvailabilitySchema } from '@/app/api/availability/validation-schemas'
-import { categorySchema } from '@/app/api/category/validation-schemas'
 import { z } from 'zod'
 
 const productSchema = z.object({
@@ -11,7 +10,7 @@ const productSchema = z.object({
 
 export const createProductBodySchema = productSchema.extend({
   availability: z.array(productAvailabilitySchema),
-  categories: z.array(categorySchema.extend({ id: z.string().length(24) })),
+  categories: z.array(z.object({ id: z.string().length(24) })),
 })
 
 export const updateProductsBodySchema = z.object({

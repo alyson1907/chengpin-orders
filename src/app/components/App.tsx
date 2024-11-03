@@ -12,6 +12,7 @@ export default function App() {
   const [isBurgerOpen, { toggle, close }] = useDisclosure()
   const pinned = useHeadroom({ fixedAt: 120 })
   const [activeCategoryId, setActiveCategoryId] = useState('')
+  console.log(activeCategoryId)
 
   useEffect(() => {
     close()

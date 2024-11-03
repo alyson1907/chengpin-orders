@@ -39,7 +39,7 @@ export default function ProductCard({ productInfo, selectProduct }: IProps) {
             <DefaultLoadingOverlay visible={!isImgLoaded} />
             <Image
               src={productInfo.coverImg}
-              h={{ base: 230, sm: 250, md: 250, lg: 300 }}
+              h={{ base: 200, sm: 300, md: 275, lg: 300 }}
               onLoad={() => setIsImgLoaded(true)}
               alt={productInfo.name}
             />

@@ -3,6 +3,8 @@ import { Button, createTheme } from '@mantine/core'
 /*Overriding light/dark color schemas
 @see https://stackoverflow.com/questions/78279141/how-to-change-body-bg-color-for-light-and-dark-mode-mantine-ui */
 
+// https://mantine.dev/styles/css-variables/#css-variables-resolver
+
 const theme = createTheme({
   fontFamilyMonospace: 'Greycliff CF, Monaco, Courier, monospace',
   headings: { fontFamily: 'Greycliff CF, sans-serif', textWrap: 'wrap' },

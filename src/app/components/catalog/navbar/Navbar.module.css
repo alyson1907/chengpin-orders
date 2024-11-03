@@ -1,14 +1,14 @@
 .navbar {
-  background-color: var(--mantine-color-matcha-filled);
-  background-color: light-dark(lighten(var(--mantine-color-body)), var(--mantine-color-body));
+  background-color: light-dark(var(--mantine-color-body), var(--mantine-color-body));
 }
 
 .title {
-  background-color: var(--mantine-color-body);
+  display: flex;
+  flex: 1;
+  align-items: center;
+  background-color: light-dark(darken(var(--mantine-color-body), 7%), lighten(var(--mantine-color-body), 7%));
   padding: var(--mantine-spacing-md);
-  padding-top: rem(18px);
   height: rem(60px);
-  border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
 }
 
 .category {
