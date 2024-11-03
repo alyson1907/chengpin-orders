@@ -32,18 +32,16 @@ export default function ProductCard({ productInfo, selectProduct }: IProps) {
   }
 
   return (
-    <Paper onClick={handleCardClick} className={styles.paper} shadow="xl" p="md" m={0} w="100%" h="100%" withBorder>
+    <Paper onClick={handleCardClick} className={styles.paper} shadow="xl" p="sm" m={0} w="100%" h="100%" withBorder>
+      <DefaultLoadingOverlay visible={!isImgLoaded} />
       <Stack h="100%" justify="space-between">
         <Box h="auto">
-          <Container>
-            <DefaultLoadingOverlay visible={!isImgLoaded} />
-            <Image
-              src={productInfo.coverImg}
-              h={{ base: 200, sm: 300, md: 275, lg: 300 }}
-              onLoad={() => setIsImgLoaded(true)}
-              alt={productInfo.name}
-            />
-          </Container>
+          <Image
+            src={productInfo.coverImg}
+            h={{ base: 200, sm: 300, md: 275, lg: 300 }}
+            onLoad={() => setIsImgLoaded(true)}
+            alt={productInfo.name}
+          />
           <Group justify="space-between" mt="sm">
             <Title order={5}>{productInfo.name}</Title>
             <Text size="md" fw={500}>
