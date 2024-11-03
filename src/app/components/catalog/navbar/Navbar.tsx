@@ -1,5 +1,5 @@
 import { Dispatch, useEffect } from 'react'
-import { Title, Skeleton, Stack, Anchor, Text } from '@mantine/core'
+import { Title, Stack, Anchor, Text } from '@mantine/core'
 import styles from './Navbar.module.css'
 import useSWR from 'swr'
 import { notifications } from '@mantine/notifications'
@@ -41,7 +41,7 @@ export function Navbar({ activeCategoryId, setActiveCategoryId }: IProps) {
   useEffect(() => {
     if (isLoading || activeCategoryId) return
     setActiveCategoryId(data[0]?.id)
-  }, [data, setActiveCategoryId, isLoading])
+  }, [data, activeCategoryId, setActiveCategoryId, isLoading])
   if (error) {
     notifications.show({
       title: 'Problema ao solicitar categorias',
@@ -50,13 +50,11 @@ export function Navbar({ activeCategoryId, setActiveCategoryId }: IProps) {
   }
 
   return (
-    <Skeleton visible={isLoading} height="100%" mb="xl">
-      <Stack className={styles.navbar} h="100%" w="100%">
-        <Title order={4} className={styles.title}>
-          Catálogo
-        </Title>
-        {renderNavButtons(data, activeCategoryId, setActiveCategoryId)}
-      </Stack>
-    </Skeleton>
+    <Stack className={styles.navbar} h="100%" w="100%">
+      <Title order={4} className={styles.title}>
+        Catálogo
+      </Title>
+      {renderNavButtons(data, activeCategoryId, setActiveCategoryId)}
+    </Stack>
   )
 }

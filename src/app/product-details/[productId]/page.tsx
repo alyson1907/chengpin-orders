@@ -11,7 +11,6 @@ import {
   Title,
   Stack,
   Button,
-  Loader,
   Divider,
   AppShell,
   AspectRatio,
@@ -30,6 +29,7 @@ import React from 'react'
 import { notifications } from '@mantine/notifications'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({
@@ -107,6 +107,7 @@ export default function ProductDetailsPage() {
   const { productId } = useParams<{ productId: string }>()
 
   const { data: product, error, isLoading } = useSWR(['/api/product', productId], fetcher)
+  const [imagesLoaded, setImagesLoaded] = useState(0)
   const [selected, setSelected] = useState<ProductAvailability>({} as ProductAvailability)
   const [quantity, setQuantity] = useState(1)
 
@@ -116,7 +117,7 @@ export default function ProductDetailsPage() {
     console.log(selected)
   }, [selected, isLoading, setSelected, product?.availability])
 
-  if (isLoading) return <Loader />
+  if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
     notifications.show({
       title: 'Problema ao carregar detalhes do produto',
@@ -130,6 +131,7 @@ export default function ProductDetailsPage() {
         <Header />
       </AppShell.Header>
 
+      <DefaultLoadingOverlay visible={imagesLoaded < product.imgs.length} />
       <AppShell.Main>
         <Container size="lg" mt="lg">
           <Grid gutter="md">
@@ -149,7 +151,14 @@ export default function ProductDetailsPage() {
                 >
                   {product?.imgs.map((src, index) => (
                     <Carousel.Slide key={index}>
-                      <Image src={src} alt={`Product image ${index + 1}`} fit="cover" height="100%" radius="sm" />
+                      <Image
+                        src={src}
+                        alt={`Product image ${index + 1}`}
+                        fit="cover"
+                        height="100%"
+                        radius="sm"
+                        onLoad={() => setImagesLoaded(imagesLoaded + 1)}
+                      />
                     </Carousel.Slide>
                   ))}
                 </Carousel>

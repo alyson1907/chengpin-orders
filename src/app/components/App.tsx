@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useDisclosure, useHeadroom } from '@mantine/hooks'
 import ProductGrid from './catalog/product/ProductGrid'
 import Header from './catalog/header/Header'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 export default function App() {
   const [isBurgerOpen, { toggle, close }] = useDisclosure()
@@ -18,10 +19,11 @@ export default function App() {
 
   return (
     <AppShell
-      header={{ height: 80, collapsed: !pinned, offset: true }}
+      header={{ height: 60, collapsed: !pinned, offset: true }}
       navbar={{ width: { sm: 200, md: 250 }, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
       padding={'md'}
     >
+      {!activeCategoryId && <DefaultLoadingOverlay />}
       <AppShell.Header>
         <Header onBurgerClick={toggle} isBurgerOpen={isBurgerOpen} showBurger={true} />
       </AppShell.Header>

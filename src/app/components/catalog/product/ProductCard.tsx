@@ -1,8 +1,9 @@
-import { Paper, Title, Image, Text, Skeleton, Group, Badge, Stack, Box } from '@mantine/core'
+import { Paper, Title, Image, Text, Group, Badge, Stack, Box, Container } from '@mantine/core'
 import styles from './ProductCard.module.css'
 import React, { Dispatch, useState } from 'react'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Product, ProductAvailability } from '@prisma/client'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 type IProps = {
   productInfo: Product & { availability: ProductAvailability[] }
@@ -34,14 +35,15 @@ export default function ProductCard({ productInfo, selectProduct }: IProps) {
     <Paper onClick={handleCardClick} className={styles.paper} shadow="xl" p="md" m={0} w="100%" h="100%" withBorder>
       <Stack h="100%" justify="space-between">
         <Box h="auto">
-          <Skeleton visible={!isImgLoaded}>
+          <Container>
+            <DefaultLoadingOverlay visible={!isImgLoaded} />
             <Image
               src={productInfo.coverImg}
               h={{ base: 230, sm: 250, md: 250, lg: 300 }}
               onLoad={() => setIsImgLoaded(true)}
               alt={productInfo.name}
             />
-          </Skeleton>
+          </Container>
           <Group justify="space-between" mt="sm">
             <Title order={5}>{productInfo.name}</Title>
             <Text size="md" fw={500}>
