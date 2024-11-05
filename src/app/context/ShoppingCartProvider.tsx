@@ -54,7 +54,7 @@ const saveToLocalStorage = (cart: ShoppingCartType) =>
   window.localStorage.setItem('chengpin-shopping-cart', JSON.stringify(cart))
 
 const readFromLocalStorage = (): ShoppingCartType =>
-  JSON.parse(window.localStorage.getItem('chengpin-shopping-cart') || 'undefined') || emptyCart
+  JSON.parse(window.localStorage.getItem('chengpin-shopping-cart') || JSON.stringify(emptyCart)) || emptyCart
 
 const removeById = (arr: AvailabilityWithProduct[], availabilityId: string) => {
   return _.filter(arr, ({ id }) => id !== availabilityId)

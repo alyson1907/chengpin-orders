@@ -6,7 +6,7 @@
 @see https://stackoverflow.com/questions/78279141/how-to-change-body-bg-color-for-light-and-dark-mode-mantine-ui */
 
 :root[data-mantine-color-scheme='light'] {
-  --mantine-color-body: lighten(var(--mantine-color-earth-0), 50%) !important;
+  --mantine-color-body: lighten(var(--mantine-color-earth-1), 40%) !important;
 }
 
 /* :root[data-mantine-color-scheme='dark'] {

@@ -26,7 +26,6 @@ import { notFound, useParams } from 'next/navigation'
 import useSWR from 'swr'
 import { ProductAvailability } from '@prisma/client'
 import Header from '@/app/components/catalog/header/Header'
-import { useHeadroom } from '@mantine/hooks'
 import React from 'react'
 import { notifications } from '@mantine/notifications'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -132,7 +131,7 @@ const resolveSizes = (breakpoint: number) => {
 
 const ProductDetailsPage = () => {
   const autoplay = useRef(Autoplay({ delay: 5000 }))
-  const pinned = useHeadroom({ fixedAt: 0 })
+  // const pinned = useHeadroom({ fixedAt: 120 })
   const theme = useMantineTheme()
   const shoppingCart = useContext(ShoppingCartContext)
   const { colorScheme } = useMantineColorScheme()
@@ -226,7 +225,7 @@ const ProductDetailsPage = () => {
   if (!product) return notFound()
 
   return (
-    <AppShell header={{ height: 80, collapsed: !pinned, offset: true }} padding={'md'}>
+    <AppShell header={{ height: 60, collapsed: false, offset: true }} padding={'md'}>
       <DefaultLoadingOverlay visible={!firstImageLoaded} />
 
       <AppShell.Header>
