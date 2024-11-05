@@ -9,6 +9,7 @@ const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   if (!activeCategoryId) return []
   const qs = new URLSearchParams({
     ['categoryProduct.some.categoryId']: activeCategoryId,
+    ['availability.some.qty.gt']: '0',
   })
   return fetch(`${url}?${qs}`).then((res) => res.json())
 }

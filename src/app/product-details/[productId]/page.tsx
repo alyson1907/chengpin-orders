@@ -43,14 +43,13 @@ const fetcher = async ([url, productId]: [string, string]) => {
   return response?.data?.entries?.shift()
 }
 
-const renderStockBadge = (availability: ProductAvailability[] = []) => {
-  const totalQty = availability.reduce((acc, item) => (acc += item.qty), 0)
-  const isSelling = !!totalQty
+const renderStockBadge = (totalForSale = 0) => {
+  const isSelling = !!totalForSale
   return (
     <Group m="xs">
       <Badge color={isSelling ? 'matcha' : 'red'}>{isSelling ? 'Em Estoque' : 'Indisponível'}</Badge>
       <Text c="dimmed" size="sm">
-        {totalQty} à venda
+        {totalForSale} à venda
       </Text>
     </Group>
   )
@@ -89,6 +88,7 @@ const renderAvailabeSection = (
       <Group m="xs">
         {sorted.map((available, idx) => (
           <Button
+            disabled={available.qty <= 0}
             key={`Availability ${idx}`}
             onClick={() => setSelected(available)}
             radius="xl"
@@ -134,6 +134,7 @@ const ProductDetailsPage = () => {
   const autoplay = useRef(Autoplay({ delay: 5000 }))
   const pinned = useHeadroom({ fixedAt: 0 })
   const theme = useMantineTheme()
+  const shoppingCart = useContext(ShoppingCartContext)
   const { colorScheme } = useMantineColorScheme()
   const [currentSlide, setCurrentSlide] = useState(0)
   const { productId } = useParams<{ productId: string }>()
@@ -141,16 +142,17 @@ const ProductDetailsPage = () => {
 
   const { data: product, error, isLoading } = useSWR(['/api/product', productId], fetcher)
   const [firstImageLoaded, setImageLoaded] = useState(false)
+
   const [selected, setSelected] = useState<ProductAvailability>({} as ProductAvailability)
-  const [quantity, setQuantity] = useState(1)
+  const [buyingQty, setBuyingQty] = useState(1)
+  const [totalForSale, setTotalForSale] = useState(0)
   const [isQuantityError, setIsQuantityError] = useState(false)
-  const shoppingCart = useContext(ShoppingCartContext)
 
   const handleAddToCart = () => {
     const currentQty = shoppingCart.cart.items.find(({ id }) => id === selected.id)?.buyingQty || 0
-    const nextQty = currentQty + quantity
+    const nextQty = currentQty + buyingQty
     if (nextQty > selected.qty) return setIsQuantityError(true)
-    const added = shoppingCart.addItem(product, selected, quantity)
+    const added = shoppingCart.addItem(product, selected, buyingQty)
     notifications.show({
       title: `${product?.name} - ${selected.name} (x${added.buyingQty})`,
       message: 'Produto adicionado ao carrinho!',
@@ -164,9 +166,10 @@ const ProductDetailsPage = () => {
         <Popover width={420} position="top" withArrow shadow="md" opened={isQuantityError}>
           <Popover.Target>
             <CustomNumberInput
+              disabled={!totalForSale}
               error={isQuantityError}
-              value={quantity}
-              setValue={setQuantity}
+              value={buyingQty}
+              setValue={setBuyingQty}
               min={1}
               max={selected.qty}
               allowDecimal={false}
@@ -205,11 +208,13 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     if (selected.id || isLoading) return
     setSelected(product?.availability[0])
-  }, [selected, isLoading, setSelected, product])
+    const totalForSale = product?.availability.reduce((acc, item) => (acc += item.qty), 0)
+    setTotalForSale(totalForSale)
+  }, [product, isLoading, selected, setSelected])
 
   useEffect(() => {
     setIsQuantityError(false)
-  }, [selected, quantity])
+  }, [selected, buyingQty])
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
@@ -266,14 +271,13 @@ const ProductDetailsPage = () => {
             <Grid.Col span={sizes.grid.col2} style={{ textAlign: 'justify' }}>
               <Stack m="md">
                 <Title order={2}>{product.name}</Title>
-                {renderStockBadge(product?.availability)}
+                {renderStockBadge(totalForSale)}
                 <Text size="md" c="dimmed">
                   {product.description}
                 </Text>
                 <Divider />
                 {renderAvailabeSection(product?.availability, selected, setSelected)}
 
-                {/* Product Details */}
                 <Text
                   size="xl"
                   fw={700}
@@ -286,7 +290,13 @@ const ProductDetailsPage = () => {
                 {/* Quantity Selector and Buttons */}
                 <Stack>
                   {renderQuantitySelector()}
-                  <Button leftSection={<IconShoppingCart />} onClick={handleAddToCart} size="md" variant="filled">
+                  <Button
+                    leftSection={<IconShoppingCart />}
+                    disabled={!totalForSale}
+                    onClick={handleAddToCart}
+                    size="md"
+                    variant="filled"
+                  >
                     Adicionar ao Carrinho
                   </Button>
                   <Text c="dimmed" size="sm">
