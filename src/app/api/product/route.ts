@@ -18,7 +18,6 @@ const fetchCategories = async (categories: CreateProductBody['categories']) => {
   const existant = await prisma.category.findMany({
     where: { id: { in: categoryIds } },
   })
-  console.log(existant)
   return {
     notFoundCategories: categoryIds.filter(
       (catId) => !existant.some((e) => e.id.toLowerCase() === catId.toLowerCase())

@@ -7,8 +7,9 @@ import '@mantine/carousel/styles.css'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import theme from './theme'
+import ShoppingCartProvider from '@/app/context/ShoppingCartProvider'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -17,9 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <Notifications />
-          {children}
+          <ShoppingCartProvider>{children}</ShoppingCartProvider>
         </MantineProvider>
       </body>
     </html>
   )
 }
+
+export default RootLayout

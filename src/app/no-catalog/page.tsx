@@ -28,7 +28,6 @@ const openWhatsapp = () => {
 
 const NoCatalogPage = () => {
   const sizes = useResolveSizes(resolveSizes)
-  console.log(sizes)
   return (
     <AppShell>
       <AppShell.Main style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>

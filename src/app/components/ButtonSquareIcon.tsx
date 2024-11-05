@@ -7,10 +7,12 @@ type IProps = {
   styles?: ButtonProps
 }
 
-export default function ButtonSquareIcon({ onClick = () => {}, size = 40, icon, styles, ...props }: IProps) {
+const ButtonSquareIcon = ({ onClick = () => {}, size = 40, icon, styles, ...props }: IProps) => {
   return (
     <Button onClick={onClick} p={0} m={0} w={size} h={size} {...styles} {...props} variant="outline">
       {icon}
     </Button>
   )
 }
+
+export default ButtonSquareIcon

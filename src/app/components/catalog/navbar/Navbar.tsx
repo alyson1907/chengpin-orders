@@ -42,7 +42,7 @@ const renderNavButtons = (data: any = [], activeCategoryId: string, setActiveCat
   })
   return navButtons
 }
-export function Navbar({ activeCategoryId, setActiveCategoryId }: IProps) {
+export const Navbar = ({ activeCategoryId, setActiveCategoryId }: IProps) => {
   const { data, error, isLoading } = useSWR('/api/category', fetcher)
   const router = useRouter()
 

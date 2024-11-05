@@ -58,7 +58,7 @@ export const buildPrismaFilter = (qs: Record<string, any>) => {
   return groupFilterClauses(prismaFilter)
 }
 
-function assignNestedFilter(currentFilter: any, keyParts: string[], value: any) {
+const assignNestedFilter = (currentFilter: any, keyParts: string[], value: any) => {
   const splitKey = '__'
   const [field, operator] = keyParts[0].split(splitKey)
   const prismaOperators = [

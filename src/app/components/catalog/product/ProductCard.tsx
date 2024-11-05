@@ -1,4 +1,4 @@
-import { Paper, Title, Image, Text, Group, Badge, Stack, Box, Container } from '@mantine/core'
+import { Paper, Title, Image, Text, Group, Badge, Stack, Box } from '@mantine/core'
 import styles from './ProductCard.module.css'
 import React, { Dispatch, useState } from 'react'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -11,7 +11,7 @@ type IProps = {
 }
 
 const renderAvailableBadges = (availability) => {
-  return availability.map(({ name }, idx) => (
+  return availability.map(({ name }, idx: number) => (
     <Badge key={idx} visibleFrom="sm">
       {name}
     </Badge>
@@ -23,7 +23,7 @@ const truncateDescription = (text: string) => {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text
 }
 
-export default function ProductCard({ productInfo, selectProduct }: IProps) {
+const ProductCard = ({ productInfo, selectProduct }: IProps) => {
   const [isImgLoaded, setIsImgLoaded] = useState(false)
   const prices = productInfo.availability.map(({ price }) => price)
   const lowestPrice = Math.min(...prices)
@@ -59,3 +59,4 @@ export default function ProductCard({ productInfo, selectProduct }: IProps) {
     </Paper>
   )
 }
+export default ProductCard

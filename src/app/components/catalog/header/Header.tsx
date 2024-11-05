@@ -23,7 +23,7 @@ const resolveSizes = (breakpoint: number) => {
   return result
 }
 
-export default function Header({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) {
+const Header = ({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const isDark = colorScheme == 'dark'
   const sizes = useResolveSizes(resolveSizes)
@@ -59,3 +59,4 @@ export default function Header({ isBurgerOpen, onBurgerClick, showBurger = false
     </Group>
   )
 }
+export default Header

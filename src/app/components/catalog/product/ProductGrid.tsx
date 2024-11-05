@@ -17,7 +17,7 @@ type IProps = {
   activeCategoryId: string
 }
 
-export default function ProductGrid({ activeCategoryId }: IProps) {
+const ProductGrid = ({ activeCategoryId }: IProps) => {
   const { data: response, error } = useSWR(['/api/product', activeCategoryId], fetcher)
   const [selectedProductId, setSelectedProductId] = useState('')
   const router = useRouter()
@@ -41,3 +41,5 @@ export default function ProductGrid({ activeCategoryId }: IProps) {
     </SimpleGrid>
   )
 }
+
+export default ProductGrid

@@ -6,7 +6,7 @@ type IProps = {
   setValue: Dispatch<number>
 } & NumberInputProps
 
-function CustomNumberInput({ value, setValue, ...props }: IProps) {
+const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
   const handlersRef = useRef(null)
   return (
     <NumberInput

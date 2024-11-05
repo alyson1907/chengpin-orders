@@ -1,5 +1,5 @@
 'use client'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
 import {
   Container,
   Grid,
@@ -16,10 +16,12 @@ import {
   AspectRatio,
   useMantineTheme,
   useMantineColorScheme,
+  Popover,
+  Alert,
 } from '@mantine/core'
 import { Carousel } from '@mantine/carousel'
 import Autoplay from 'embla-carousel-autoplay'
-import { IconShoppingCart } from '@tabler/icons-react'
+import { IconExclamationCircle, IconShoppingCart } from '@tabler/icons-react'
 import { notFound, useParams } from 'next/navigation'
 import useSWR from 'swr'
 import { ProductAvailability } from '@prisma/client'
@@ -31,6 +33,7 @@ import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
+import { ShoppingCartContext } from '@/app/context/ShoppingCartProvider'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({
@@ -127,9 +130,9 @@ const resolveSizes = (breakpoint: number) => {
   }
 }
 
-export default function ProductDetailsPage() {
+const ProductDetailsPage = () => {
   const autoplay = useRef(Autoplay({ delay: 5000 }))
-  const pinned = useHeadroom({ fixedAt: 120 })
+  const pinned = useHeadroom({ fixedAt: 0 })
   const theme = useMantineTheme()
   const { colorScheme } = useMantineColorScheme()
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -140,11 +143,73 @@ export default function ProductDetailsPage() {
   const [firstImageLoaded, setImageLoaded] = useState(false)
   const [selected, setSelected] = useState<ProductAvailability>({} as ProductAvailability)
   const [quantity, setQuantity] = useState(1)
+  const [isQuantityError, setIsQuantityError] = useState(false)
+  const shoppingCart = useContext(ShoppingCartContext)
+
+  const handleAddToCart = () => {
+    const currentQty = shoppingCart.cart.items.find(({ id }) => id === selected.id)?.buyingQty || 0
+    const nextQty = currentQty + quantity
+    if (nextQty > selected.qty) return setIsQuantityError(true)
+    const added = shoppingCart.addItem(product, selected, quantity)
+    notifications.show({
+      title: `${product?.name} - ${selected.name} (x${added.buyingQty})`,
+      message: 'Produto adicionado ao carrinho!',
+    })
+  }
+
+  const renderQuantitySelector = () => {
+    return (
+      <Group>
+        <Text>Quantidade</Text>
+        <Popover width={420} position="top" withArrow shadow="md" opened={isQuantityError}>
+          <Popover.Target>
+            <CustomNumberInput
+              error={isQuantityError}
+              value={quantity}
+              setValue={setQuantity}
+              min={1}
+              max={selected.qty}
+              allowDecimal={false}
+              w={80}
+              styles={{
+                input: {
+                  textAlign: 'center',
+                  paddingRight: 0,
+                  paddingLeft: 0,
+                },
+              }}
+            />
+          </Popover.Target>
+          <Popover.Dropdown c="red" p={0} m={0}>
+            <Alert
+              m={0}
+              variant="transparent"
+              icon={<IconExclamationCircle />}
+              c="red"
+              styles={(theme) => ({
+                message: { color: colorScheme === 'dark' ? theme.colors.red[4] : theme.colors.red[7] },
+              })}
+            >
+              Quantidade no carrinho excede a quantidade disponível
+            </Alert>
+            {/* <Text size="sm">Quantidade no carrinho excede a quantidade disponível</Text> */}
+          </Popover.Dropdown>
+        </Popover>
+        <Text c="dimmed" size="sm">
+          {`+${selected.qty} disponíveis`}
+        </Text>
+      </Group>
+    )
+  }
 
   useEffect(() => {
     if (selected.id || isLoading) return
     setSelected(product?.availability[0])
   }, [selected, isLoading, setSelected, product])
+
+  useEffect(() => {
+    setIsQuantityError(false)
+  }, [selected, quantity])
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
@@ -217,32 +282,11 @@ export default function ProductDetailsPage() {
                 >
                   Preço: {BRL.format(selected.price || 0)}
                 </Text>
+
                 {/* Quantity Selector and Buttons */}
                 <Stack>
-                  <Group>
-                    <Text>Quantidade</Text>
-                    <CustomNumberInput
-                      value={quantity}
-                      setValue={setQuantity}
-                      min={1}
-                      max={selected.qty}
-                      step={1}
-                      stepHoldDelay={200}
-                      allowDecimal={false}
-                      w={80}
-                      styles={{
-                        input: {
-                          textAlign: 'center',
-                          paddingRight: 0,
-                          paddingLeft: 0,
-                        },
-                      }}
-                    />
-                    <Text c="dimmed" size="sm">
-                      {`+${selected.qty} disponíveis`}
-                    </Text>
-                  </Group>
-                  <Button leftSection={<IconShoppingCart />} size="md" mt="sm" variant="filled">
+                  {renderQuantitySelector()}
+                  <Button leftSection={<IconShoppingCart />} onClick={handleAddToCart} size="md" variant="filled">
                     Adicionar ao Carrinho
                   </Button>
                   <Text c="dimmed" size="sm">
@@ -257,3 +301,4 @@ export default function ProductDetailsPage() {
     </AppShell>
   )
 }
+export default ProductDetailsPage

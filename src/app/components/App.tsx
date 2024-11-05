@@ -8,11 +8,10 @@ import ProductGrid from './catalog/product/ProductGrid'
 import Header from './catalog/header/Header'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
-export default function App() {
+const App = () => {
   const [isBurgerOpen, { toggle, close }] = useDisclosure()
   const pinned = useHeadroom({ fixedAt: 120 })
   const [activeCategoryId, setActiveCategoryId] = useState('')
-  console.log(activeCategoryId)
 
   useEffect(() => {
     close()
@@ -39,3 +38,5 @@ export default function App() {
     </AppShell>
   )
 }
+
+export default App
