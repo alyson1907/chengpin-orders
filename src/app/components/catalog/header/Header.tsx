@@ -32,7 +32,7 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) => 
     <Group flex={sizes.title} justify="space-between" h="100%" px="md">
       {showBurger && <Burger opened={isBurgerOpen} onClick={onBurgerClick} hiddenFrom="sm" size="sm" />}
       <Image
-        src={'/assets/img/company-logo.png'}
+        src={'/assets/img/chengpin-logo.svg'}
         onClick={() => router.push('/')}
         style={{ cursor: 'pointer' }}
         h={sizes.logo.height}

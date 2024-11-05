@@ -32,7 +32,7 @@ const NoCatalogPage = () => {
     <AppShell>
       <AppShell.Main style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Stack align="center" ml="xl" mr="xl">
-          <Image src={'/assets/img/company-logo.png'} alt="not-found-logo" w={sizes.logo.w} fit="contain" />
+          <Image src={'/assets/img/chengpin-logo.svg'} alt="not-found-logo" w={sizes.logo.w} fit="contain" />
           <Title order={sizes.title}>Catálogo vazio ᕱ⑅ᕱ</Title>
           <Text>Que pena! Parece que nosso catálogo online está vazio...</Text>
           <Text>Mas não se preocupe! Vamos te atender logo abaixo: </Text>
