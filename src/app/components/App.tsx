@@ -4,16 +4,19 @@ import { useContext, useEffect } from 'react'
 import ProductGrid from './catalog/product/ProductGrid'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import { LayoutContext } from '@/app/context/LayoutContextProvider'
+import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 
 const App = () => {
   const {
     category,
     navbar: { open },
   } = useContext(LayoutContext)
+  const breakpoint = useBreakpoint()
+  const isMobile = isScreenSmaller(breakpoint, 'sm')
 
   useEffect(() => {
-    open()
-  }, [open])
+    if (!isMobile) open()
+  }, [open, isMobile])
 
   return (
     <>
