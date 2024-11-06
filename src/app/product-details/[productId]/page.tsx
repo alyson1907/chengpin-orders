@@ -12,7 +12,6 @@ import {
   Stack,
   Button,
   Divider,
-  AppShell,
   AspectRatio,
   useMantineTheme,
   useMantineColorScheme,
@@ -25,7 +24,6 @@ import { IconExclamationCircle, IconShoppingCart } from '@tabler/icons-react'
 import { notFound, useParams } from 'next/navigation'
 import useSWR from 'swr'
 import { ProductAvailability } from '@prisma/client'
-import Header from '@/app/components/catalog/header/Header'
 import React from 'react'
 import { notifications } from '@mantine/notifications'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -33,6 +31,7 @@ import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
 import { ShoppingCartContext } from '@/app/context/ShoppingCartProvider'
+import { LayoutContext } from '@/app/context/LayoutContextProvider'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({
@@ -130,15 +129,17 @@ const resolveSizes = (breakpoint: number) => {
 }
 
 const ProductDetailsPage = () => {
-  const autoplay = useRef(Autoplay({ delay: 5000 }))
-  // const pinned = useHeadroom({ fixedAt: 120 })
+  // Globals
   const theme = useMantineTheme()
   const shoppingCart = useContext(ShoppingCartContext)
+  const layoutContext = useContext(LayoutContext)
   const { colorScheme } = useMantineColorScheme()
+
+  const autoplay = useRef(Autoplay({ delay: 5000 }))
   const [currentSlide, setCurrentSlide] = useState(0)
   const { productId } = useParams<{ productId: string }>()
   const sizes = useResolveSizes(resolveSizes)
-
+  // Data
   const { data: product, error, isLoading } = useSWR(['/api/product', productId], fetcher)
   const [firstImageLoaded, setImageLoaded] = useState(false)
 
@@ -206,10 +207,11 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     if (selected.id || isLoading) return
+    layoutContext.navbar.close()
+    const totalForSale = product?.availability.reduce((acc: number, item: ProductAvailability) => (acc += item.qty), 0)
     setSelected(product?.availability[0])
-    const totalForSale = product?.availability.reduce((acc, item) => (acc += item.qty), 0)
     setTotalForSale(totalForSale)
-  }, [product, isLoading, selected, setSelected])
+  }, [layoutContext.navbar, product, isLoading, selected, setSelected])
 
   useEffect(() => {
     setIsQuantityError(false)
@@ -225,89 +227,75 @@ const ProductDetailsPage = () => {
   if (!product) return notFound()
 
   return (
-    <AppShell header={{ height: 60, collapsed: false, offset: true }} padding={'md'}>
+    <Container size="lg" mt="lg">
       <DefaultLoadingOverlay visible={!firstImageLoaded} />
+      <Grid gutter="md">
+        {/* Left Side: Image Carousel */}
+        <Grid.Col span={sizes.grid.col1}>
+          <Paper shadow="md" p="md">
+            <Carousel
+              onSlideChange={setCurrentSlide}
+              plugins={[autoplay.current]}
+              onMouseEnter={autoplay.current.stop}
+              onMouseLeave={autoplay.current.reset}
+              withIndicators
+              height={sizes.carousel.img}
+              slideSize="100%"
+              slideGap="md"
+              loop
+            >
+              {product?.imgs.map((src, index) => (
+                <Carousel.Slide key={index}>
+                  <Image
+                    src={src}
+                    alt={`Product image ${index + 1}`}
+                    fit="cover"
+                    height="100%"
+                    radius="sm"
+                    onLoad={() => index === 0 && setImageLoaded(true)}
+                  />
+                </Carousel.Slide>
+              ))}
+            </Carousel>
+            {renderThumbnails(product?.imgs, currentSlide, sizes)}
+          </Paper>
+        </Grid.Col>
 
-      <AppShell.Header>
-        <Header />
-      </AppShell.Header>
+        {/* Right Side: Product Info */}
+        <Grid.Col span={sizes.grid.col2} style={{ textAlign: 'justify' }}>
+          <Stack m="md">
+            <Title order={2}>{product.name}</Title>
+            {renderStockBadge(totalForSale)}
+            <Text size="md" c="dimmed">
+              {product.description}
+            </Text>
+            <Divider />
+            {renderAvailabeSection(product?.availability, selected, setSelected)}
 
-      <AppShell.Main>
-        <Container size="lg" mt="lg">
-          <Grid gutter="md">
-            {/* Left Side: Image Carousel */}
-            <Grid.Col span={sizes.grid.col1}>
-              <Paper shadow="md" p="md">
-                <Carousel
-                  onSlideChange={setCurrentSlide}
-                  plugins={[autoplay.current]}
-                  onMouseEnter={autoplay.current.stop}
-                  onMouseLeave={autoplay.current.reset}
-                  withIndicators
-                  height={sizes.carousel.img}
-                  slideSize="100%"
-                  slideGap="md"
-                  loop
-                >
-                  {product?.imgs.map((src, index) => (
-                    <Carousel.Slide key={index}>
-                      <Image
-                        src={src}
-                        alt={`Product image ${index + 1}`}
-                        fit="cover"
-                        height="100%"
-                        radius="sm"
-                        onLoad={() => index === 0 && setImageLoaded(true)}
-                      />
-                    </Carousel.Slide>
-                  ))}
-                </Carousel>
-                {renderThumbnails(product?.imgs, currentSlide, sizes)}
-              </Paper>
-            </Grid.Col>
+            <Text size="xl" fw={700} mt="md" c={colorScheme === 'dark' ? theme.colors.green[4] : theme.colors.green[9]}>
+              Preço: {BRL.format(selected.price || 0)}
+            </Text>
 
-            {/* Right Side: Product Info */}
-            <Grid.Col span={sizes.grid.col2} style={{ textAlign: 'justify' }}>
-              <Stack m="md">
-                <Title order={2}>{product.name}</Title>
-                {renderStockBadge(totalForSale)}
-                <Text size="md" c="dimmed">
-                  {product.description}
-                </Text>
-                <Divider />
-                {renderAvailabeSection(product?.availability, selected, setSelected)}
-
-                <Text
-                  size="xl"
-                  fw={700}
-                  mt="md"
-                  c={colorScheme === 'dark' ? theme.colors.green[4] : theme.colors.green[9]}
-                >
-                  Preço: {BRL.format(selected.price || 0)}
-                </Text>
-
-                {/* Quantity Selector and Buttons */}
-                <Stack>
-                  {renderQuantitySelector()}
-                  <Button
-                    leftSection={<IconShoppingCart />}
-                    disabled={!totalForSale}
-                    onClick={handleAddToCart}
-                    size="md"
-                    variant="filled"
-                  >
-                    Adicionar ao Carrinho
-                  </Button>
-                  <Text c="dimmed" size="sm">
-                    OBS: Após o pedido, entraremos em contato para confirmação do mesmo
-                  </Text>
-                </Stack>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Container>
-      </AppShell.Main>
-    </AppShell>
+            {/* Quantity Selector and Buttons */}
+            <Stack>
+              {renderQuantitySelector()}
+              <Button
+                leftSection={<IconShoppingCart />}
+                disabled={!totalForSale}
+                onClick={handleAddToCart}
+                size="md"
+                variant="filled"
+              >
+                Adicionar ao Carrinho
+              </Button>
+              <Text c="dimmed" size="sm">
+                OBS: Após o pedido, entraremos em contato para confirmação do mesmo
+              </Text>
+            </Stack>
+          </Stack>
+        </Grid.Col>
+      </Grid>
+    </Container>
   )
 }
 export default ProductDetailsPage

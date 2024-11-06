@@ -1,16 +1,12 @@
-import { Dispatch, useEffect } from 'react'
+import { Dispatch, useContext, useEffect } from 'react'
 import { Title, Stack, Anchor, Text, Group } from '@mantine/core'
 import styles from './Navbar.module.css'
 import useSWR from 'swr'
 import { notifications } from '@mantine/notifications'
 import { Category } from '@prisma/client'
 import { IconBook } from '@tabler/icons-react'
-import { useRouter } from 'next/navigation'
-
-type IProps = {
-  activeCategoryId: string
-  setActiveCategoryId: Dispatch<string>
-}
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutContext } from '@/app/context/LayoutContextProvider'
 
 const fetcher = (url: string) => {
   const qs = new URLSearchParams({
@@ -22,7 +18,13 @@ const fetcher = (url: string) => {
     .then((body) => body?.data?.entries)
 }
 
-const renderNavButtons = (data: any = [], activeCategoryId: string, setActiveCategoryId: Dispatch<string>) => {
+const renderNavButtons = (
+  currentUrl: string,
+  router,
+  data: any = [],
+  activeCategoryId: string,
+  setActiveCategoryId: Dispatch<string>
+) => {
   const navButtons = data.map((category: Category & { categoryProduct: Array<any> }) => {
     if (!category.visible || !category?.categoryProduct.length) return
     return (
@@ -32,6 +34,7 @@ const renderNavButtons = (data: any = [], activeCategoryId: string, setActiveCat
         onClick={(event) => {
           event.preventDefault()
           setActiveCategoryId(category.id)
+          if (currentUrl !== '/') router.push('/')
         }}
         href="#"
         key={category.name}
@@ -42,9 +45,13 @@ const renderNavButtons = (data: any = [], activeCategoryId: string, setActiveCat
   })
   return navButtons
 }
-export const Navbar = ({ activeCategoryId, setActiveCategoryId }: IProps) => {
+export const Navbar = () => {
   const { data, error, isLoading } = useSWR('/api/category', fetcher)
+  const {
+    category: { activeCategoryId, setActiveCategoryId },
+  } = useContext(LayoutContext)
   const router = useRouter()
+  const currentUrl = usePathname()
 
   useEffect(() => {
     if (isLoading || activeCategoryId) return
@@ -68,7 +75,7 @@ export const Navbar = ({ activeCategoryId, setActiveCategoryId }: IProps) => {
           Catálogo
         </Title>
       </Group>
-      {renderNavButtons(data, activeCategoryId, setActiveCategoryId)}
+      {renderNavButtons(currentUrl, router, data, activeCategoryId, setActiveCategoryId)}
     </Stack>
   )
 }

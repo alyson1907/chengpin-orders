@@ -2,8 +2,9 @@ import { SimpleGrid } from '@mantine/core'
 import ProductCard from './ProductCard'
 import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { notifications } from '@mantine/notifications'
+import { LayoutContext } from '@/app/context/LayoutContextProvider'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   if (!activeCategoryId) return []
@@ -14,12 +15,9 @@ const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   return fetch(`${url}?${qs}`).then((res) => res.json())
 }
 
-type IProps = {
-  activeCategoryId: string
-}
-
-const ProductGrid = ({ activeCategoryId }: IProps) => {
-  const { data: response, error } = useSWR(['/api/product', activeCategoryId], fetcher)
+const ProductGrid = () => {
+  const layoutContext = useContext(LayoutContext)
+  const { data: response, error } = useSWR(['/api/product', layoutContext.category.activeCategoryId], fetcher)
   const [selectedProductId, setSelectedProductId] = useState('')
   const router = useRouter()
   useMemo(() => response, [response])

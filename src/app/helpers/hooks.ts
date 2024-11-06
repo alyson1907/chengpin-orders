@@ -37,7 +37,9 @@ export const isScreenLarger = (current: number, bpName: 'base' | 'xs' | 'sm' | '
 export const isScreenSmaller = (current: number, bpName: 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'): boolean => {
   return !isScreenLarger(current, bpName)
 }
-
+/** Receives a callback function with rules to apply depending on screen size and applies returns the proper object
+ * @param fn function that receives the current `breakpoint` (`base, sm, md...`) , resolves it and returns a object for each case
+ */
 export const useResolveSizes = (fn: (current: number) => Record<string, any>) => {
   const bp = useBreakpoint()
   return useMemo(() => fn(bp), [bp, fn])

@@ -1,41 +1,25 @@
 'use client'
 import '@mantine/core/styles.css'
-import { AppShell } from '@mantine/core'
-import { Navbar } from './catalog/navbar/Navbar'
-import { useEffect, useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
+import { useContext, useEffect } from 'react'
 import ProductGrid from './catalog/product/ProductGrid'
-import Header from './catalog/header/Header'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import { LayoutContext } from '@/app/context/LayoutContextProvider'
 
 const App = () => {
-  const [isBurgerOpen, { toggle, close }] = useDisclosure()
-  // const pinned = useHeadroom({ fixedAt: 120 })
-  const [activeCategoryId, setActiveCategoryId] = useState('')
+  const {
+    category,
+    navbar: { open },
+  } = useContext(LayoutContext)
 
   useEffect(() => {
-    close()
-  }, [activeCategoryId, close])
+    open()
+  }, [open])
 
   return (
-    <AppShell
-      header={{ height: 60, collapsed: false, offset: true }}
-      navbar={{ width: { sm: 200, md: 250 }, breakpoint: 'sm', collapsed: { mobile: !isBurgerOpen } }}
-      padding={'md'}
-    >
-      {!activeCategoryId && <DefaultLoadingOverlay />}
-      <AppShell.Header>
-        <Header onBurgerClick={toggle} isBurgerOpen={isBurgerOpen} showBurger={true} />
-      </AppShell.Header>
-
-      <AppShell.Navbar>
-        <Navbar activeCategoryId={activeCategoryId} setActiveCategoryId={setActiveCategoryId} />
-      </AppShell.Navbar>
-
-      <AppShell.Main>
-        <ProductGrid activeCategoryId={activeCategoryId} />
-      </AppShell.Main>
-    </AppShell>
+    <>
+      {!category.activeCategoryId && <DefaultLoadingOverlay />}
+      <ProductGrid />
+    </>
   )
 }
 

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 type IProps = {
   isBurgerOpen?: boolean
   onBurgerClick?: () => void
-  showBurger?: boolean
+  showBurger: boolean
 }
 
 const headerFont = Parisienne({
@@ -23,14 +23,14 @@ const resolveSizes = (breakpoint: number) => {
   return result
 }
 
-const Header = ({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) => {
+const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true }: IProps) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const isDark = colorScheme == 'dark'
   const sizes = useResolveSizes(resolveSizes)
   const router = useRouter()
   return (
     <Group flex={sizes.title} justify="space-between" h="100%" px="md">
-      {showBurger && <Burger opened={isBurgerOpen} onClick={onBurgerClick} hiddenFrom="sm" size="sm" />}
+      {showBurger && <Burger opened={isBurgerOpen} onClick={onBurgerClick} size="sm" />}
       <Image
         src={'/assets/img/chengpin-logo.svg'}
         onClick={() => router.push('/')}
@@ -41,7 +41,7 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = false }: IProps) => 
       />
 
       <Group>
-        <Title order={sizes.title} className={headerFont.className} style={{ display: 'flex', alignItems: 'center' }}>
+        <Title order={sizes.title} style={{ ...headerFont.style, display: 'flex', alignItems: 'center' }}>
           Chengpin
           <IconPlant />
         </Title>
