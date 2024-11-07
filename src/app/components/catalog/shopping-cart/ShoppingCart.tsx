@@ -5,7 +5,7 @@ import {
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
-import { Drawer, Group, Image, Title, Text, Divider, Container, Stack } from '@mantine/core'
+import { Drawer, Group, Image, Title, Text, Divider, Stack } from '@mantine/core'
 import { IconShoppingBag, IconTrash } from '@tabler/icons-react'
 import { useContext } from 'react'
 
@@ -15,9 +15,9 @@ const renderCartItems = (items: AvailabilityWithProduct[]) =>
       <Divider />
       <Group
         key={idx}
-        styles={(theme) => ({
+        styles={{
           root: { display: 'flex', flexDirection: 'row' },
-        })}
+        }}
         mt={16}
         mb={16}
       >
