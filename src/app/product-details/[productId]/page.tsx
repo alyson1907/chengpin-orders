@@ -30,8 +30,8 @@ import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
-import { ShoppingCartContext } from '@/app/context/ShoppingCartProvider'
-import { LayoutContext } from '@/app/context/LayoutContextProvider'
+import { ShoppingCartContext } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({
@@ -163,7 +163,7 @@ const ProductDetailsPage = () => {
     return (
       <Group>
         <Text>Quantidade</Text>
-        <Popover width={420} position="top" withArrow shadow="md" opened={isQuantityError}>
+        <Popover width={'auto'} position="top" withArrow shadow="md" opened={isQuantityError}>
           <Popover.Target>
             <CustomNumberInput
               disabled={!totalForSale}
@@ -183,7 +183,7 @@ const ProductDetailsPage = () => {
               }}
             />
           </Popover.Target>
-          <Popover.Dropdown c="red" p={0} m={0}>
+          <Popover.Dropdown c="red" p={0} m={'sm'}>
             <Alert
               m={0}
               variant="transparent"

@@ -1,0 +1,21 @@
+.container {
+  width: 80px;
+  overflow: visible;
+}
+
+.badge {
+  color: var(--mantine-color-white);
+  background-color: light-dark(var(--mantine-color-red-6), var(--mantine-color-red-4));
+  font-weight: bold;
+  font-size: 14px;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 20px;
+  /* width: 22px; */
+  margin: 0px;
+  padding: 12px 8px;
+  z-index: 2;
+  cursor: pointer;
+  transition: 300ms;
+}

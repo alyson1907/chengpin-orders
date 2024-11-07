@@ -5,7 +5,7 @@ import _ from 'lodash'
 type PickedProduct = Pick<Product, 'id' | 'name' | 'coverImg'>
 type PickedAvailability = Pick<ProductAvailability, 'id' | 'name' | 'price'> & { buyingQty: number }
 
-type AvailabilityWithProduct = PickedAvailability & { productInfo: PickedProduct }
+export type AvailabilityWithProduct = PickedAvailability & { productInfo: PickedProduct }
 export type ShoppingCartType = {
   items: Array<AvailabilityWithProduct>
 }

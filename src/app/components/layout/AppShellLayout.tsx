@@ -1,7 +1,8 @@
 'use client'
 import Header from '@/app/components/catalog/header/Header'
 import { Navbar } from '@/app/components/catalog/navbar/Navbar'
-import { LayoutContext } from '@/app/context/LayoutContextProvider'
+import ShoppingCart from '@/app/components/catalog/shopping-cart/ShoppingCart'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 import { AppShell } from '@mantine/core'
 import { usePathname } from 'next/navigation'
@@ -25,7 +26,7 @@ const AppShellLayout = ({ children }) => {
 
   return (
     <AppShell
-      header={{ height: 60, collapsed: headerHidden, offset: true }}
+      header={{ height: { base: 60, sm: 60, md: 80 }, collapsed: headerHidden, offset: true }}
       navbar={{
         width: { sm: 200, md: 250 },
         breakpoint: 'sm',
@@ -33,6 +34,7 @@ const AppShellLayout = ({ children }) => {
       }}
       padding={'md'}
     >
+      <ShoppingCart></ShoppingCart>
       <AppShell.Header>
         <Header isBurgerOpen={isNavbarOpen} onBurgerClick={toggle} showBurger={showBurger} />
       </AppShell.Header>

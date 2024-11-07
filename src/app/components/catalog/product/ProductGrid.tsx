@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { notifications } from '@mantine/notifications'
-import { LayoutContext } from '@/app/context/LayoutContextProvider'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   if (!activeCategoryId) return []

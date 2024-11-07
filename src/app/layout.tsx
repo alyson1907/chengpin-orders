@@ -7,9 +7,9 @@ import '@mantine/carousel/styles.css'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import theme from './theme'
-import ShoppingCartProvider from '@/app/context/ShoppingCartProvider'
-import LayoutContextProvider from '@/app/context/LayoutContextProvider'
-import AppShellLayout from '@/app/components/AppShellLayout'
+import ShoppingCartProvider from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
+import LayoutContextProvider from '@/app/components/layout/LayoutContextProvider'
+import AppShellLayout from '@/app/components/layout/AppShellLayout'
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (

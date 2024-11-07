@@ -3,7 +3,7 @@ import '@mantine/core/styles.css'
 import { useContext, useEffect } from 'react'
 import ProductGrid from './catalog/product/ProductGrid'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
-import { LayoutContext } from '@/app/context/LayoutContextProvider'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 
 const App = () => {
