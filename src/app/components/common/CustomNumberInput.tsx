@@ -8,6 +8,31 @@ type IProps = {
 
 const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
   const handlersRef = useRef(null)
+
+  const minusBtn = () => (
+    <UnstyledButton
+      onClick={() => {
+        const handlers = handlersRef?.current as unknown as NumberInputHandlers
+        handlers.decrement()
+      }}
+      fw={500}
+    >
+      -
+    </UnstyledButton>
+  )
+
+  const plusBtn = () => (
+    <UnstyledButton
+      onClick={() => {
+        const handlers = handlersRef?.current as unknown as NumberInputHandlers
+        handlers.increment()
+      }}
+      fw={500}
+    >
+      +
+    </UnstyledButton>
+  )
+
   return (
     <NumberInput
       handlersRef={handlersRef}
@@ -17,28 +42,8 @@ const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
         const newValue = parseInt(val.toString()) || 0
         setValue(newValue)
       }}
-      leftSection={
-        <UnstyledButton
-          onClick={() => {
-            const handlers = handlersRef?.current as unknown as NumberInputHandlers
-            handlers.decrement()
-          }}
-          fw={500}
-        >
-          -
-        </UnstyledButton>
-      }
-      rightSection={
-        <UnstyledButton
-          onClick={() => {
-            const handlers = handlersRef?.current as unknown as NumberInputHandlers
-            handlers.increment()
-          }}
-          fw={500}
-        >
-          +
-        </UnstyledButton>
-      }
+      leftSection={minusBtn()}
+      rightSection={plusBtn()}
     />
   )
 }

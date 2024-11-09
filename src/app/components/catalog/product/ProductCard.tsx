@@ -12,7 +12,7 @@ type IProps = {
 
 const renderAvailableBadges = (availability) => {
   return availability.map(({ name }, idx: number) => (
-    <Badge key={idx} visibleFrom="sm" variant="outline" m={0} style={{ cursor: 'pointer' }}>
+    <Badge key={idx} size="sm" variant="outline" m={0} style={{ cursor: 'pointer' }}>
       {name}
     </Badge>
   ))
@@ -54,7 +54,7 @@ const ProductCard = ({ productInfo, selectProduct }: IProps) => {
                 </Text>
               )}
             </Stack>
-            <Group justify="center" mt="sm">
+            <Group justify="flex-start" mt="sm">
               {renderAvailableBadges(productInfo.availability)}
             </Group>
           </Container>

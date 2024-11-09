@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Product, ProductAvailability } from '@prisma/client'
 import React, { createContext, useEffect, useState } from 'react'
 import _ from 'lodash'
 
 type PickedProduct = Pick<Product, 'id' | 'name' | 'coverImg'>
-type PickedAvailability = Pick<ProductAvailability, 'id' | 'name' | 'price'> & { buyingQty: number }
+type PickedAvailability = Pick<ProductAvailability, 'id' | 'name' | 'price'> & { buyingQty: number; maxQty: number }
 
 export type AvailabilityWithProduct = PickedAvailability & { productInfo: PickedProduct }
 export type ShoppingCartType = {
@@ -16,13 +17,13 @@ const emptyCart: ShoppingCartType = {
 
 const defaultProvided = {
   cart: emptyCart,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   addItem: (product: Product, availability: ProductAvailability, addQty: number): AvailabilityWithProduct => {
     return {
       id: '',
       name: '',
       price: 0.0,
       buyingQty: 0,
+      maxQty: 0,
       productInfo: {
         id: '',
         name: '',
@@ -30,8 +31,8 @@ const defaultProvided = {
       },
     }
   },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   removeItem: (availability: ProductAvailability, removeQty: number) => {},
+  deleteItem: (id: string) => {},
 }
 
 const buildCartItem = (product: Product, availability: ProductAvailability): AvailabilityWithProduct => {
@@ -40,6 +41,7 @@ const buildCartItem = (product: Product, availability: ProductAvailability): Ava
     name: availability.name,
     price: availability.price,
     buyingQty: 0,
+    maxQty: availability.qty,
     productInfo: {
       id: product.id,
       name: product.name,
@@ -87,10 +89,17 @@ const ShoppingCartProvider = ({ children }) => {
     saveToLocalStorage(cart)
   }
 
+  const deleteItem = (id: string) => {
+    const newItems = removeById(cart.items, id)
+    setCart({ ...cart, items: newItems })
+    saveToLocalStorage(cart)
+  }
+
   const provided = {
     cart,
     addItem,
     removeItem,
+    deleteItem,
   }
 
   return <ShoppingCartContext.Provider value={provided}>{children}</ShoppingCartContext.Provider>
