@@ -6,8 +6,13 @@ import { Button, createTheme } from '@mantine/core'
 // https://mantine.dev/styles/css-variables/#css-variables-resolver
 
 const theme = createTheme({
-  fontFamilyMonospace: 'Greycliff CF, Monaco, Courier, monospace',
-  headings: { fontFamily: 'Greycliff CF, sans-serif', textWrap: 'wrap' },
+  fontFamily: '"Roboto", Monaco, Courier, monospace',
+  fontFamilyMonospace: '"Roboto", Monaco, Courier, monospace',
+  headings: {
+    fontFamily: '"Lexend Deca", sans-serif',
+    // sizes: { h4: { fontSize: rem(24) } },
+    textWrap: 'wrap',
+  },
   primaryColor: 'matcha',
   // white: '#f0e9df',
   colors: {

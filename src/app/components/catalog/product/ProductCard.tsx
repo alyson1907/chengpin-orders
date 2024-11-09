@@ -1,4 +1,4 @@
-import { Paper, Title, Image, Text, Group, Badge, Stack, Box } from '@mantine/core'
+import { Paper, Title, Image, Text, Group, Badge, Stack, Box, Container } from '@mantine/core'
 import styles from './ProductCard.module.css'
 import React, { Dispatch, useState } from 'react'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -12,7 +12,7 @@ type IProps = {
 
 const renderAvailableBadges = (availability) => {
   return availability.map(({ name }, idx: number) => (
-    <Badge key={idx} visibleFrom="sm">
+    <Badge key={idx} visibleFrom="sm" variant="outline" m={0} style={{ cursor: 'pointer' }}>
       {name}
     </Badge>
   ))
@@ -32,7 +32,7 @@ const ProductCard = ({ productInfo, selectProduct }: IProps) => {
   }
 
   return (
-    <Paper onClick={handleCardClick} className={styles.paper} shadow="xl" p="sm" m={0} w="100%" h="100%" withBorder>
+    <Paper onClick={handleCardClick} className={styles.paper} shadow="xl" p={0} m={0} w="100%" h="100%">
       <DefaultLoadingOverlay visible={!isImgLoaded} />
       <Stack h="100%" justify="space-between">
         <Box h="auto">
@@ -42,19 +42,23 @@ const ProductCard = ({ productInfo, selectProduct }: IProps) => {
             onLoad={() => setIsImgLoaded(true)}
             alt={productInfo.name}
           />
-          <Group justify="space-between" mt="sm">
-            <Title order={5}>{productInfo.name}</Title>
-            <Text size="md" fw={500}>
-              {BRL.format(lowestPrice)}
-            </Text>
-          </Group>
-          <Text size="sm" mt="sm">
-            {truncateDescription(String(productInfo.description))}
-          </Text>
+          <Container p="sm">
+            <Stack>
+              <Title order={5}>{productInfo.name}</Title>
+              <Text size="sm" fw={400}>
+                {BRL.format(lowestPrice)}
+              </Text>
+              {productInfo.description && (
+                <Text size="sm" c="dimmed">
+                  {truncateDescription(productInfo.description as string)}
+                </Text>
+              )}
+            </Stack>
+            <Group justify="center" mt="sm">
+              {renderAvailableBadges(productInfo.availability)}
+            </Group>
+          </Container>
         </Box>
-        <Group justify="flex-start" mt="sm">
-          {renderAvailableBadges(productInfo.availability)}
-        </Group>
       </Stack>
     </Paper>
   )

@@ -157,7 +157,7 @@ const ProductDetailsPage = () => {
       title: `${product?.name} - ${selected.name} (x${added.buyingQty})`,
       message: 'Produto adicionado ao carrinho!',
       icon: <IconCheck />,
-      position: 'top-right',
+      position: 'top-center',
     })
   }
 

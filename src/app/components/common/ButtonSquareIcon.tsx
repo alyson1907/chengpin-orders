@@ -1,5 +1,6 @@
 import { Button, ButtonProps } from '@mantine/core'
 import React, { PropsWithChildren } from 'react'
+import css from './ButtonSquareIcon.module.css'
 
 type IProps = {
   onClick?: () => void
@@ -11,7 +12,17 @@ type IProps = {
 
 const ButtonSquareIcon = ({ onClick = () => {}, size = 40, icon, styles, children, ...props }: IProps) => {
   return (
-    <Button onClick={onClick} p={0} m={0} w={size} h={size} {...styles} {...props} variant="outline">
+    <Button
+      onClick={onClick}
+      p={0}
+      m={0}
+      w={size}
+      h={size}
+      {...styles}
+      {...props}
+      className={css.container}
+      variant="subtle"
+    >
       {icon}
       {children}
     </Button>

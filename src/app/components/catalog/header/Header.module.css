@@ -1,3 +1,13 @@
 .header {
   background-color: darken(var(--mantine-color-body), 50%);
 }
+
+.shoppingCartIndicator {
+  cursor: pointer;
+  font-weight: bold;
+  &:hover {
+    transition: 300ms;
+    border-radius: 4px;
+    background-color: alpha(var(--mantine-color-matcha-7), 0.2);
+  }
+}

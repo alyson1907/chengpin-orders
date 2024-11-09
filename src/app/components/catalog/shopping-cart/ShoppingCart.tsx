@@ -14,7 +14,7 @@ const renderCartItems = (items: AvailabilityWithProduct[]) =>
     <>
       <Divider key={`Cart divider ${idx}`} />
       <Group
-        key={idx}
+        key={`Cart Group ${idx}`}
         styles={{
           root: { display: 'flex', flexDirection: 'row' },
         }}
@@ -75,7 +75,7 @@ const ShoppingCart = () => {
         },
       }}
     >
-      <Divider />
+      <Divider key={`First divider`} />
       {renderCartItems(cart.items)}
     </Drawer>
   )
