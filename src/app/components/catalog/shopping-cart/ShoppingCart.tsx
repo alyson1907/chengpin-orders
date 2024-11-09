@@ -12,7 +12,7 @@ import { useContext } from 'react'
 const renderCartItems = (items: AvailabilityWithProduct[]) =>
   items.map((item, idx) => (
     <>
-      <Divider />
+      <Divider key={`Cart divider ${idx}`} />
       <Group
         key={idx}
         styles={{

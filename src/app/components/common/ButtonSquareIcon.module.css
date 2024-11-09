@@ -1,9 +1,15 @@
-.container {
-  width: 80px;
+.container > * {
   overflow: visible;
+  background-color: aqua;
+}
+
+.container {
+  overflow: visible;
+  width: 80px;
 }
 
 .badge {
+  overflow: visible;
   color: var(--mantine-color-white);
   background-color: light-dark(var(--mantine-color-red-6), var(--mantine-color-red-4));
   font-weight: bold;
@@ -15,7 +21,7 @@
   /* width: 22px; */
   margin: 0px;
   padding: 12px 8px;
-  z-index: 2;
+  z-index: 3;
   cursor: pointer;
   transition: 300ms;
 }

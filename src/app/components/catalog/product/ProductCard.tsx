@@ -38,7 +38,7 @@ const ProductCard = ({ productInfo, selectProduct }: IProps) => {
         <Box h="auto">
           <Image
             src={productInfo.coverImg}
-            h={{ base: 200, sm: 300, md: 275, lg: 300 }}
+            h={{ base: 400, xs: 300, sm: 300, md: 275, lg: 300 }}
             onLoad={() => setIsImgLoaded(true)}
             alt={productInfo.name}
           />

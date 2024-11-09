@@ -12,7 +12,8 @@ import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 type IProps = {
   isBurgerOpen?: boolean
   onBurgerClick?: () => void
-  showBurger: boolean
+  showBurger?: boolean
+  showLogo?: boolean
 }
 
 const headerFont = Parisienne({
@@ -22,11 +23,14 @@ const headerFont = Parisienne({
 
 const resolveSizes = (breakpoint: number) => {
   const result = { title: 1 as TitleOrder, logo: { height: '100%' } }
-  if (!isScreenLarger(breakpoint, 'xs')) result.title = 2 as TitleOrder
+  if (!isScreenLarger(breakpoint, 'xs')) {
+    result.title = 3 as TitleOrder
+    result.logo.height = '80%'
+  }
   return result
 }
 
-const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true }: IProps) => {
+const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true, showLogo = true }: IProps) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const isDark = colorScheme == 'dark'
   const { cart } = useContext(ShoppingCartContext)
@@ -48,7 +52,7 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true }: IProps) => {
     return (
       <>
         <ButtonSquareIcon icon={<IconShoppingCart />} className={styles.container} onClick={layout.shoppingCart.toggle}>
-          {cart.items.length && <Badge className={styles.badge}>{cart.items.length}</Badge>}
+          {!!cart.items.length && <Badge className={styles.badge}>{cart.items.length}</Badge>}
         </ButtonSquareIcon>
       </>
     )
@@ -58,18 +62,20 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true }: IProps) => {
     <Group justify="space-between" h="100%" px="md">
       <Group h="100%">
         {showBurger && <Burger opened={isBurgerOpen} onClick={onBurgerClick} size="sm" />}
-        <Image
-          src={'/assets/img/chengpin-logo.svg'}
-          onClick={() => router.push('/')}
-          style={{ cursor: 'pointer' }}
-          h={sizes.logo.height}
-          fit="contain"
-          alt="header-logo"
-        />
+        {showLogo && (
+          <Image
+            src={'/assets/img/chengpin-logo.svg'}
+            onClick={() => router.push('/')}
+            style={{ cursor: 'pointer' }}
+            h={sizes.logo.height}
+            fit="contain"
+            alt="header-logo"
+          />
+        )}
       </Group>
 
       <Group>
-        <Title order={sizes.title} style={{ ...headerFont.style, display: 'flex', alignItems: 'center' }}>
+        <Title order={sizes.title} style={{ ...headerFont.style, display: 'flex', flex: 1, alignItems: 'center' }}>
           Chengpin
           <IconPlant />
         </Title>

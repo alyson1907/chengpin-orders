@@ -30,17 +30,17 @@ export const useBreakpoint = (): any => {
   return results.findIndex((value) => !value)
 }
 
-export const isScreenLarger = (current: number, bpName: 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'): boolean => {
-  return current > bp[bpName]
+export const isScreenLarger = (currentBp: number, bpName: 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'): boolean => {
+  return currentBp > bp[bpName]
 }
 
-export const isScreenSmaller = (current: number, bpName: 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'): boolean => {
-  return !isScreenLarger(current, bpName)
+export const isScreenSmaller = (currentBp: number, bpName: 'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'): boolean => {
+  return !isScreenLarger(currentBp, bpName)
 }
 /** Receives a callback function with rules to apply depending on screen size and applies returns the proper object
  * @param fn function that receives the current `breakpoint` (`base, sm, md...`) , resolves it and returns a object for each case
  */
-export const useResolveSizes = (fn: (current: number) => Record<string, any>) => {
+export const useResolveSizes = (fn: (currentBp: number) => Record<string, any>) => {
   const bp = useBreakpoint()
   return useMemo(() => fn(bp), [bp, fn])
 }

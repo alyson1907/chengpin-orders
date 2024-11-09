@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { notifications } from '@mantine/notifications'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { IconExclamationMark } from '@tabler/icons-react'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   if (!activeCategoryId) return []
@@ -30,10 +31,12 @@ const ProductGrid = () => {
     notifications.show({
       title: 'Problema ao carregar lista de produtos',
       message: 'Por favor, verifique a conexão',
+      icon: <IconExclamationMark />,
+      color: 'red',
     })
   }
   return (
-    <SimpleGrid cols={{ base: 2, sm: 2, md: 3, lg: 4 }}>
+    <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>
       {response?.data?.entries.map((product) => (
         <ProductCard key={product.id} productInfo={product} selectProduct={setSelectedProductId} />
       ))}

@@ -4,7 +4,7 @@ import styles from './Navbar.module.css'
 import useSWR from 'swr'
 import { notifications } from '@mantine/notifications'
 import { Category } from '@prisma/client'
-import { IconBook } from '@tabler/icons-react'
+import { IconBook, IconExclamationMark } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 
@@ -64,6 +64,8 @@ export const Navbar = () => {
     notifications.show({
       title: 'Problema ao solicitar categorias',
       message: 'Não foi possível coletar as informações de categorias de plantinha',
+      icon: <IconExclamationMark />,
+      color: 'red',
     })
   }
 

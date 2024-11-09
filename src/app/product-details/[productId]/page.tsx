@@ -20,7 +20,7 @@ import {
 } from '@mantine/core'
 import { Carousel } from '@mantine/carousel'
 import Autoplay from 'embla-carousel-autoplay'
-import { IconExclamationCircle, IconShoppingCart } from '@tabler/icons-react'
+import { IconCheck, IconExclamationCircle, IconExclamationMark, IconShoppingCart } from '@tabler/icons-react'
 import { notFound, useParams } from 'next/navigation'
 import useSWR from 'swr'
 import { ProductAvailability } from '@prisma/client'
@@ -156,6 +156,8 @@ const ProductDetailsPage = () => {
     notifications.show({
       title: `${product?.name} - ${selected.name} (x${added.buyingQty})`,
       message: 'Produto adicionado ao carrinho!',
+      icon: <IconCheck />,
+      position: 'top-right',
     })
   }
 
@@ -222,6 +224,8 @@ const ProductDetailsPage = () => {
     notifications.show({
       title: 'Problema ao carregar detalhes do produto',
       message: 'Por favor, verifique a conexão',
+      icon: <IconExclamationMark />,
+      color: 'red',
     })
   }
   if (!product) return notFound()
