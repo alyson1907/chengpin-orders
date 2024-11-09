@@ -1,8 +1,4 @@
-import {
-  AvailabilityWithProduct,
-  ShoppingCartContext,
-  ShoppingCartType,
-} from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
+import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
 import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
@@ -11,60 +7,6 @@ import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio } from '@mantine/core'
 import { IconShoppingBag, IconTrash } from '@tabler/icons-react'
 import { useContext } from 'react'
-
-const renderCartItems = (
-  items: AvailabilityWithProduct[],
-  sizes: Record<string, any>,
-  onTrashClick: (id: string) => void
-) =>
-  items.map((item, idx) => (
-    <>
-      <Divider key={`Cart divider ${idx}`} m={0} />
-      <Group key={`Cart container ${idx}`} h={sizes.item.container.h} mt={'xs'} mb={'xs'}>
-        <AspectRatio h="100%">
-          <Image
-            src={item.productInfo.coverImg}
-            alt={`Cart item ${item.productInfo.name}`}
-            h="100%"
-            w="70px"
-            bg={'blue'}
-          />
-        </AspectRatio>
-        <Stack flex={1} style={{ flexShrink: 1 }} h="100%">
-          <Group justify="space-between">
-            <Text fw={900} maw={'70%'} truncate>
-              {item.productInfo.name}
-            </Text>
-            <ButtonSquareIcon
-              icon={<IconTrash />}
-              onClick={() => onTrashClick(item.id)}
-              size={sizes.item.icon.trash}
-              styles={{ color: 'grey' }}
-            />
-          </Group>
-          <Group justify="space-between">
-            <Text fw={500} size="sm">
-              {item.name}
-            </Text>
-            <CustomNumberInput
-              fw={500}
-              w={65}
-              size="xs"
-              value={item.buyingQty}
-              setValue={(value: number) => {
-                console.log(value)
-              }}
-            />
-          </Group>
-          <Group justify="flex-end">
-            <Text fw={500} size="sm">
-              {BRL.format(item.price)}
-            </Text>
-          </Group>
-        </Stack>
-      </Group>
-    </>
-  ))
 
 const renderCartHeader = (sizes: Record<string, any>) => {
   return (
@@ -97,9 +39,63 @@ const calculateTotal = (cart: ShoppingCartType) => {
 }
 
 const ShoppingCart = () => {
-  const { cart, deleteItem } = useContext(ShoppingCartContext)
+  const { cart, deleteItem, setQty } = useContext(ShoppingCartContext)
   const { shoppingCart } = useContext(LayoutContext)
   const sizes = useResolveSizes(resolveSizes)
+
+  const renderCartItems = (onTrashClick: (id: string) => void) =>
+    cart.items.map((item, idx) => (
+      <>
+        <Divider key={`Cart divider ${idx}`} m={0} />
+        <Group key={`Cart container ${idx}`} h={sizes.item.container.h} mt={'md'} mb={'md'}>
+          <AspectRatio h="100%">
+            <Image
+              src={item.productInfo.coverImg}
+              alt={`Cart item ${item.productInfo.name}`}
+              h="100%"
+              w="70px"
+              bg={'blue'}
+            />
+          </AspectRatio>
+          <Stack flex={1} style={{ flexShrink: 1 }} h="100%">
+            <Group justify="space-between">
+              <Text fw={900} maw={'70%'} truncate>
+                {item.productInfo.name}
+              </Text>
+              <ButtonSquareIcon
+                icon={<IconTrash />}
+                onClick={() => onTrashClick(item.id)}
+                size={sizes.item.icon.trash}
+                styles={{ color: 'grey' }}
+              />
+            </Group>
+            <Group justify="space-between">
+              <Text fw={500} size="sm">
+                {item.name}
+              </Text>
+              <CustomNumberInput
+                fw={500}
+                w={80}
+                min={1}
+                max={item.qty}
+                allowDecimal={false}
+                isPlusMinusButtons={false}
+                size="sm"
+                value={item.buyingQty}
+                setValue={(value: number) => {
+                  setQty(item.id, value)
+                }}
+              />
+            </Group>
+            <Group justify="flex-end">
+              <Text fw={500} size="sm">
+                {BRL.format(item.price)}
+              </Text>
+            </Group>
+          </Stack>
+        </Group>
+      </>
+    ))
 
   return (
     <Drawer
@@ -119,7 +115,7 @@ const ShoppingCart = () => {
         },
       }}
     >
-      {renderCartItems(cart.items, sizes, deleteItem)}
+      {renderCartItems(deleteItem)}
       <Divider />
       <Group justify="space-between" mt={'xl'}>
         <Text size="xl">Total:</Text>

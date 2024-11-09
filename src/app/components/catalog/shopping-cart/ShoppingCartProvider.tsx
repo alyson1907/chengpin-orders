@@ -3,8 +3,10 @@ import { Product, ProductAvailability } from '@prisma/client'
 import React, { createContext, useEffect, useState } from 'react'
 import _ from 'lodash'
 
-type PickedProduct = Pick<Product, 'id' | 'name' | 'coverImg'>
-type PickedAvailability = Pick<ProductAvailability, 'id' | 'name' | 'price'> & { buyingQty: number; maxQty: number }
+export type PickedProduct = Pick<Product, 'id' | 'name' | 'coverImg'>
+export type PickedAvailability = Pick<ProductAvailability, 'id' | 'name' | 'price' | 'qty'> & {
+  buyingQty: number
+}
 
 export type AvailabilityWithProduct = PickedAvailability & { productInfo: PickedProduct }
 export type ShoppingCartType = {
@@ -17,13 +19,13 @@ const emptyCart: ShoppingCartType = {
 
 const defaultProvided = {
   cart: emptyCart,
-  addItem: (product: Product, availability: ProductAvailability, addQty: number): AvailabilityWithProduct => {
+  addItem: (product: PickedProduct, availability: PickedAvailability, addQty: number): AvailabilityWithProduct => {
     return {
       id: '',
       name: '',
       price: 0.0,
       buyingQty: 0,
-      maxQty: 0,
+      qty: 0,
       productInfo: {
         id: '',
         name: '',
@@ -31,17 +33,18 @@ const defaultProvided = {
       },
     }
   },
-  removeItem: (availability: ProductAvailability, removeQty: number) => {},
+  removeItem: (availability: PickedAvailability, removeQty: number) => {},
   deleteItem: (id: string) => {},
+  setQty: (id: string, newValue: number) => {},
 }
 
-const buildCartItem = (product: Product, availability: ProductAvailability): AvailabilityWithProduct => {
+const buildCartItem = (product: PickedProduct, availability: PickedAvailability): AvailabilityWithProduct => {
   return {
     id: availability.id,
     name: availability.name,
     price: availability.price,
     buyingQty: 0,
-    maxQty: availability.qty,
+    qty: availability.qty,
     productInfo: {
       id: product.id,
       name: product.name,
@@ -68,7 +71,7 @@ const ShoppingCartProvider = ({ children }) => {
     setCart(readFromLocalStorage())
   }, [])
 
-  const addItem = (product: Product, availability: ProductAvailability, addQty = 1) => {
+  const addItem = (product: PickedProduct, availability: PickedAvailability, addQty = 1) => {
     const found = cart.items?.find((item) => item.id === availability.id) || buildCartItem(product, availability)
     const item = { ...found }
     item.buyingQty += addQty
@@ -78,7 +81,7 @@ const ShoppingCartProvider = ({ children }) => {
     return item
   }
 
-  const removeItem = (availability: ProductAvailability, removeQty = 1) => {
+  const removeItem = (availability: PickedAvailability, removeQty = 1) => {
     const found = cart.items.find((item) => item.id === availability.id)
     if (!found) return
     const item = { ...found }
@@ -95,11 +98,21 @@ const ShoppingCartProvider = ({ children }) => {
     saveToLocalStorage(cart)
   }
 
+  const setQty = (id: string, newValue: number) => {
+    const found = cart.items.find((item) => item.id === id)
+    if (!found) return
+    found.buyingQty = newValue > 0 ? newValue : 1
+    const newItems = cart.items
+    setCart({ ...cart, items: newItems })
+    saveToLocalStorage(cart)
+  }
+
   const provided = {
     cart,
     addItem,
     removeItem,
     deleteItem,
+    setQty,
   }
 
   return <ShoppingCartContext.Provider value={provided}>{children}</ShoppingCartContext.Provider>

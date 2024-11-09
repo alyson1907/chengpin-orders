@@ -144,15 +144,15 @@ const ProductDetailsPage = () => {
   const [firstImageLoaded, setImageLoaded] = useState(false)
 
   const [selected, setSelected] = useState<ProductAvailability>({} as ProductAvailability)
-  const [buyingQty, setBuyingQty] = useState(1)
+  const [addQty, setAddQty] = useState(1)
   const [totalForSale, setTotalForSale] = useState(0)
   const [isQuantityError, setIsQuantityError] = useState(false)
 
   const handleAddToCart = () => {
     const currentQty = shoppingCart.cart.items.find(({ id }) => id === selected.id)?.buyingQty || 0
-    const nextQty = currentQty + buyingQty
+    const nextQty = currentQty + addQty
     if (nextQty > selected.qty) return setIsQuantityError(true)
-    const added = shoppingCart.addItem(product, selected, buyingQty)
+    const added = shoppingCart.addItem(product, { ...selected, buyingQty: currentQty }, addQty)
     notifications.show({
       title: `${product?.name} - ${selected.name} (x${added.buyingQty})`,
       message: 'Produto adicionado ao carrinho!',
@@ -170,8 +170,8 @@ const ProductDetailsPage = () => {
             <CustomNumberInput
               disabled={!totalForSale}
               error={isQuantityError}
-              value={buyingQty}
-              setValue={setBuyingQty}
+              value={addQty}
+              setValue={setAddQty}
               min={1}
               max={selected.qty}
               allowDecimal={false}
@@ -217,7 +217,7 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     setIsQuantityError(false)
-  }, [selected, buyingQty])
+  }, [selected, addQty])
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {

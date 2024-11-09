@@ -4,13 +4,15 @@ import { Dispatch, useRef } from 'react'
 type IProps = {
   value: number
   setValue: Dispatch<number>
+  isPlusMinusButtons?: boolean
 } & NumberInputProps
 
-const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
+const CustomNumberInput = ({ value, setValue, isPlusMinusButtons = true, ...props }: IProps) => {
   const handlersRef = useRef(null)
 
   const minusBtn = () => (
     <UnstyledButton
+      w={8}
       onClick={() => {
         const handlers = handlersRef?.current as unknown as NumberInputHandlers
         handlers.decrement()
@@ -23,6 +25,7 @@ const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
 
   const plusBtn = () => (
     <UnstyledButton
+      w={8}
       onClick={() => {
         const handlers = handlersRef?.current as unknown as NumberInputHandlers
         handlers.increment()
@@ -36,14 +39,17 @@ const CustomNumberInput = ({ value, setValue, ...props }: IProps) => {
   return (
     <NumberInput
       handlersRef={handlersRef}
+      stepHoldDelay={200}
+      stepHoldInterval={50}
+      styles={() => ({ input: { textAlign: 'center' } })}
       {...props}
       value={value}
       onChange={(val) => {
         const newValue = parseInt(val.toString()) || 0
         setValue(newValue)
       }}
-      leftSection={minusBtn()}
-      rightSection={plusBtn()}
+      leftSection={isPlusMinusButtons && minusBtn()}
+      rightSection={isPlusMinusButtons && plusBtn()}
     />
   )
 }
