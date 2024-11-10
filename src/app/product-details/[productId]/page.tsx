@@ -197,7 +197,6 @@ const ProductDetailsPage = () => {
             >
               Quantidade no carrinho excede a quantidade disponível
             </Alert>
-            {/* <Text size="sm">Quantidade no carrinho excede a quantidade disponível</Text> */}
           </Popover.Dropdown>
         </Popover>
         <Text c="dimmed" size="sm">
@@ -290,7 +289,7 @@ const ProductDetailsPage = () => {
                 size="md"
                 variant="filled"
               >
-                Adicionar ao Carrinho
+                Adicionar
               </Button>
               <Text c="dimmed" size="sm">
                 OBS: Após o pedido, entraremos em contato para confirmação do mesmo

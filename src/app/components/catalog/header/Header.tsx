@@ -2,7 +2,7 @@ import { Group, Burger, Image, useMantineColorScheme, Tooltip, Title, TitleOrder
 import { Parisienne } from 'next/font/google'
 import { IconMoonStars, IconPlant, IconShoppingCart, IconSun } from '@tabler/icons-react'
 import ButtonSquareIcon from '../../common/ButtonSquareIcon'
-import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
+import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
 import btnSquareStyles from '../../common/ButtonSquareIcon.module.css'
@@ -23,12 +23,14 @@ const headerFont = Parisienne({
 })
 
 const resolveSizes = (breakpoint: number) => {
-  const result = { title: 1 as TitleOrder, logo: { height: '100%' } }
-  if (!isScreenLarger(breakpoint, 'xs')) {
-    result.title = 3 as TitleOrder
-    result.logo.height = '80%'
+  const sizes = { title: { show: true, size: 1 as TitleOrder, iconSize: 22 }, logo: { height: '100%' } }
+  if (isScreenSmaller(breakpoint, 'xs')) {
+    sizes.title.show = false
+    sizes.title.size = 3 as TitleOrder
+    sizes.title.iconSize = 0
+    sizes.logo.height = '80%'
   }
-  return result
+  return sizes
 }
 
 const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true, showLogo = true }: IProps) => {
@@ -93,10 +95,15 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true, showLogo = tru
       </Group>
 
       <Group>
-        <Title order={sizes.title} style={{ ...headerFont.style, display: 'flex', flex: 1, alignItems: 'center' }}>
-          Chengpin
-          <IconPlant />
-        </Title>
+        {sizes.title.show && (
+          <Title
+            order={sizes.title.size}
+            style={{ ...headerFont.style, display: 'flex', flex: 1, alignItems: 'center' }}
+          >
+            Chengpin
+            <IconPlant size={sizes.title.iconSize} />
+          </Title>
+        )}
       </Group>
 
       <Group>

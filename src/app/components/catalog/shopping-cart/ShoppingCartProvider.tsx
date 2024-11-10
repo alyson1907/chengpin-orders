@@ -36,6 +36,7 @@ const defaultProvided = {
   removeItem: (availability: PickedAvailability, removeQty: number) => {},
   deleteItem: (id: string) => {},
   setQty: (id: string, newValue: number) => {},
+  clearCart: () => {},
 }
 
 const buildCartItem = (product: PickedProduct, availability: PickedAvailability): AvailabilityWithProduct => {
@@ -107,12 +108,17 @@ const ShoppingCartProvider = ({ children }) => {
     saveToLocalStorage(cart)
   }
 
+  const clearCart = () => {
+    setCart(emptyCart)
+  }
+
   const provided = {
     cart,
     addItem,
     removeItem,
     deleteItem,
     setQty,
+    clearCart,
   }
 
   return <ShoppingCartContext.Provider value={provided}>{children}</ShoppingCartContext.Provider>

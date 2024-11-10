@@ -2,10 +2,10 @@ import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/
 import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
 import CustomNumberInput from '@/app/components/common/CustomNumberInput'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
-import { useResolveSizes } from '@/app/helpers/hooks'
+import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
-import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio } from '@mantine/core'
-import { IconShoppingBag, IconTrash } from '@tabler/icons-react'
+import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio, Button } from '@mantine/core'
+import { IconShoppingBag, IconShoppingCartOff, IconTrash, IconTruck } from '@tabler/icons-react'
 import { useContext } from 'react'
 
 const renderCartHeader = (sizes: Record<string, any>) => {
@@ -19,10 +19,12 @@ const renderCartHeader = (sizes: Record<string, any>) => {
   )
 }
 
-const resolveSizes = () => {
+const resolveSizes = (currentBp: number) => {
   const sizes = {
     drawer: { title: { text: 'xl' }, icon: 24 },
     item: {
+      availabilityFontSize: 'sm',
+      qtyInputWidth: 80,
       container: {
         h: '100px',
       },
@@ -31,6 +33,13 @@ const resolveSizes = () => {
       },
     },
   }
+
+  if (isScreenSmaller(currentBp, 'xs')) {
+    sizes.item.icon.trash = 20
+    sizes.item.availabilityFontSize = 'xs'
+    sizes.item.qtyInputWidth = 60
+  }
+
   return sizes
 }
 
@@ -47,19 +56,13 @@ const ShoppingCart = () => {
     cart.items.map((item, idx) => (
       <>
         <Divider key={`Cart divider ${idx}`} m={0} />
-        <Group key={`Cart container ${idx}`} h={sizes.item.container.h} mt={'md'} mb={'md'}>
+        <Group key={`Cart container ${idx}`} h={sizes.item.container.h} mt={'xl'} mb={'xl'}>
           <AspectRatio h="100%">
-            <Image
-              src={item.productInfo.coverImg}
-              alt={`Cart item ${item.productInfo.name}`}
-              h="100%"
-              w="70px"
-              bg={'blue'}
-            />
+            <Image src={item.productInfo.coverImg} alt={`Cart item ${item.productInfo.name}`} h="100%" w="70px" />
           </AspectRatio>
           <Stack flex={1} style={{ flexShrink: 1 }} h="100%">
             <Group justify="space-between">
-              <Text fw={900} maw={'70%'} truncate>
+              <Text fw={900} maw="75%" lineClamp={1}>
                 {item.productInfo.name}
               </Text>
               <ButtonSquareIcon
@@ -70,12 +73,12 @@ const ShoppingCart = () => {
               />
             </Group>
             <Group justify="space-between">
-              <Text fw={500} size="sm">
+              <Text fw={500} size={sizes.item.availabilityFontSize}>
                 {item.name}
               </Text>
               <CustomNumberInput
                 fw={500}
-                w={80}
+                w={sizes.item.qtyInputWidth}
                 min={1}
                 max={item.qty}
                 allowDecimal={false}
@@ -97,8 +100,36 @@ const ShoppingCart = () => {
       </>
     ))
 
+  const renderEmptyCart = () => {
+    return (
+      <Stack h={'85%'} justify="center" align="center">
+        <IconShoppingCartOff width="100%" height={'10%'} color="grey" opacity={0.7} />
+        <Text c="grey">Seu carrinho ainda está vazio...</Text>
+      </Stack>
+    )
+  }
+
+  const renderCartContent = () => {
+    return (
+      <>
+        {renderCartItems(deleteItem)}
+        <Divider />
+        <Group justify="space-between" mt={'xl'}>
+          <Text size="md">Total:</Text>
+          <Text size="md">{BRL.format(calculateTotal(cart))}</Text>
+        </Group>
+        <Group mt={'sm'}>
+          <Button w="100%" onClick={() => {}} leftSection={<IconTruck />} size="md">
+            Finalizar pedido
+          </Button>
+        </Group>
+      </>
+    )
+  }
+
   return (
     <Drawer
+      key={'Shopping cart drawre container'}
       title={renderCartHeader(sizes)}
       position="right"
       opened={shoppingCart.isOpen}
@@ -113,14 +144,13 @@ const ShoppingCart = () => {
           width: '100%',
           alignItems: 'center',
         },
+        body: {
+          height: '100%',
+        },
       }}
     >
-      {renderCartItems(deleteItem)}
       <Divider />
-      <Group justify="space-between" mt={'xl'}>
-        <Text size="xl">Total:</Text>
-        <Text size="xl">{BRL.format(calculateTotal(cart))}</Text>
-      </Group>
+      {cart.items.length ? renderCartContent() : renderEmptyCart()}
     </Drawer>
   )
 }
