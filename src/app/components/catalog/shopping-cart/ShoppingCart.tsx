@@ -6,7 +6,13 @@ import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio, Button } from '@mantine/core'
 import { IconShoppingBag, IconShoppingCartOff, IconTrash, IconTruck } from '@tabler/icons-react'
+import { usePathname, useRouter } from 'next/navigation'
+import React from 'react'
 import { useContext } from 'react'
+
+type IProps = {
+  editable: boolean
+}
 
 const renderCartHeader = (sizes: Record<string, any>) => {
   return (
@@ -47,36 +53,44 @@ const calculateTotal = (cart: ShoppingCartType) => {
   return cart.items?.reduce((acc, item) => (acc += item.buyingQty * item.price), 0) || 0
 }
 
-const ShoppingCart = () => {
+const ShoppingCart = ({ editable = false }: IProps) => {
   const { cart, deleteItem, setQty } = useContext(ShoppingCartContext)
-  const { shoppingCart } = useContext(LayoutContext)
+  const { shoppingCart, navbar } = useContext(LayoutContext)
   const sizes = useResolveSizes(resolveSizes)
+  const router = useRouter()
+  const url = usePathname()
 
   const renderCartItems = (onTrashClick: (id: string) => void) =>
     cart.items.map((item, idx) => (
-      <>
+      <React.Fragment key={`render cart items fragment ${idx}`}>
         <Divider key={`Cart divider ${idx}`} m={0} />
         <Group key={`Cart container ${idx}`} h={sizes.item.container.h} mt={'xl'} mb={'xl'}>
+          {/* Product Image */}
           <AspectRatio h="100%">
             <Image src={item.productInfo.coverImg} alt={`Cart item ${item.productInfo.name}`} h="100%" w="70px" />
           </AspectRatio>
+          {/* Product Name */}
           <Stack flex={1} style={{ flexShrink: 1 }} h="100%">
             <Group justify="space-between">
               <Text fw={900} maw="75%" lineClamp={1}>
                 {item.productInfo.name}
               </Text>
-              <ButtonSquareIcon
-                icon={<IconTrash />}
-                onClick={() => onTrashClick(item.id)}
-                size={sizes.item.icon.trash}
-                styles={{ color: 'grey' }}
-              />
+              {editable && (
+                <ButtonSquareIcon
+                  icon={<IconTrash />}
+                  onClick={() => onTrashClick(item.id)}
+                  size={sizes.item.icon.trash}
+                  styles={{ color: 'grey' }}
+                />
+              )}
             </Group>
+            {/* Selected Info */}
             <Group justify="space-between">
               <Text fw={500} size={sizes.item.availabilityFontSize}>
                 {item.name}
               </Text>
               <CustomNumberInput
+                disabled={!editable}
                 fw={500}
                 w={sizes.item.qtyInputWidth}
                 min={1}
@@ -97,7 +111,7 @@ const ShoppingCart = () => {
             </Group>
           </Stack>
         </Group>
-      </>
+      </React.Fragment>
     ))
 
   const renderEmptyCart = () => {
@@ -111,7 +125,7 @@ const ShoppingCart = () => {
 
   const renderCartContent = () => {
     return (
-      <>
+      <React.Fragment key={'render cart content fragment'}>
         {renderCartItems(deleteItem)}
         <Divider />
         <Group justify="space-between" mt={'xl'}>
@@ -119,17 +133,26 @@ const ShoppingCart = () => {
           <Text size="md">{BRL.format(calculateTotal(cart))}</Text>
         </Group>
         <Group mt={'sm'}>
-          <Button w="100%" onClick={() => {}} leftSection={<IconTruck />} size="md">
+          <Button
+            w="100%"
+            onClick={() => {
+              shoppingCart.close()
+              navbar.close()
+              if (url !== '/checkout') router.push('/checkout')
+            }}
+            leftSection={<IconTruck />}
+            size="md"
+          >
             Finalizar pedido
           </Button>
         </Group>
-      </>
+      </React.Fragment>
     )
   }
 
   return (
     <Drawer
-      key={'Shopping cart drawre container'}
+      key={'Shopping cart drawer container'}
       title={renderCartHeader(sizes)}
       position="right"
       opened={shoppingCart.isOpen}
