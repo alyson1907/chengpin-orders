@@ -1,7 +1,7 @@
 'use client'
 import { Button, Group, Stack, Stepper } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 
 const isValid = (value: any, schema: z.Schema) => schema.safeParse(value).success
@@ -22,7 +22,7 @@ const CheckoutOrder = () => {
     },
   })
 
-  form.clearErrors()
+  useEffect(() => {}, [form])
 
   return (
     <Stack>
