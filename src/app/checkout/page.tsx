@@ -1,3 +1,4 @@
+'use client'
 import { Button, Group, Stack, Stepper } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useState } from 'react'
@@ -20,6 +21,8 @@ const CheckoutOrder = () => {
       email: (value) => (isValid(value, z.string().email()) ? null : 'Invalid email'),
     },
   })
+
+  form.clearErrors()
 
   return (
     <Stack>
