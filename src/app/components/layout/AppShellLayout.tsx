@@ -1,6 +1,7 @@
 'use client'
 import Header from '@/app/components/catalog/header/Header'
 import { Navbar } from '@/app/components/catalog/navbar/Navbar'
+import ShoppingCart from '@/app/components/catalog/shopping-cart/ShoppingCart'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 import { AppShell } from '@mantine/core'
@@ -23,6 +24,7 @@ const AppShellLayout = ({ children }) => {
     url.includes('/product-details') ||
     url === '/checkout'
   const headerHidden = url === '/not-found' || url === '/no-catalog'
+  const isCartEditable = !url.includes('/checkout')
 
   useEffect(() => {
     if (isMobile) close()
@@ -38,6 +40,7 @@ const AppShellLayout = ({ children }) => {
       }}
       padding={'md'}
     >
+      <ShoppingCart editable={isCartEditable} />
       <AppShell.Header>
         <Header isBurgerOpen={isNavbarOpen} onBurgerClick={toggle} showBurger={showBurger} />
       </AppShell.Header>

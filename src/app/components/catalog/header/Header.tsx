@@ -57,7 +57,7 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true, showLogo = tru
         icon={<IconShoppingCart />}
         className={btnSquareStyles.container}
         onClick={layout.shoppingCart.toggle}
-      ></ButtonSquareIcon>
+      />
     )
     if (cart.items.length)
       return (
@@ -74,7 +74,6 @@ const Header = ({ isBurgerOpen, onBurgerClick, showBurger = true, showLogo = tru
           {btn()}
         </Indicator>
       )
-
     return btn()
   }
 
