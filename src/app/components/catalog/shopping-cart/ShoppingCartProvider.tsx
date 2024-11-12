@@ -98,7 +98,7 @@ const ShoppingCartProvider = ({ children }) => {
 
   const deleteItem = (id: string) => {
     const newItems = removeById(cart.items, id)
-    setCart({ ...cart, items: newItems })
+    setCart({ items: newItems })
     saveToLocalStorage(cart)
   }
 
