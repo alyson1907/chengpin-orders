@@ -5,7 +5,7 @@ import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio, Button } from '@mantine/core'
-import { IconShoppingBag, IconShoppingCartOff, IconTrash, IconTruck } from '@tabler/icons-react'
+import { IconGhost, IconShoppingBag, IconTrash, IconTruck } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import { useContext } from 'react'
@@ -117,7 +117,7 @@ const ShoppingCart = ({ editable = false }: IProps) => {
   const renderEmptyCart = () => {
     return (
       <Stack h={'85%'} justify="center" align="center">
-        <IconShoppingCartOff width="100%" height={'10%'} color="grey" opacity={0.7} />
+        <IconGhost width="100%" height={'10%'} color="grey" opacity={0.7} />
         <Text c="grey">Seu carrinho ainda está vazio...</Text>
       </Stack>
     )
