@@ -60,7 +60,9 @@ const saveToLocalStorage = (cart: ShoppingCartType) =>
   window.localStorage.setItem('chengpin-shopping-cart', JSON.stringify(cart))
 
 const readFromLocalStorage = (): ShoppingCartType => {
-  const loaded = JSON.parse(window.localStorage.getItem('chengpin-shopping-cart') || 'undefined') as ShoppingCartType
+  const loaded = JSON.parse(
+    window.localStorage.getItem('chengpin-shopping-cart') || JSON.stringify(emptyCart)
+  ) as ShoppingCartType
   if (!loaded?.items?.length) return emptyCart
   return loaded
 }
@@ -80,8 +82,9 @@ const ShoppingCartProvider = ({ children }) => {
     const item = { ...found }
     item.buyingQty += addQty
     const newItems = [...removeById(cart.items, availability.id), item]
-    setCart({ ...cart, items: newItems })
-    saveToLocalStorage(cart)
+    const newCart = { ...cart, items: newItems }
+    setCart(newCart)
+    saveToLocalStorage(newCart)
     return item
   }
 
@@ -92,14 +95,18 @@ const ShoppingCartProvider = ({ children }) => {
     item.buyingQty -= removeQty
     const newItems = removeById(cart.items, availability.id)
     if (item.buyingQty > 0) newItems.push(item)
-    setCart({ ...cart, items: newItems })
-    saveToLocalStorage(cart)
+    const newCart = { ...cart, items: newItems }
+    setCart(newCart)
+    saveToLocalStorage(newCart)
   }
 
   const deleteItem = (id: string) => {
     const newItems = removeById(cart.items, id)
-    setCart({ items: newItems })
-    saveToLocalStorage(cart)
+    console.log(id, cart.items)
+    console.log(`{ ...cart, items: newItems }`, { ...cart, items: newItems })
+    const newCart = { ...cart, items: newItems }
+    setCart(newCart)
+    saveToLocalStorage(newCart)
   }
 
   const setQty = (id: string, newValue: number) => {
@@ -107,8 +114,9 @@ const ShoppingCartProvider = ({ children }) => {
     if (!found) return
     found.buyingQty = newValue > 0 ? newValue : 1
     const newItems = cart.items
-    setCart({ ...cart, items: newItems })
-    saveToLocalStorage(cart)
+    const newCart = { ...cart, items: newItems }
+    setCart(newCart)
+    saveToLocalStorage(newCart)
   }
 
   const clearCart = () => {
