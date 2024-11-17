@@ -1,4 +1,8 @@
-import { createProductAvailabilitySchema } from '@/app/api/availability/validation-schemas'
+import {
+  createProductAvailabilityBodySchema,
+  deleteProductAvailabilityBodySchema,
+  updateProductAvailabilityBodySchema,
+} from '@/app/api/availability/validation-schemas'
 import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
 import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
 import { NextRequest } from 'next/server'
@@ -10,7 +14,7 @@ import { Prisma } from '@prisma/client'
 
 const createAvailability = async (req: NextRequest) => {
   const { body } = await parseReq(req)
-  const { productId, ...availability } = createProductAvailabilitySchema.parse(body)
+  const { productId, ...availability } = createProductAvailabilityBodySchema.parse(body)
   const product = await prisma.product.findFirst({ where: { id: productId } })
   if (!product)
     throw new NotFoundError(ErrorKey.MISSING_ENTITIES, productId, 'No product found to relate the availability')
@@ -36,9 +40,39 @@ const getAvailability = async (req: NextRequest) => {
 }
 
 const updateAvailability = async (req: NextRequest) => {
-  console.log(req)
+  const { body } = await parseReq(req)
+  const { availabilities } = updateProductAvailabilityBodySchema.parse(body)
+  const found = await prisma.productAvailability.findMany({ where: { id: { in: availabilities.map(({ id }) => id) } } })
+  const notFound = availabilities.filter((a) => !found.map(({ id }) => id).includes(a.id))
+  if (notFound.length) throw new NotFoundError(ErrorKey.MISSING_ENTITIES, notFound)
+
+  const updated = await prisma.$transaction(async (trx) => {
+    const promises = availabilities.map((availability) =>
+      trx.productAvailability.update({
+        data: {
+          name: availability.name,
+          qty: availability.qty,
+          price: availability.price,
+        },
+        where: { id: availability.id },
+      })
+    )
+    const updated = await Promise.all(promises)
+    return updated
+  })
+  return updated
+}
+
+const deleteAvailability = async (req: NextRequest) => {
+  const { body } = await parseReq(req)
+  const { availabilities } = deleteProductAvailabilityBodySchema.parse(body)
+  const found = await prisma.productAvailability.findMany({ where: { id: { in: availabilities } } })
+  const notFound = availabilities.filter((deleteId) => !found.map(({ id }) => id).includes(deleteId))
+  if (notFound.length) throw new NotFoundError(ErrorKey.MISSING_ENTITIES, notFound)
+  return prisma.productAvailability.deleteMany({ where: { id: { in: availabilities } } })
 }
 
 export const POST = middlewares(createAvailability)
 export const GET = middlewaresWithoutAuth(getAvailability)
 export const PATCH = middlewares(updateAvailability)
+export const DELETE = middlewares(deleteAvailability)
