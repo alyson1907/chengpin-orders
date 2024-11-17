@@ -1,4 +1,4 @@
-import { ErrorKey } from '@/app/api/lib/error/errors.enum'
+import { ErrorKey } from '@/app/api/common/error/errors.enum'
 import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
 import {
@@ -7,11 +7,11 @@ import {
   deleteProductsBodySchema,
   updateProductsBodySchema,
 } from '@/app/api/product/validation-schemas'
-import { buildPrismaFilter, parseReq } from '@/app/api/lib/helpers/request-parser'
-import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
-import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-errors'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
+import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
 import { Product } from '@prisma/client'
-import { PaginationDto } from '@/app/api/lib/types/common-response'
+import { PaginationDto } from '@/app/api/common/types/common-response'
+import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
 
 const fetchCategories = async (categories: CreateProductBody['categories']) => {
   const categoryIds = categories.map(({ id }) => id)
@@ -108,7 +108,7 @@ const deleteProducts = async (req: NextRequest): Promise<Product[]> => {
   return deleted
 }
 
-export const POST = errorsMiddleware(createProduct)
-export const GET = errorsMiddleware(getProducts)
-export const PATCH = errorsMiddleware(updateProducts)
-export const DELETE = errorsMiddleware(deleteProducts)
+export const POST = middlewares(createProduct)
+export const GET = middlewaresWithoutAuth(getProducts)
+export const PATCH = middlewares(updateProducts)
+export const DELETE = middlewares(deleteProducts)

@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
-import { ErrorKey } from '../lib/error/errors.enum'
+import { ErrorKey } from '../common/error/errors.enum'
 import { createCategoryBodySchema, updateCategoryBodySchema } from './validation-schemas'
-import { buildPrismaFilter, parseReq } from '@/app/api/lib/helpers/request-parser'
-import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
-import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-errors'
-import { PaginationDto } from '@/app/api/lib/types/common-response'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
+import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
+import { PaginationDto } from '@/app/api/common/types/common-response'
 import { Category } from '@prisma/client'
+import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
 
 const createCategories = async (req: NextRequest) => {
   const { body } = await parseReq(req)
@@ -58,6 +58,6 @@ const updateCategories = async (req: NextRequest) => {
   return Promise.all(promises)
 }
 
-export const POST = errorsMiddleware(createCategories)
-export const GET = errorsMiddleware(getCategories)
-export const PATCH = errorsMiddleware(updateCategories)
+export const POST = middlewares(createCategories)
+export const GET = middlewaresWithoutAuth(getCategories)
+export const PATCH = middlewares(updateCategories)

@@ -108,7 +108,7 @@ const CheckoutPage = () => {
     },
 
     validate: {
-      buyerKey: (value) => isNotValid(value, z.string().regex(/\d/g).min(4)) && 'A chave deve ser maior que 4 dígitos',
+      buyerKey: (value) => isNotValid(value, z.string().regex(/\d/g).max(6)) && 'A chave deve ser menor que 6 dígitos',
       firstName: (value) => isNotValid(value, z.string().min(1)) && 'Primeiro nome não pode ser vazio',
       lastName: (value) => isNotValid(value, z.string().min(1)) && 'Sobrenome não pode ser vazio',
       phone: (value) =>

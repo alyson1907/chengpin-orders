@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
     "start": "next start",
+    "build": "prisma generate && next build",
     "prisma:sync": "prisma db push",
+    "prisma:seed": "prisma db seed",
     "postinstall": "prisma generate",
     "lint": "next lint"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@mantine/carousel": "^7.13.4",
@@ -30,9 +34,12 @@
     "@tiptap/pm": "^2.9.1",
     "@tiptap/react": "^2.9.1",
     "@tiptap/starter-kit": "^2.9.1",
+    "bcrypt": "^5.1.1",
+    "continuation-local-storage": "^3.2.1",
     "dayjs": "^1.11.13",
     "embla-carousel-autoplay": "^7.1.0",
     "embla-carousel-react": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
@@ -40,9 +47,13 @@
     "react-imask": "^7.6.1",
     "recharts": "2",
     "swr": "^2.2.5",
+    "tsx": "^4.19.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/continuation-local-storage": "^3.2.7",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/lodash": "^4.17.12",
     "@types/node": "^20",
     "@types/react": "^18",

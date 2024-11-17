@@ -1,19 +1,22 @@
-import { ErrorKey } from '@/app/api/lib/error/errors.enum'
-import { HttpStatus } from '@/app/api/lib/enum/http-status.enum'
-import { BadRequestError, NotFoundError } from '@/app/api/lib/error/common-errors'
-import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
+import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
+import { BadRequestError, NotFoundError, UnauthorizedError } from '@/app/api/common/error/common-errors'
+import { ResponseBuilder } from '@/app/api/common/helpers/response-builder'
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { PrismaClientValidationError } from '@prisma/client/runtime/library'
+import { JsonWebTokenError } from 'jsonwebtoken'
 
-export const errorsMiddleware = (handler: (req: NextRequest, context: any) => Promise<any> | undefined) => {
+type ReqHandlerResponse = Promise<any> | NextResponse | undefined
+type Middleware = (req: NextRequest, context: any) => Promise<any>
+
+export const errorsMiddleware = (handler: (req: NextRequest, context: any) => ReqHandlerResponse | Middleware) => {
   return async (req: NextRequest, context: any) => {
     try {
       const result = await handler(req, context)
       if (result instanceof NextResponse) return result
       return new ResponseBuilder().data(result).build()
     } catch (error) {
-      console.error(error)
       return handleErrors(error)
     }
   }
@@ -36,6 +39,17 @@ const handleErrors = (error: any) => {
       .message(error?.message)
       .data(error?.data)
       .build()
+
+  if (error instanceof UnauthorizedError)
+    return new ResponseBuilder().status(HttpStatus.UNAUTHORIZED).errorKey(error.errorKey).message(error.message).build()
+
+  if (error instanceof JsonWebTokenError)
+    return new ResponseBuilder()
+      .status(HttpStatus.UNAUTHORIZED)
+      .errorKey(ErrorKey.AUTH_INVALID_TOKEN)
+      .message(error.message)
+      .build()
+
   if (error instanceof PrismaClientValidationError)
     return new ResponseBuilder()
       .status(HttpStatus.BAD_REQUEST)

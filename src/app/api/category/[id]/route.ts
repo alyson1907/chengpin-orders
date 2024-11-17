@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server'
-import { HttpStatus } from '@/app/api/lib/enum/http-status.enum'
+import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
 import prisma from '../../../../../prisma/prisma'
 import { deleteCategoryParamSchema } from '@/app/api/category/validation-schemas'
-import { ErrorKey } from '@/app/api/lib/error/errors.enum'
-import { ResponseBuilder } from '@/app/api/lib/helpers/response-builder'
-import { parseReq } from '@/app/api/lib/helpers/request-parser'
-import { errorsMiddleware } from '@/app/api/lib/error/error-handler-middleware'
-import { RequestContext } from '@/app/api/lib/types/request-context'
+import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { ResponseBuilder } from '@/app/api/common/helpers/response-builder'
+import { parseReq } from '@/app/api/common/helpers/request-parser'
+import { RequestContext } from '@/app/api/common/types/request-context'
+import { middlewares } from '@/app/api/common/apply-middlewares'
 
 const deleteCategory = async (req: NextRequest, context: RequestContext) => {
   const { params: pathParams } = await parseReq(req, context)
@@ -25,4 +25,4 @@ const deleteCategory = async (req: NextRequest, context: RequestContext) => {
   return new ResponseBuilder().data(deleted).build()
 }
 
-export const DELETE = errorsMiddleware(deleteCategory)
+export const DELETE = middlewares(deleteCategory)

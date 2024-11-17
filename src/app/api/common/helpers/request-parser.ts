@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import * as _ from 'lodash'
-import { RequestContext } from '@/app/api/lib/types/request-context'
+import { RequestContext } from '@/app/api/common/types/request-context'
 
 type ParsedRequest = {
   body: any
