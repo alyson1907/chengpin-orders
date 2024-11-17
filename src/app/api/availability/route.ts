@@ -35,7 +35,9 @@ const getAvailability = async (req: NextRequest) => {
   return paginationDto
 }
 
-const updateAvailability = async (req: NextRequest) => {}
+const updateAvailability = async (req: NextRequest) => {
+  console.log(req)
+}
 
 export const POST = middlewares(createAvailability)
 export const GET = middlewaresWithoutAuth(getAvailability)
