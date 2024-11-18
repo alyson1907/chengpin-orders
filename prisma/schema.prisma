@@ -72,12 +72,37 @@ model CategoryProduct {
 model ProductAvailability {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  productId String?   @db.ObjectId
+  productId String    @db.ObjectId
   price     Float
-  qty       Float
-  product   Product?  @relation(fields: [productId], references: [id])
+  qty       Int
+  product   Product   @relation(fields: [productId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   @@unique([productId, name])
+}
+
+model Order {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  customerKey   String
+  customerName  String
+  customerPhone String
+  status        String       @default("DRAFT")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?    @updatedAt
+  orderItems    OrderItems[]
+}
+
+model OrderItems {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId        String    @db.ObjectId
+  availabilityId   String    @db.ObjectId
+  orderId          String    @db.ObjectId
+  order            Order     @relation(fields: [orderId], references: [id])
+  productName      String?
+  availabilityName String
+  qty              Int
+  price            Float
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
 }
