@@ -14,14 +14,14 @@ const ButtonSquareIcon = ({ onClick = () => {}, size = 40, icon, styles, childre
   return (
     <Button
       onClick={onClick}
+      className={css.container}
+      variant="subtle"
       p={0}
       m={0}
       w={size}
       h={size}
       {...styles}
       {...props}
-      className={css.container}
-      variant="subtle"
     >
       {icon}
       {children}

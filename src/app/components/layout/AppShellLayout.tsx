@@ -42,7 +42,7 @@ const AppShellLayout = ({ children }) => {
     >
       <ShoppingCart editable={isCartEditable} />
       <AppShell.Header>
-        <Header isBurgerOpen={isNavbarOpen} onBurgerClick={toggle} showBurger={showBurger} />
+        <Header isBurgerOpen={isNavbarOpen} onBurgerClick={toggle} showBurger={showBurger} showBackBtn={!showBurger} />
       </AppShell.Header>
 
       <AppShell.Navbar>
