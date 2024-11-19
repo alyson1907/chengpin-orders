@@ -32,6 +32,8 @@ import {
 } from '@tabler/icons-react'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
+import { handleResponseError } from '@/app/helpers/show-error-toast'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 type SizesType = {
   text: MantineSize
@@ -94,6 +96,7 @@ const isNotValid = (value: any, schema: z.Schema) => {
 const CheckoutPage = () => {
   const [activeStep, setActiveStep] = useState(0)
   const { cart, clearCart } = useContext(ShoppingCartContext)
+  const [isLoading, setIsLoading] = useState(false)
   const layout = useContext(LayoutContext)
   const closeNavbar = layout.navbar.close
   const sizes = useResolveSizes(resolveSizes) as SizesType
@@ -101,23 +104,24 @@ const CheckoutPage = () => {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      buyerKey: '',
+      customerKey: '',
       firstName: '',
       lastName: '',
       phone: '',
     },
 
     validate: {
-      buyerKey: (value) => isNotValid(value, z.string().regex(/\d/g).max(6)) && 'A chave deve ser menor que 6 dígitos',
+      customerKey: (value) =>
+        isNotValid(value, z.string().regex(/\d/g).max(6)) && 'A chave deve ser menor que 6 dígitos',
       firstName: (value) => isNotValid(value, z.string().min(1)) && 'Primeiro nome não pode ser vazio',
       lastName: (value) => isNotValid(value, z.string().min(1)) && 'Sobrenome não pode ser vazio',
       phone: (value) =>
         isNotValid(value, z.string().regex(mobilePhoneRegex)) && 'Whatsapp deve ser um número de telefone',
     },
     transformValues: (values) => {
-      const { firstName, lastName, phone, buyerKey } = values
+      const { firstName, lastName, phone, customerKey } = values
       return {
-        buyerKey: buyerKey.trim(),
+        customerKey: customerKey.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         phone: phone.trim().replaceAll(/\D/g, ''),
@@ -131,12 +135,25 @@ const CheckoutPage = () => {
 
   const handleNext = () => setActiveStep((prev) => prev + 1)
   const handlePrevious = () => setActiveStep((prev) => prev - 1)
-  const handleSubmit = (values, event) => {
-    console.log(`handleSubmit`, JSON.stringify(values), event)
+  const handleSubmit = () => {
     handleNext()
   }
-  const handleSendOrder = () => {
-    // Send BE request
+  const handleSendOrder = async () => {
+    const values = form.getTransformedValues()
+    const body = {
+      customerKey: values.customerKey,
+      customerName: `${values.firstName} ${values.lastName}`,
+      customerPhone: values.phone,
+      orderItems: cart.items.map((item) => ({ id: item.id, qty: item.buyingQty })),
+    }
+    setIsLoading(true)
+    const response = await fetch('/api/order', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+    const responseBody = await response.json()
+    if (response.status !== 200) handleResponseError(response.status, responseBody)
+    setIsLoading(false)
     clearCart()
     handleNext()
   }
@@ -155,11 +172,13 @@ const CheckoutPage = () => {
           </Title>
           <form onSubmit={form.onSubmit(handleSubmit)} id="checkout-form">
             <InputBase
-              key={form.key('buyerKey')}
+              key={form.key('customerKey')}
               label="Chave do Comprador"
-              placeholder="000000"
+              placeholder="1234"
+              component={IMaskInput}
+              mask={[{ mask: '0000' }]}
               withAsterisk
-              {...form.getInputProps('buyerKey')}
+              {...form.getInputProps('customerKey')}
               type="number"
             />
             <InputBase
@@ -322,6 +341,7 @@ const CheckoutPage = () => {
 
   return (
     <Container p="xl">
+      <DefaultLoadingOverlay visible={isLoading} />
       <Box maw={500} mx="auto">
         <Stepper
           orientation={sizes.stepper.orientation}

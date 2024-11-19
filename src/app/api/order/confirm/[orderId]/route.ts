@@ -15,7 +15,11 @@ const confirmOrder = async (req: NextRequest, context: RequestContext) => {
   const order = await prisma.order.findFirst({ where: { id: orderId } })
   if (!order) throw new NotFoundError(ErrorKey.MISSING_ENTITIES, orderId, `No order with id ${orderId} was found`)
   if (order.status !== OrderStatus.DRAFT)
-    throw new BadRequestError(ErrorKey.INVALID_OPERATION, order, 'Only orders with DRAFT status can be confirmed')
+    throw new BadRequestError(
+      ErrorKey.INVALID_OPERATION_DRAFT_ORDER,
+      order,
+      'Only orders with DRAFT status can be confirmed'
+    )
   return prisma.order.update({ where: { id: order.id }, data: { status: OrderStatus.CONFIRMED } })
 }
 

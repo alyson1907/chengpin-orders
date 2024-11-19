@@ -16,7 +16,11 @@ const cancelOrder = async (req: NextRequest, context: RequestContext) => {
   const order = await prisma.order.findFirst({ where: { id: orderId }, include: { orderItems: true } })
   if (!order) throw new NotFoundError(ErrorKey.MISSING_ENTITIES, orderId, `No order with id ${orderId} was found`)
   if (order.status !== OrderStatus.DRAFT)
-    throw new BadRequestError(ErrorKey.INVALID_OPERATION, order, 'Only orders with DRAFT status can be cancelled')
+    throw new BadRequestError(
+      ErrorKey.INVALID_OPERATION_DRAFT_ORDER,
+      order,
+      'Only orders with DRAFT status can be cancelled'
+    )
 
   const cancelledOrder = await prisma.$transaction(async (trx) => {
     const restockPromises = order.orderItems.map((item) => restock(trx, item.availabilityId, item.qty))

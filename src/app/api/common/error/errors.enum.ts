@@ -3,7 +3,6 @@ export enum ErrorKey {
   AUTH_NO_PERMISSION = 'AUTH_NO_PERMISSION',
   AUTH_INVALID_CREDENTIALS = 'AUTH_INVALID_CREDENTIALS',
   UNEXPECTED_ERROR = 'UNEXPECTED_ERROR',
-  INVALID_OPERATION = 'INVALID_OPERATION',
   SCHEMA_VALIDATION_ERROR = 'SCHEMA_VALIDATION_ERROR',
   VALIDATION_ERROR_JSON_BODY = 'VALIDATION_ERROR_JSON_BODY',
   VALIDATION_ERROR_PATH_PARAMS = 'VALIDATION_ERROR_PATH_PARAMS',
@@ -11,6 +10,8 @@ export enum ErrorKey {
   MISSING_ENTITIES = 'MISSING_ENTITIES',
   DUPLICATED_ENTRY = 'DUPLICATED_ENTRY',
   UNAVAILABLE_RESOURCE = 'UNAVAILABLE_RESOURCE',
+  AMOUNT_LIMIT = 'AMOUNT_LIMIT',
+  INVALID_OPERATION_DRAFT_ORDER = 'INVALID_OPERATION_DRAFT_ORDER',
 }
 
 export const ErrorMsg = {
@@ -18,7 +19,6 @@ export const ErrorMsg = {
   AUTH_NO_PERMISSION: 'The user has no permission to access this resource',
   AUTH_INVALID_CREDENTIALS: 'The credentials provided are incorrect',
   UNEXPECTED_ERROR: 'An unexpected error ocurred',
-  INVALID_OPERATION: 'The request cant be processed because its invalid',
   SCHEMA_VALIDATION_ERROR: "Data doesn't match the validation schema",
   VALIDATION_ERROR_JSON_BODY: "Request body doesn't match the validation schema",
   VALIDATION_ERROR_PATH_PARAMS: "Request path parameters don't match the validation schema",
@@ -26,4 +26,6 @@ export const ErrorMsg = {
   MISSING_ENTITIES: 'Some entities were not found in the database',
   DUPLICATED_ENTRY: 'Duplicated value in the database',
   UNAVAILABLE_RESOURCE: 'Cant process request because the resource is not available',
+  AMOUNT_LIMIT: 'The amount requested is higher than the available',
+  INVALID_OPERATION_DRAFT_ORDER: 'The request cant be processed because its invalid',
 }

@@ -30,7 +30,7 @@ const createOrder = async (req: NextRequest) => {
   const insufficientStockItems = await filterInsufficientStock(orderItems)
   if (insufficientStockItems.length)
     throw new BadRequestError(
-      ErrorKey.UNAVAILABLE_RESOURCE,
+      ErrorKey.AMOUNT_LIMIT,
       insufficientStockItems,
       'The buying amount is heigher than available in stock'
     )

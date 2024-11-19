@@ -3,9 +3,8 @@ import ProductCard from './ProductCard'
 import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { notifications } from '@mantine/notifications'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
-import { IconExclamationMark } from '@tabler/icons-react'
+import { showErrorToast } from '@/app/helpers/show-error-toast'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
   if (!activeCategoryId) return []
@@ -28,12 +27,7 @@ const ProductGrid = () => {
   }, [selectedProductId, router])
 
   if (error) {
-    notifications.show({
-      title: 'Problema ao carregar lista de produtos',
-      message: 'Por favor, verifique a conexão',
-      icon: <IconExclamationMark />,
-      color: 'red',
-    })
+    showErrorToast('Problema ao carregar lista de produtos', 'Por favor, verifique a conexão')
   }
   return (
     <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>

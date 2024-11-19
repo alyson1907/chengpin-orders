@@ -25,7 +25,11 @@ const updateOrder = async (req: NextRequest, context: RequestContext) => {
   const oldOrder = await prisma.order.findFirst({ where: { id: orderId }, include: { orderItems: true } })
   if (!oldOrder) throw new NotFoundError(ErrorKey.MISSING_ENTITIES, orderId, `No order with id ${orderId} was found`)
   if (oldOrder.status !== OrderStatus.DRAFT)
-    throw new BadRequestError(ErrorKey.INVALID_OPERATION, oldOrder, 'Only orders with DRAFT status can be updated')
+    throw new BadRequestError(
+      ErrorKey.INVALID_OPERATION_DRAFT_ORDER,
+      oldOrder,
+      'Only orders with DRAFT status can be updated'
+    )
 
   const notFound = await filterItemsNotInAvailables(newOrderItems)
   if (notFound.length)
@@ -38,7 +42,7 @@ const updateOrder = async (req: NextRequest, context: RequestContext) => {
   const insufficientStockItems = await filterInsufficientStock(newOrderItems, oldOrder)
   if (insufficientStockItems.length)
     throw new BadRequestError(
-      ErrorKey.UNAVAILABLE_RESOURCE,
+      ErrorKey.AMOUNT_LIMIT,
       insufficientStockItems,
       'The buying amount is heigher than available in stock'
     )
