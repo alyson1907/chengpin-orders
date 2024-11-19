@@ -7,65 +7,13 @@ import prisma from '../../../../../prisma/prisma'
 import { updateOrderByIdBodySchema } from '@/app/api/order/validation-schemas'
 import { RequestContext } from '@/app/api/common/types/request-context'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
-import { Prisma, PrismaClient } from '@prisma/client'
-import { DefaultArgs } from '@prisma/client/runtime/library'
-
-type TPrismaTrx = Omit<
-  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
->
-const findAvailables = async (orderItems: { id: string; qty: number }[]) => {
-  return prisma.productAvailability.findMany({
-    where: { id: { in: orderItems.map(({ id }) => id) } },
-    include: { product: true },
-  })
-}
-const filterItemsNotInAvailables = async (orderItems: { id: string; qty: number }[]) => {
-  const currentAvailables = await findAvailables(orderItems)
-  return orderItems.filter((b) => !currentAvailables.some((ca) => ca.id === b.id))
-}
-
-const filterInsufficientStock = async (orderItems: { id: string; qty: number }[], order: any) => {
-  const currentAvailables = await findAvailables(orderItems)
-  return orderItems.filter((b) => {
-    const newQty = b.qty
-    const currentlyInOrderQty = order.orderItems.find((orderItem) => orderItem.availabilityId === b.id)?.qty || 0
-    const availableQty = currentAvailables.find((ca) => ca.id === b.id)?.qty || 0
-    return newQty > availableQty + currentlyInOrderQty
-  })
-}
-
-const buildOrderItemsInsert = async (newOrderItems: { id: string; qty: number }[]) => {
-  const currentAvailables = await findAvailables(newOrderItems)
-  return currentAvailables.map((item) => {
-    const buyingQty = newOrderItems.find((a) => a.id === item.id)?.qty
-    if (!buyingQty) throw new BadRequestError(ErrorKey.UNEXPECTED_ERROR, undefined, 'Wrong buying amount')
-    return {
-      availabilityId: item.id,
-      availabilityName: item.name,
-      productId: item.productId,
-      productName: item.product?.name,
-      qty: buyingQty,
-      price: item.price,
-    }
-  })
-}
-
-const restock = async (trx: TPrismaTrx, productAvailabilityId: string, addQty: number) => {
-  const productAvailability = await trx.productAvailability.findFirst({ where: { id: productAvailabilityId } })
-  return trx.productAvailability.update({
-    where: { id: productAvailability?.id },
-    data: { qty: (productAvailability?.qty || 0) + addQty },
-  })
-}
-
-const decrementStock = async (trx: TPrismaTrx, productAvailabilityId: string, decrementQty: number) => {
-  const productAvailability = await trx.productAvailability.findFirst({ where: { id: productAvailabilityId } })
-  return trx.productAvailability.update({
-    where: { id: productAvailability?.id },
-    data: { qty: (productAvailability?.qty || 0) - decrementQty },
-  })
-}
+import {
+  filterItemsNotInAvailables,
+  filterInsufficientStock,
+  buildOrderItemsInsert,
+  decrementStock,
+  restock,
+} from '@/app/api/order/order-helper'
 
 const updateOrder = async (req: NextRequest, context: RequestContext) => {
   const { body, params } = await parseReq(req, context)

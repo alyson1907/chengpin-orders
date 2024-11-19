@@ -20,5 +20,5 @@ export const createOrderBodySchema = orderBaseSchema.omit({ status: true }).exte
 })
 
 export const updateOrderByIdBodySchema = orderBaseSchema.extend({
-  orderItems: z.array(orderItemsBaseSchema),
+  orderItems: z.array(orderItemsBaseSchema).min(1),
 })
