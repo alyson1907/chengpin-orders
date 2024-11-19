@@ -1,4 +1,4 @@
-import { middlewares } from '@/app/api/common/apply-middlewares'
+import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
 import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
 import { createOrderBodySchema } from '@/app/api/order/validation-schemas'
 import { NextRequest } from 'next/server'
@@ -87,6 +87,6 @@ const deleteOrders = async (req: NextRequest) => {
   console.log(req)
 }
 
-export const POST = middlewares(createOrder)
+export const POST = middlewaresWithoutAuth(createOrder)
 export const GET = middlewares(getOrders)
 export const DELETE = middlewares(deleteOrders)
