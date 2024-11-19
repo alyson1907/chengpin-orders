@@ -152,8 +152,8 @@ const CheckoutPage = () => {
       body: JSON.stringify(body),
     })
     const responseBody = await response.json()
-    if (response.status !== 200) handleResponseError(response.status, responseBody)
     setIsLoading(false)
+    if (response.status !== 200) return handleResponseError(response.status, responseBody)
     clearCart()
     handleNext()
   }
