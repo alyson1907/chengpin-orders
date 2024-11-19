@@ -50,6 +50,7 @@ export const buildOrderItemsInsert = async (orderItems: { id: string; qty: numbe
 
 export const restock = async (trx: TPrismaTrx, productAvailabilityId: string, addQty: number) => {
   const productAvailability = await trx.productAvailability.findFirst({ where: { id: productAvailabilityId } })
+  console.log(`productAvailability`, productAvailability)
   if (!productAvailability) return
   return trx.productAvailability.update({
     where: { id: productAvailability.id },
