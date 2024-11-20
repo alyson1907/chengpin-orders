@@ -3,7 +3,7 @@ import styles from './ProductCard.module.css'
 import React, { Dispatch, useState } from 'react'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Product, ProductAvailability } from '@prisma/client'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import { DefaultLoadingOverlay } from '@/app/catalog/components/common/DefaultLoadingOverlay'
 
 type IProps = {
   productInfo: Product & { availability: ProductAvailability[] }

@@ -2,8 +2,8 @@
 import '@mantine/core/styles.css'
 import { useContext, useEffect } from 'react'
 import ProductGrid from './catalog/product/ProductGrid'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { DefaultLoadingOverlay } from '@/app/catalog/components/common/DefaultLoadingOverlay'
+import { LayoutContext } from '@/app/catalog/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 
 const App = () => {

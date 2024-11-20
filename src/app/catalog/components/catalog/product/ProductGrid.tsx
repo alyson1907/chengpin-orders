@@ -3,7 +3,7 @@ import ProductCard from './ProductCard'
 import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { LayoutContext } from '@/app/catalog/components/layout/LayoutContextProvider'
 import { showErrorToast } from '@/app/helpers/show-error-toast'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
@@ -23,7 +23,7 @@ const ProductGrid = () => {
   useMemo(() => response, [response])
 
   useEffect(() => {
-    if (selectedProductId) router.push(`/product-details/${selectedProductId}`)
+    if (selectedProductId) router.push(`/catalog/product-details/${selectedProductId}`)
   }, [selectedProductId, router])
 
   if (error) {

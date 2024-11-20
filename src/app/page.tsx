@@ -1,8 +1,14 @@
+'use client'
 import '@mantine/core/styles.css'
-import App from './components/App'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 const Home = () => {
-  return <App />
+  const router = useRouter()
+  useEffect(() => {
+    router.push('/catalog')
+  }, [router])
+  return <></>
 }
 
 export default Home

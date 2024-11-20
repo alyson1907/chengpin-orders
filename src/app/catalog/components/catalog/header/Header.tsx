@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
 import btnSquareStyles from '../../common/ButtonSquareIcon.module.css'
 import styles from './Header.module.css'
-import { ShoppingCartContext } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { ShoppingCartContext } from '@/app/catalog/components/catalog/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/components/layout/LayoutContextProvider'
 
 type IProps = {
   isBurgerOpen?: boolean
@@ -116,7 +116,7 @@ const Header = ({
         {showLogo && (
           <Image
             src={'/assets/img/chengpin-logo.svg'}
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/catalog')}
             style={{ cursor: 'pointer' }}
             h={sizes.logo.height}
             fit="contain"
