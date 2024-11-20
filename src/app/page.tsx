@@ -8,7 +8,7 @@ const Home = () => {
   useEffect(() => {
     router.push('/catalog')
   }, [router])
-  return <></>
+  return
 }
 
 export default Home

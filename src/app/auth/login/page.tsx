@@ -2,9 +2,14 @@
 import React, { useState } from 'react'
 import { useForm } from '@mantine/form'
 import { TextInput, PasswordInput, Button, Box, Paper, Text, Group, Stack, Title } from '@mantine/core'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import { redirect, useSearchParams } from 'next/navigation'
+import { login } from '@/app/auth/auth-actions'
 
 export default function LoginPage() {
+  const [isLoading, setisLoading] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
   const form = useForm({
     initialValues: {
       username: '',
@@ -16,13 +21,16 @@ export default function LoginPage() {
     },
   })
 
-  const handleSubmit = (values: typeof form.values) => {
+  const handleSubmit = async () => {
     setLoginError(null)
-    if (values.username !== 'admin' || values.password !== 'password123') {
-      setLoginError('Invalid username or password')
-      return
-    }
-    alert('Logged in successfully')
+    setisLoading(true)
+    // const { username, password } = form.getValues()
+    // const isError = await login(username, password)
+    const isError = await login('admin', 'chengpin123')
+    setisLoading(false)
+    if (isError) return setLoginError('Invalid username or password')
+    const redirectBack = searchParams.get('redirect_url') || '/'
+    redirect(redirectBack)
   }
 
   return (
@@ -34,11 +42,12 @@ export default function LoginPage() {
         justifyContent: 'center',
       }}
     >
+      <DefaultLoadingOverlay visible={isLoading} />
       <Paper radius="md" p="xl" withBorder shadow="xl" w={400}>
         <Stack>
           <Title order={2}>Login</Title>
 
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+          <form onSubmit={form.onSubmit(() => handleSubmit())}>
             <Stack>
               <TextInput label="Usuário" placeholder="Meu usuário" withAsterisk {...form.getInputProps('username')} />
               <PasswordInput label="Senha" placeholder="Minha senha" withAsterisk {...form.getInputProps('password')} />

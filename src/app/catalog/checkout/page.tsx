@@ -19,13 +19,10 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { DateInput } from '@mantine/dates'
-import {
-  ShoppingCartContext,
-  ShoppingCartType,
-} from '@/app/catalog/components/catalog/shopping-cart/ShoppingCartProvider'
+import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
 import { z } from 'zod'
 import dayjs from '@/app/api/common/dayjs'
-import { LayoutContext } from '@/app/catalog/components/layout/LayoutContextProvider'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
   IconCheck,
@@ -38,8 +35,8 @@ import {
 } from '@tabler/icons-react'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
-import { handleResponseError } from '@/app/helpers/show-error-toast'
-import { DefaultLoadingOverlay } from '@/app/catalog/components/common/DefaultLoadingOverlay'
+import { handleResponseError } from '@/app/helpers/handle-request-error'
+import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 type SizesType = {
   text: MantineSize

@@ -9,19 +9,19 @@ import '@mantine/dates/styles.css'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import theme from './theme'
-import ShoppingCartProvider from '@/app/catalog/components/catalog/shopping-cart/ShoppingCartProvider'
-import LayoutContextProvider from '@/app/catalog/components/layout/LayoutContextProvider'
-import AppShellLayout from '@/app/catalog/components/layout/AppShellLayout'
 import { DatesProvider } from '@mantine/dates'
 import { ReactNode, useEffect } from 'react'
 import { usePathname, useRouter, redirect } from 'next/navigation'
+import CatalogPage from '@/app/catalog/CatalogPage'
+import ShoppingCartProvider from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
+import LayoutContextProvider from '@/app/components/layout/LayoutContextProvider'
 
 const getLayout = (url: string, children: ReactNode) => {
   if (url.startsWith('/catalog'))
     return (
       <ShoppingCartProvider>
         <LayoutContextProvider>
-          <AppShellLayout>{children}</AppShellLayout>
+          <CatalogPage>{children}</CatalogPage>
         </LayoutContextProvider>
       </ShoppingCartProvider>
     )

@@ -1,5 +1,6 @@
 import { User, Role, UserRoles } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 const secret = process.env.JWT_SECRET || 'default-secret-chengpin'
 export type TokenContent = Partial<User> & { roles: Partial<Role>[] } & { userRoles?: UserRoles[] }
@@ -16,9 +17,15 @@ const validateToken = (token: string) => {
   return decoded
 }
 
+const validatePassword = (user: User, receivedPassword: string) => {
+  const expectedPassword = user.password
+  return bcrypt.compareSync(receivedPassword, expectedPassword)
+}
+
 const jwtModule = {
   createToken,
   validateToken,
+  validatePassword,
 }
 
 export default jwtModule

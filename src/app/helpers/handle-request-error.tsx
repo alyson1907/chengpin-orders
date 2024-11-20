@@ -1,6 +1,9 @@
+import { AuthCookieKeys } from '@/app/api/common/enum/auth-cookie-keys.enum'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { redirectLogin } from '@/app/auth/auth-actions'
 import { notifications } from '@mantine/notifications'
 import { IconExclamationMark } from '@tabler/icons-react'
+import Cookies from 'js-cookie'
 
 type TDisplayMessage = {
   title: string
@@ -36,6 +39,10 @@ const getDisplayMessage = (errorKey: ErrorKey): TDisplayMessage => {
       title: 'Não encontrado',
       message: 'O recurso solicitado não foi encontrado',
     },
+    NOT_FOUND_USER: {
+      title: 'Usuário não encontrado',
+      message: 'O usuário solicitado não existe',
+    },
     DUPLICATED_ENTRY: {
       title: 'Recurso já cadastrado',
       message: 'O recurso já está cadastrado no sistema',
@@ -62,8 +69,16 @@ export const showErrorToast = (title: string, message: string) => {
   })
 }
 
-export const handleResponseError = (responseBody: any) => {
+export const handleResponseError = (responseBody: any, authRedirectUrl?: string) => {
   const errorKey = responseBody?.errorKey
+  if (!errorKey) return false
+  if (errorKey === ErrorKey.AUTH_INVALID_TOKEN) {
+    Cookies.remove(AuthCookieKeys.TOKEN)
+    Cookies.remove(AuthCookieKeys.USER)
+    redirectLogin(authRedirectUrl)
+    return true
+  }
   const displayMessage = getDisplayMessage(errorKey)
-  return showErrorToast(displayMessage.title, displayMessage.message)
+  showErrorToast(displayMessage.title, displayMessage.message)
+  return true
 }

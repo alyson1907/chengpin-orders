@@ -1,10 +1,7 @@
-import {
-  ShoppingCartContext,
-  ShoppingCartType,
-} from '@/app/catalog/components/catalog/shopping-cart/ShoppingCartProvider'
-import ButtonSquareIcon from '@/app/catalog/components/common/ButtonSquareIcon'
-import CustomNumberInput from '@/app/catalog/components/common/CustomNumberInput'
-import { LayoutContext } from '@/app/catalog/components/layout/LayoutContextProvider'
+import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
+import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
+import CustomNumberInput from '@/app/components/common/CustomNumberInput'
+import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Drawer, Group, Image, Text, Divider, Stack, AspectRatio, Button } from '@mantine/core'
