@@ -53,7 +53,6 @@ const getDisplayMessage = (errorKey: ErrorKey): TDisplayMessage => {
 }
 
 export const showErrorToast = (title: string, message: string) => {
-  console.log(title, message)
   notifications.show({
     title,
     message,
@@ -66,7 +65,5 @@ export const showErrorToast = (title: string, message: string) => {
 export const handleResponseError = (responseBody: any) => {
   const errorKey = responseBody?.errorKey
   const displayMessage = getDisplayMessage(errorKey)
-  console.log(displayMessage)
-  console.log(displayMessage)
   return showErrorToast(displayMessage.title, displayMessage.message)
 }

@@ -149,7 +149,6 @@ const CheckoutPage = () => {
   const handleNext = () => setActiveStep((prev) => prev + 1)
   const handlePrevious = () => setActiveStep((prev) => prev - 1)
   const handleSubmit = () => {
-    console.log(form.getTransformedValues())
     handleNext()
   }
   const handleSendOrder = async () => {
