@@ -14,10 +14,11 @@ import {
   findAvailables,
   buildOrderItemsInsert,
 } from '@/app/api/order/order-helper'
+import dayjs from '@/app/api/common/dayjs'
 
 const createOrder = async (req: NextRequest) => {
   const { body } = await parseReq(req)
-  const { orderItems, ...customer } = createOrderBodySchema.parse(body)
+  const { orderItems, deliveryDate, commercialDate, ...customer } = createOrderBodySchema.parse(body)
 
   const notFound = await filterItemsNotInAvailables(orderItems)
   if (notFound.length)
@@ -38,6 +39,8 @@ const createOrder = async (req: NextRequest) => {
   const currentAvailables = await findAvailables(orderItems)
   const orderInsert = {
     status: OrderStatus.DRAFT,
+    deliveryDate: dayjs.utc(deliveryDate).toDate(),
+    commercialDate: dayjs.utc(commercialDate).toDate(),
     customerKey: customer.customerKey,
     customerName: customer.customerName,
     customerPhone: customer.customerPhone,
@@ -83,10 +86,5 @@ const getOrders = async (req: NextRequest) => {
   return response
 }
 
-const deleteOrders = async (req: NextRequest) => {
-  console.log(req)
-}
-
 export const POST = middlewaresWithoutAuth(createOrder)
 export const GET = middlewares(getOrders)
-export const DELETE = middlewares(deleteOrders)

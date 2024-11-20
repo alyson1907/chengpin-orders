@@ -14,11 +14,12 @@ import {
   decrementStock,
   restock,
 } from '@/app/api/order/order-helper'
+import dayjs from '@/app/api/common/dayjs'
 
 const updateOrder = async (req: NextRequest, context: RequestContext) => {
   const { body, params } = await parseReq(req, context)
   const { orderId } = params
-  const { orderItems: newOrderItems, ...customer } = updateOrderByIdBodySchema.parse(body)
+  const { orderItems: newOrderItems, deliveryDate, commercialDate, ...customer } = updateOrderByIdBodySchema.parse(body)
 
   if (!orderId)
     throw new BadRequestError(ErrorKey.VALIDATION_ERROR_PATH_PARAMS, 'orderId', 'orderId is a required path params')
@@ -57,6 +58,8 @@ const updateOrder = async (req: NextRequest, context: RequestContext) => {
     const updatedOrder = await trx.order.update({
       where: { id: oldOrder.id },
       data: {
+        deliveryDate: dayjs.utc(deliveryDate).toDate(),
+        commercialDate: dayjs.utc(commercialDate).toDate(),
         ...customer,
         orderItems: {
           createMany: { data: await buildOrderItemsInsert(newOrderItems) },
@@ -74,4 +77,4 @@ const updateOrder = async (req: NextRequest, context: RequestContext) => {
   return updated
 }
 
-export const PATCH = middlewares(updateOrder)
+export const PUT = middlewares(updateOrder)

@@ -1,4 +1,5 @@
 'use client'
+import '@mantine/dates/styles.css'
 import React, { useContext, useEffect, useState } from 'react'
 import { IMaskInput } from 'react-imask'
 import {
@@ -17,8 +18,10 @@ import {
   MantineSize,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { DateInput } from '@mantine/dates'
 import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
 import { z } from 'zod'
+import dayjs from '@/app/api/common/dayjs'
 import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
@@ -49,6 +52,7 @@ type SizesType = {
     orientation: 'horizontal' | 'vertical' | undefined
     mt: MantineSize | string
   }
+  forms: { dateInput: MantineSize }
   summary: { imgw: string; imgh: string; imgRatio: number; placeholder: { icon: string; text: MantineSize } }
   orderComplete: { logo: { maw: number | string } }
 }
@@ -60,6 +64,7 @@ const resolveSizes = (currentBp: number) => {
     title: { icon: 24 },
     btn: { icon: 16 },
     stepper: { size: 'md', icon: 36, title: 4, orientation: 'horizontal', mt: 'xl' },
+    forms: { dateInput: 'sm' },
     summary: { imgw: '55px', imgh: 'auto', imgRatio: 9 / 16, placeholder: { icon: '25%', text: 'lg' } },
     orderComplete: { logo: { maw: 150 } },
   }
@@ -101,9 +106,13 @@ const CheckoutPage = () => {
   const closeNavbar = layout.navbar.close
   const sizes = useResolveSizes(resolveSizes) as SizesType
   const router = useRouter()
+  const [deliveryDate, setDeliveryDate] = useState(new Date())
+  const [commercialDate, setCommercialDate] = useState<Date | null>(null)
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
+      deliveryDate: new Date(),
+      commercialDate: new Date(),
       customerKey: '',
       firstName: '',
       lastName: '',
@@ -111,6 +120,8 @@ const CheckoutPage = () => {
     },
 
     validate: {
+      deliveryDate: (value) => isNotValid(value, z.date()),
+      commercialDate: (value) => isNotValid(value, z.date()),
       customerKey: (value) =>
         isNotValid(value, z.string().regex(/\d/g).max(6)) && 'A chave deve ser menor que 6 dígitos',
       firstName: (value) => isNotValid(value, z.string().min(1)) && 'Primeiro nome não pode ser vazio',
@@ -121,6 +132,8 @@ const CheckoutPage = () => {
     transformValues: (values) => {
       const { firstName, lastName, phone, customerKey } = values
       return {
+        deliveryDate: dayjs(deliveryDate).format('YYYY-MM-DD'),
+        commercialDate: dayjs(commercialDate).format('YYYY-MM-DD'),
         customerKey: customerKey.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -136,11 +149,14 @@ const CheckoutPage = () => {
   const handleNext = () => setActiveStep((prev) => prev + 1)
   const handlePrevious = () => setActiveStep((prev) => prev - 1)
   const handleSubmit = () => {
+    console.log(form.getTransformedValues())
     handleNext()
   }
   const handleSendOrder = async () => {
     const values = form.getTransformedValues()
     const body = {
+      deliveryDate: values.deliveryDate,
+      commercialDate: values.commercialDate,
       customerKey: values.customerKey,
       customerName: `${values.firstName} ${values.lastName}`,
       customerPhone: values.phone,
@@ -153,7 +169,7 @@ const CheckoutPage = () => {
     })
     const responseBody = await response.json()
     setIsLoading(false)
-    if (response.status !== 200) return handleResponseError(response.status, responseBody)
+    if (response.status !== 200) return handleResponseError(responseBody)
     clearCart()
     handleNext()
   }
@@ -171,7 +187,45 @@ const CheckoutPage = () => {
             <IconChecklist size={sizes.title.icon} /> Passo 1: Preencha suas informações
           </Title>
           <form onSubmit={form.onSubmit(handleSubmit)} id="checkout-form">
+            <Group>
+              <DateInput
+                size={sizes.forms.dateInput}
+                contentEditable={false}
+                valueFormat="DD/MM/YYYY (ddd)"
+                label="Data de entrega"
+                placeholder="Data de entrega"
+                minDate={new Date()}
+                withAsterisk
+                {...form.getInputProps('deliveryDate')}
+                onChange={(value) => {
+                  const date = dayjs(value).toDate()
+                  form.setFieldValue('deliveryDate', date)
+                  form.setFieldValue('commercialDate', date)
+                  setDeliveryDate(date)
+                  setCommercialDate(date)
+                }}
+              />
+              <DateInput
+                size={sizes.forms.dateInput}
+                contentEditable={false}
+                valueFormat="DD/MM/YYYY (ddd)"
+                label="Data comercial"
+                placeholder="Data comercial"
+                minDate={deliveryDate}
+                maxDate={dayjs(deliveryDate).add(2, 'day').toDate()}
+                withAsterisk
+                {...form.getInputProps('commercialDate')}
+                value={commercialDate}
+                onChange={(value) => {
+                  const date = dayjs(value).toDate()
+                  setCommercialDate(date)
+                  form.setFieldValue('commercialDate', date)
+                }}
+              />
+            </Group>
+
             <InputBase
+              mt="2px"
               key={form.key('customerKey')}
               label="Chave do Comprador"
               placeholder="1234"
@@ -181,7 +235,9 @@ const CheckoutPage = () => {
               {...form.getInputProps('customerKey')}
               type="number"
             />
+
             <InputBase
+              mt="2px"
               key={form.key('firstName')}
               label="Primeiro nome"
               placeholder="José Carlos"
@@ -189,6 +245,7 @@ const CheckoutPage = () => {
               {...form.getInputProps('firstName')}
             />
             <InputBase
+              mt="2px"
               key={form.key('lastName')}
               label="Sobrenome"
               placeholder="Silva Costa"
@@ -196,6 +253,7 @@ const CheckoutPage = () => {
               {...form.getInputProps('lastName')}
             />
             <InputBase
+              mt="2px"
               key={form.key('phone')}
               label="Whatsapp (celular)"
               placeholder="(15) 9999-3333"

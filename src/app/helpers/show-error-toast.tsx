@@ -1,4 +1,3 @@
-import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
 import { notifications } from '@mantine/notifications'
 import { IconExclamationMark } from '@tabler/icons-react'
@@ -8,6 +7,10 @@ type TDisplayMessage = {
   message: string
 }
 const getDisplayMessage = (errorKey: ErrorKey): TDisplayMessage => {
+  const defaultDisplayMessage = {
+    title: 'Problema inesperado',
+    message: 'Ocorreu um problema inesperado. Por favor tente novamente mais tarde',
+  }
   const displayMessages = {
     AUTH_INVALID_TOKEN: {
       title: 'Problema de autenticação',
@@ -46,10 +49,11 @@ const getDisplayMessage = (errorKey: ErrorKey): TDisplayMessage => {
       message: 'A quantidade desejada não está mais disponível. Por favor refaça seu pedido',
     },
   }
-  return displayMessages[errorKey] || 'Ocorreu um problema inesperado. Por favor tente novamente mais tarde'
+  return displayMessages[errorKey] || defaultDisplayMessage
 }
 
 export const showErrorToast = (title: string, message: string) => {
+  console.log(title, message)
   notifications.show({
     title,
     message,
@@ -59,10 +63,10 @@ export const showErrorToast = (title: string, message: string) => {
   })
 }
 
-export const handleResponseError = (status: number, responseBody: any) => {
-  if (status === HttpStatus.INTERNAL_SERVER_ERROR)
-    return showErrorToast('Problema inesperado', 'Ocorreu um problema inesperado. Por favor tente novamente mais tarde')
-  const errorKey = responseBody.errorKey
+export const handleResponseError = (responseBody: any) => {
+  const errorKey = responseBody?.errorKey
   const displayMessage = getDisplayMessage(errorKey)
-  showErrorToast(displayMessage.title, displayMessage.message)
+  console.log(displayMessage)
+  console.log(displayMessage)
+  return showErrorToast(displayMessage.title, displayMessage.message)
 }

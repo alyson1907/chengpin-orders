@@ -210,8 +210,8 @@ const ProductDetailsPage = () => {
     if (selected.id || isLoading) return
     layoutContext.navbar.close()
     const totalForSale = product?.availability.reduce((acc: number, item: ProductAvailability) => (acc += item.qty), 0)
-    setSelected(product?.availability[0])
     setTotalForSale(totalForSale)
+    setSelected(product?.availability.find(({ qty }) => qty) || product?.availability[0])
   }, [layoutContext.navbar, product, isLoading, selected, setSelected])
 
   useEffect(() => {

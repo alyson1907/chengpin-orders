@@ -83,14 +83,16 @@ model ProductAvailability {
 }
 
 model Order {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  customerKey   String
-  customerName  String
-  customerPhone String
-  status        String       @default("DRAFT")
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime?    @updatedAt
-  orderItems    OrderItems[]
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  customerKey    String
+  customerName   String
+  customerPhone  String
+  deliveryDate   DateTime
+  commercialDate DateTime
+  status         String       @default("DRAFT")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
+  orderItems     OrderItems[]
 }
 
 model OrderItems {

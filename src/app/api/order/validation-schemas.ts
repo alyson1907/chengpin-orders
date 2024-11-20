@@ -4,6 +4,8 @@ import { z } from 'zod'
 const idSchema = z.string().length(24)
 
 const orderBaseSchema = z.object({
+  deliveryDate: z.string().date(),
+  commercialDate: z.string().date(),
   customerKey: z.string().max(6),
   customerName: z.string(),
   customerPhone: z.string().max(12),

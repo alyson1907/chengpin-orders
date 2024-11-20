@@ -74,5 +74,5 @@ const deleteAvailability = async (req: NextRequest) => {
 
 export const POST = middlewares(createAvailability)
 export const GET = middlewaresWithoutAuth(getAvailability)
-export const PATCH = middlewares(updateAvailability)
+export const PUT = middlewares(updateAvailability)
 export const DELETE = middlewares(deleteAvailability)
