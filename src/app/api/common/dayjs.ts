@@ -5,5 +5,5 @@ import 'dayjs/locale/pt-br'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-
+dayjs.locale('pt-br')
 export default dayjs

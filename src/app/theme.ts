@@ -14,7 +14,7 @@ const theme = createTheme({
     textWrap: 'wrap',
   },
   primaryColor: 'matcha',
-  // white: '#f0e9df',
+  white: '#fdfaf6',
   colors: {
     matcha: [
       '#edf9ec',

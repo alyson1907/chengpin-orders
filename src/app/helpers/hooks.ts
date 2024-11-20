@@ -1,3 +1,4 @@
+import { useMantineColorScheme, useMantineTheme } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useMemo } from 'react'
 
@@ -43,4 +44,11 @@ export const isScreenSmaller = (currentBp: number, bpName: 'base' | 'xs' | 'sm' 
 export const useResolveSizes = (fn: (currentBp: number) => Record<string, any>) => {
   const bp = useBreakpoint()
   return useMemo(() => fn(bp), [bp, fn])
+}
+
+export const useMantineColor = (colorName: string) => {
+  const theme = useMantineTheme()
+  const colorScheme = useMantineColorScheme()
+  const isDark = colorScheme.colorScheme === 'dark'
+  return isDark ? theme.colors[colorName][4] : theme.colors[colorName][8]
 }

@@ -137,7 +137,7 @@ const CheckoutPage = () => {
         customerKey: customerKey.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        phone: phone.trim().replaceAll(/\D/g, ''),
+        phone: phone.trim(),
       }
     },
   })
