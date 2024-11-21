@@ -3,6 +3,7 @@ import dayjs from '@/app/api/common/dayjs'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/components/common/LongPressButton'
+import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { useMantineColor } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
@@ -53,6 +54,12 @@ const badgeColor = {
   CANCELLED: 'grey',
 }
 
+const statusTranslation = {
+  DRAFT: 'Pendente',
+  CONFIRMED: 'Confirmado',
+  CANCELLED: 'Cancelado',
+}
+
 const DashboardOrders = () => {
   const { data, error, isLoading } = useSWR('/api/order', fetcher)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
@@ -74,7 +81,7 @@ const DashboardOrders = () => {
       const totalPrice = order.orderItems.reduce((total, item) => total + item.price * item.qty, 0)
       const totalDisplay = BRL.format(totalPrice)
       return (
-        <Card key={order.id} shadow="md" radius="sm" withBorder>
+        <Card key={order.id} shadow="md" radius="sm" mt="sm" withBorder>
           <Stack>
             <Group grow>
               <Group justify="space-between">
@@ -102,7 +109,7 @@ const DashboardOrders = () => {
                 </Group>
                 <Box>
                   <Badge leftSection={statusIcons[order.status]} color={badgeColor[order.status]} variant="outline">
-                    {order.status}
+                    {statusTranslation[order.status]}
                   </Badge>
                 </Box>
               </Group>
@@ -133,54 +140,56 @@ const DashboardOrders = () => {
               >
                 {expandedOrder === order.id ? 'Hide Items' : 'Show Items'}
               </Button>
-              <Group>
-                <LongPressButton
-                  buttonProps={{
-                    variant: 'light',
-                    color: 'matcha',
-                    size: 'xs',
-                    disabled: completedOrders.includes(order.id),
-                  }}
-                  iconColor="matcha"
-                  durationMs={700}
-                  onLongPress={() => {
-                    if (completedOrders.includes(order.id)) return
-                    // Send request to Complete order to BE
-                    setCompletedOrders([...completedOrders, order.id])
-                  }}
-                >
-                  Confirmar
-                </LongPressButton>
-                <Button
-                  size="xs"
-                  variant="light"
-                  color="blue"
-                  leftSection={<IconPencil size={18} />}
-                  onClick={() => {
-                    alert(`Edit order ${order.id}`)
-                  }}
-                >
-                  Alterar
-                </Button>
-                <LongPressButton
-                  buttonProps={{
-                    variant: 'light',
-                    color: 'red',
-                    size: 'xs',
-                    disabled: completedOrders.includes(order.id),
-                  }}
-                  iconColor="red"
-                  iconLongPressed={<IconX />}
-                  durationMs={700}
-                  onLongPress={() => {
-                    if (completedOrders.includes(order.id)) return
-                    // Send request to Complete order to BE
-                    setCompletedOrders([...completedOrders, order.id])
-                  }}
-                >
-                  Cancelar
-                </LongPressButton>
-              </Group>
+              {order.status === OrderStatus.DRAFT && (
+                <Group>
+                  <LongPressButton
+                    buttonProps={{
+                      variant: 'light',
+                      color: 'matcha',
+                      size: 'xs',
+                      disabled: completedOrders.includes(order.id),
+                    }}
+                    iconColor="matcha"
+                    durationMs={700}
+                    onLongPress={() => {
+                      if (completedOrders.includes(order.id)) return
+                      // Send request to Complete order to BE
+                      setCompletedOrders([...completedOrders, order.id])
+                    }}
+                  >
+                    Confirmar
+                  </LongPressButton>
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="blue"
+                    leftSection={<IconPencil size={18} />}
+                    onClick={() => {
+                      alert(`Edit order ${order.id}`)
+                    }}
+                  >
+                    Alterar
+                  </Button>
+                  <LongPressButton
+                    buttonProps={{
+                      variant: 'light',
+                      color: 'red',
+                      size: 'xs',
+                      disabled: completedOrders.includes(order.id),
+                    }}
+                    iconColor="red"
+                    iconLongPressed={<IconX />}
+                    durationMs={700}
+                    onLongPress={() => {
+                      if (completedOrders.includes(order.id)) return
+                      // Send request to Complete order to BE
+                      setCompletedOrders([...completedOrders, order.id])
+                    }}
+                  >
+                    Cancelar
+                  </LongPressButton>
+                </Group>
+              )}
             </Group>
           </Stack>
 
@@ -233,10 +242,15 @@ const DashboardOrders = () => {
   }
 
   return (
-    <Stack>
-      {renderOrders(data?.entries[OrderStatus.DRAFT])}
+    <Group justify="center">
+      <OrdersTabs
+        draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}
+        confirmedOrders={renderOrders(data?.entries[OrderStatus.CONFIRMED])}
+        cancelledOrders={renderOrders(data?.entries[OrderStatus.CANCELLED])}
+      />
+      {/* {renderOrders(data?.entries[OrderStatus.DRAFT])} */}
       {/* {renderOrders(data?.entries[OrderStatus.CONFIRMED])} */}
-    </Stack>
+    </Group>
   )
 }
 
