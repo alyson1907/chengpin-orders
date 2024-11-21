@@ -61,6 +61,7 @@ export const buildPrismaFilter = (qs: Record<string, any>) => {
 const assignNestedFilter = (currentFilter: any, keyParts: string[], value: any) => {
   const splitKey = '__'
   const [field, operator] = keyParts[0].split(splitKey)
+  const stringOperators = ['contains', 'startsWith', 'endsWith']
   const prismaOperators = [
     'gte',
     'lte',
@@ -78,9 +79,12 @@ const assignNestedFilter = (currentFilter: any, keyParts: string[], value: any) 
   else if (keyParts.length === 1) {
     // If it's the last part, assign the filter value directly
     if (operator && prismaOperators.includes(operator)) {
+      const transformedValue = stringOperators.includes(operator) ? '' + value : value
+      const caseInsensitive = typeof transformedValue === 'string' ? { mode: 'insensitive' } : {}
       currentFilter[field] = {
         ...currentFilter[field],
-        [operator]: value,
+        ...caseInsensitive,
+        [operator]: transformedValue,
       }
     } else {
       // Direct match: if value is an array, use "in" filter automatically

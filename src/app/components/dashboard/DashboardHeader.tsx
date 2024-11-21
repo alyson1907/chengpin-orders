@@ -1,7 +1,6 @@
 import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
-import { Group, Tooltip, useMantineColorScheme } from '@mantine/core'
+import { Anchor, Group, Tooltip, useMantineColorScheme } from '@mantine/core'
 import { IconSun, IconMoonStars } from '@tabler/icons-react'
-import Link from 'next/link'
 
 const DashboardHeader = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
@@ -18,10 +17,10 @@ const DashboardHeader = () => {
   return (
     <Group justify="center" w="100%" h="100%">
       <Group>
-        <Link href={'/dashboard'}>Pedidos</Link>
-        <Link href={'/dashboard/categories'}>Categorias</Link>
-        <Link href={'/dashboard/products'}>Produtos</Link>
-        <Link href={'/dashboard/availables'}>Disponíveis à Venda</Link>
+        <Anchor href={'/dashboard'}>Pedidos</Anchor>
+        <Anchor href={'/dashboard/categories'}>Categorias</Anchor>
+        <Anchor href={'/dashboard/products'}>Produtos</Anchor>
+        <Anchor href={'/dashboard/availables'}>Disponíveis à Venda</Anchor>
       </Group>
       <Group>{renderDarkModeToggle()}</Group>
     </Group>

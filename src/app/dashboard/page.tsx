@@ -23,15 +23,27 @@ import {
   IconReceipt2,
 } from '@tabler/icons-react'
 import _ from 'lodash'
-import { useState } from 'react'
-import useSWR from 'swr'
+import { useEffect, useState } from 'react'
+import useSWR, { mutate } from 'swr'
 
-const fetcher = async (url: string) => {
+const fetcher = async ([url, filter]: [
+  string,
+  { searchCustomerKey: string; searchCustomerName: string; orderBy: string; orderDirection: string }
+]) => {
+  const searchCustomerKey = filter.searchCustomerKey
+  const searchCustomerName = filter.searchCustomerName
+  const orderBy = filter.orderBy || 'createdAt'
+  const orderDirection = filter.orderDirection || 'desc'
+  const orderFilter = { [`orderBy__${orderDirection}`]: orderBy }
+
   const ordersPromise = Object.entries(OrderStatus).map(async ([key, value]) => {
-    const qs = new URLSearchParams({
-      orderBy__desc: 'createdAt',
+    const baseFilter = {
+      ...orderFilter,
       status: value,
-    })
+    }
+    if (searchCustomerKey) baseFilter['customerKey__contains'] = searchCustomerKey
+    if (searchCustomerName) baseFilter['customerName__contains'] = searchCustomerName
+    const qs = new URLSearchParams(baseFilter)
     const response = await fetch(`${url}?${qs}`)
     const body = await response.json()
     handleResponseError(body)
@@ -95,12 +107,22 @@ const statusTranslation = {
 }
 
 const DashboardOrders = () => {
-  const { data, error, isLoading } = useSWR('/api/order', fetcher)
+  const [filter, setFilter] = useState({
+    searchCustomerKey: '',
+    searchCustomerName: '',
+    orderBy: '',
+    orderDirection: '',
+  })
+  const { data, error, isLoading } = useSWR(['/api/order', filter], fetcher)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
   const [loadingOrders, setLoadingOrders] = useState<Array<string>>([])
   const [completedOrders, setCompletedOrders] = useState<Array<string>>([])
   const isCompleted = (orderId: string) => completedOrders.includes(orderId)
   const isOrderLoading = (orderId: string) => loadingOrders.includes(orderId)
+
+  useEffect(() => {
+    mutate('/api/order')
+  }, [filter])
 
   const handleOrderConfirmation = async (orderId: string) => {
     if (isCompleted(orderId)) return showErrorToast('Pedido Confirmado', `Esse pedido já está confirmado`)
@@ -316,9 +338,13 @@ const DashboardOrders = () => {
   return (
     <Group justify="center">
       <OrdersTabs
+        applyFilters={setFilter}
         draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}
         confirmedOrders={renderOrders(data?.entries[OrderStatus.CONFIRMED])}
         cancelledOrders={renderOrders(data?.entries[OrderStatus.CANCELLED])}
+        draftQty={data?.entries[OrderStatus.DRAFT]?.length || 0}
+        confirmedQty={data?.entries[OrderStatus.CONFIRMED]?.length || 0}
+        cancelledQty={data?.entries[OrderStatus.CANCELLED]?.length || 0}
       />
     </Group>
   )
