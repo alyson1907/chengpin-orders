@@ -10,7 +10,7 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import theme from './theme'
 import { DatesProvider } from '@mantine/dates'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, Suspense, useEffect } from 'react'
 import { usePathname, redirect } from 'next/navigation'
 import CatalogPage from '@/app/catalog/CatalogPage'
 import ShoppingCartProvider from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
@@ -49,7 +49,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <DatesProvider settings={{ locale: 'pt-br', firstDayOfWeek: 0 }}>
             <Notifications />
-            {getLayout(url, children)}
+            <Suspense>{getLayout(url, children)}</Suspense>
           </DatesProvider>
         </MantineProvider>
       </body>
