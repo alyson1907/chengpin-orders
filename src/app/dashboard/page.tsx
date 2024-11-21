@@ -76,6 +76,7 @@ const DashboardOrders = () => {
   }
 
   const renderOrders = (orders: any[]) => {
+    if (!orders) return
     return orders.map((order) => {
       const totalPrice = order.orderItems.reduce((total, item) => total + item.price * item.qty, 0)
       const totalDisplay = BRL.format(totalPrice)

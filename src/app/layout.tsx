@@ -30,10 +30,9 @@ const getLayout = (url: string, children: ReactNode) => {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const url = usePathname()
-  const router = useRouter()
   useEffect(() => {
     if (url === '/') return redirect('/catalog')
-  }, [url, router])
+  })
 
   return (
     <html lang="en" suppressHydrationWarning>

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import { useForm } from '@mantine/form'
 import { TextInput, PasswordInput, Button, Box, Paper, Text, Group, Stack, Title } from '@mantine/core'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
@@ -34,37 +34,44 @@ export default function LoginPage() {
   }
 
   return (
-    <Box
-      style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <DefaultLoadingOverlay visible={isLoading} />
-      <Paper radius="md" p="xl" withBorder shadow="xl" w={400}>
-        <Stack>
-          <Title order={2}>Login</Title>
+    <Suspense>
+      <Box
+        style={{
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <DefaultLoadingOverlay visible={isLoading} />
+        <Paper radius="md" p="xl" withBorder shadow="xl" w={400}>
+          <Stack>
+            <Title order={2}>Login</Title>
 
-          <form onSubmit={form.onSubmit(() => handleSubmit())}>
-            <Stack>
-              <TextInput label="Usuário" placeholder="Meu usuário" withAsterisk {...form.getInputProps('username')} />
-              <PasswordInput label="Senha" placeholder="Minha senha" withAsterisk {...form.getInputProps('password')} />
-              {loginError && (
-                <Text c="red" size="sm">
-                  {loginError}
-                </Text>
-              )}
-              <Group mt="md">
-                <Button type="submit" fullWidth>
-                  Login
-                </Button>
-              </Group>
-            </Stack>
-          </form>
-        </Stack>
-      </Paper>
-    </Box>
+            <form onSubmit={form.onSubmit(() => handleSubmit())}>
+              <Stack>
+                <TextInput label="Usuário" placeholder="Meu usuário" withAsterisk {...form.getInputProps('username')} />
+                <PasswordInput
+                  label="Senha"
+                  placeholder="Minha senha"
+                  withAsterisk
+                  {...form.getInputProps('password')}
+                />
+                {loginError && (
+                  <Text c="red" size="sm">
+                    {loginError}
+                  </Text>
+                )}
+                <Group mt="md">
+                  <Button type="submit" fullWidth>
+                    Login
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          </Stack>
+        </Paper>
+      </Box>
+    </Suspense>
   )
 }
