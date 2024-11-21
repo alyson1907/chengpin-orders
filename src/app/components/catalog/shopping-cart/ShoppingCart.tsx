@@ -128,11 +128,11 @@ const ShoppingCart = ({ editable = false }: IProps) => {
       <React.Fragment key={'render cart content fragment'}>
         {renderCartItems(deleteItem)}
         <Divider />
-        <Group justify="space-between" mt={'xl'}>
+        <Group justify="space-between" mt="xl">
           <Text size="md">Total:</Text>
           <Text size="md">{BRL.format(calculateTotal(cart))}</Text>
         </Group>
-        <Group mt={'sm'}>
+        <Group mt="sm" pb="xl">
           <Button
             w="100%"
             onClick={() => {

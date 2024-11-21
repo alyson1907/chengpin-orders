@@ -23,8 +23,8 @@ export const errorsMiddleware = (handler: (req: NextRequest, context: any) => Re
 }
 
 const handleErrors = (error: any) => {
-  console.error('\n\n[handleErrors] class name: ', new Date(), error?.constructor?.name)
-  console.log(error)
+  console.info('\n\n[handleErrors] class name: ', new Date(), error?.constructor?.name)
+  console.info(error)
   if (error instanceof BadRequestError)
     return new ResponseBuilder()
       .status(HttpStatus.BAD_REQUEST)

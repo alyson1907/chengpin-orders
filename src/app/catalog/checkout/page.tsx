@@ -36,7 +36,6 @@ import {
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 
 type SizesType = {
   text: MantineSize
@@ -352,6 +351,7 @@ const CheckoutPage = () => {
                 variant="outline"
                 onClick={handlePrevious}
                 leftSection={<IconChevronLeft size={sizes.btn.icon} />}
+                disabled={isLoading}
               >
                 Voltar
               </Button>
@@ -359,6 +359,7 @@ const CheckoutPage = () => {
                 onClick={handleSendOrder}
                 rightSection={<IconCheck size={sizes.btn.icon} />}
                 disabled={isCartEmpty}
+                loading={isLoading}
               >
                 Finalizar
               </Button>
@@ -398,7 +399,6 @@ const CheckoutPage = () => {
 
   return (
     <Container p="xl">
-      <DefaultLoadingOverlay visible={isLoading} />
       <Box maw={500} mx="auto">
         <Stepper
           orientation={sizes.stepper.orientation}

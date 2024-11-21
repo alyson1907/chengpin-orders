@@ -4,7 +4,7 @@ import { OrderStatus } from '@/app/api/order/order-status.enum'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/components/common/LongPressButton'
 import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
-import { handleResponseError } from '@/app/helpers/handle-request-error'
+import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { useMantineColor } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text } from '@mantine/core'
@@ -236,10 +236,7 @@ const DashboardOrders = () => {
   }
 
   if (isLoading) return <DefaultLoadingOverlay visible={isLoading} />
-  if (error) {
-    console.log(`error`, error)
-    // showErrorToast('Problema ao ler pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
-  }
+  if (error) showErrorToast('Problema ao ler pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
 
   return (
     <Group justify="center">

@@ -27,9 +27,6 @@ const CatalogPage = ({ children }: PropsWithChildren) => {
   const headerHidden = url === '/not-found' || url === '/no-catalog'
   const isCartEditable = !url.includes('/catalog/checkout')
   useEffect(() => {
-    console.log(`children`, children)
-  })
-  useEffect(() => {
     if (isMobile) close()
   }, [selectedCategory, close, isMobile])
 

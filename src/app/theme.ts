@@ -81,6 +81,7 @@ const theme = createTheme({
     Button: Button.extend({
       defaultProps: {
         variant: 'filled',
+        loaderProps: { type: 'dots' },
       },
     }),
     // Paper: Paper.extend({

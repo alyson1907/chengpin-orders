@@ -24,9 +24,9 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     setLoginError(null)
     setisLoading(true)
-    // const { username, password } = form.getValues()
-    // const isError = await login(username, password)
-    const isError = await login('admin', 'chengpin123')
+    const { username, password } = form.getValues()
+    const isError = await login(username, password)
+    // const isError = await login('admin', 'chengpin123')
     setisLoading(false)
     if (isError) return setLoginError('Invalid username or password')
     const redirectBack = searchParams.get('redirect_url') || '/'

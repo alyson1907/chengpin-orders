@@ -10,7 +10,7 @@ export const DefaultLoadingOverlay = ({ visible = true, ...props }: IProps) => {
       visible={visible}
       zIndex={1000}
       overlayProps={{ radius: 'sm', blur: 2, center: true }}
-      loaderProps={{ color: 'pink', type: 'bars' }}
+      loaderProps={{ color: 'pink', type: 'dots' }}
       {...props}
     />
   )
