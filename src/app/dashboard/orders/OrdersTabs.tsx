@@ -16,7 +16,7 @@ const OrdersTabs = ({ draftOrders, confirmedOrders, cancelledOrders }: IProps) =
   }
 
   useEffect(() => {
-    console.log(filter)
+    console.log(JSON.stringify(filter))
   }, [filter])
 
   return (

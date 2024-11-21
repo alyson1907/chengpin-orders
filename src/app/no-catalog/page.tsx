@@ -1,6 +1,7 @@
 'use client'
 import companyInfo from '@/app/company-info'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
+import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
 import { AppShell, Text, Image, Stack, Title, Button, TitleOrder } from '@mantine/core'
 import { IconBrandWhatsapp } from '@tabler/icons-react'
 
@@ -22,10 +23,6 @@ const resolveSizes = (current: number) => {
   return result
 }
 
-const openWhatsapp = () => {
-  window.open(`https://wa.me/${companyInfo.contact.whatsapp}?text=Olá Chengpin! Tudo bem?`)
-}
-
 const NoCatalogPage = () => {
   const sizes = useResolveSizes(resolveSizes)
   return (
@@ -36,7 +33,12 @@ const NoCatalogPage = () => {
           <Title order={sizes.title}>Catálogo vazio ᕱ⑅ᕱ</Title>
           <Text>Que pena! Parece que nosso catálogo online está vazio...</Text>
           <Text>Mas não se preocupe! Vamos te atender logo abaixo: </Text>
-          <Button onClick={openWhatsapp} mt="md" radius="xl" leftSection={<IconBrandWhatsapp />}>
+          <Button
+            onClick={() => openWhatsapp(companyInfo.contact.whatsapp, 'Olá Chengpin! Tudo bem')}
+            mt="md"
+            radius="xl"
+            leftSection={<IconBrandWhatsapp />}
+          >
             Whatsapp
           </Button>
         </Stack>

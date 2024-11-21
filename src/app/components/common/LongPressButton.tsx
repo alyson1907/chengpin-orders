@@ -31,6 +31,7 @@ const LongPressButton = ({
 
   // * local state
   const [progressValue, setProgressValue] = useState(0)
+  const [wasLongPressExecuted, setLongPressExecuted] = useState(false)
 
   const interval = useInterval(() => {
     setProgressValue((current) => {
@@ -67,10 +68,11 @@ const LongPressButton = ({
   }
 
   useEffect(() => {
-    if (progressValue >= 100) {
-      if (onLongPress != null) onLongPress()
-    }
-  }, [onLongPress, progressValue])
+    if (progressValue < 100 || !onLongPress) return
+    if (wasLongPressExecuted) return
+    onLongPress()
+    setLongPressExecuted(true)
+  }, [onLongPress, progressValue, wasLongPressExecuted])
 
   return (
     <Button

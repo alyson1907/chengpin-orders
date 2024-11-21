@@ -1,5 +1,6 @@
 'use client'
 import dayjs from '@/app/api/common/dayjs'
+import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/components/common/LongPressButton'
@@ -7,6 +8,7 @@ import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { useMantineColor } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
 import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text } from '@mantine/core'
 import {
   IconCheck,
@@ -17,7 +19,10 @@ import {
   IconClock,
   IconKey,
   IconPencil,
+  IconTruckDelivery,
+  IconReceipt2,
 } from '@tabler/icons-react'
+import _ from 'lodash'
 import { useState } from 'react'
 import useSWR from 'swr'
 
@@ -47,6 +52,35 @@ const fetcher = async (url: string) => {
   }
   return result
 }
+const confirmOrder = async (orderId: string) => fetch(`/api/order/confirm/${orderId}`, { method: 'POST' })
+const cancelOrder = async (orderId: string) => fetch(`/api/order/cancel/${orderId}`, { method: 'POST' })
+const calculateTotal = (order: any) =>
+  order.orderItems.reduce((total: number, item: any) => total + item.price * item.qty, 0)
+const buildWhatsappMessage = (order: any) => {
+  return `Olá, tudo bem? Agradecemos escolher a Chengpin!
+
+Acabamos de receber seu pedido, vamos confirmar?
+
+🌸 *[ Informações do Pedido ]*
+    - *Chave*: ${order.customerKey}
+    - *Nome*: ${order.customerName}
+    - *Data de Entrega*: ${dayjs.utc(order.deliveryDate).format('DD/MM/YYYY')}
+    - *Data Comercial*: ${dayjs.utc(order.commercialDate).format('DD/MM/YYYY')}
+
+🚚 *[ Itens Inclusos ]*
+${order.orderItems
+  .map(
+    (item) =>
+      `    - *${item.productName} - ${item.availabilityName}* (${item.qty} x ${BRL.format(
+        item.price
+      )}) | Total: ${BRL.format(item.qty * item.price)}`
+  )
+  .join('\n')}
+
+*Total do Pedido:* ${BRL.format(calculateTotal(order))}
+
+Por favor, me responda confirmando se o pedido está correto, assim podemos combinar o restante, ok?`
+}
 
 const badgeColor = {
   DRAFT: 'orange',
@@ -63,7 +97,30 @@ const statusTranslation = {
 const DashboardOrders = () => {
   const { data, error, isLoading } = useSWR('/api/order', fetcher)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+  const [loadingOrders, setLoadingOrders] = useState<Array<string>>([])
   const [completedOrders, setCompletedOrders] = useState<Array<string>>([])
+  const isCompleted = (orderId: string) => completedOrders.includes(orderId)
+  const isOrderLoading = (orderId: string) => loadingOrders.includes(orderId)
+
+  const handleOrderConfirmation = async (orderId: string) => {
+    if (isCompleted(orderId)) return showErrorToast('Pedido Confirmado', `Esse pedido já está confirmado`)
+    setLoadingOrders([...loadingOrders, orderId])
+    const res = await confirmOrder(orderId)
+    const body = await res.json()
+    if (res.status !== HttpStatus.OK) return handleResponseError(body)
+    setCompletedOrders([...completedOrders, orderId])
+    setLoadingOrders(_.remove(loadingOrders, (completingId) => completingId === orderId))
+  }
+
+  const handleOrderCancel = async (orderId: string) => {
+    if (isCompleted(orderId)) return showErrorToast('Pedido Cancelado', `Esse pedido já está cancelado`)
+    setLoadingOrders([...loadingOrders, orderId])
+    const res = await cancelOrder(orderId)
+    const body = await res.json()
+    if (res.status !== HttpStatus.OK) return handleResponseError(body)
+    setCompletedOrders([...completedOrders, orderId])
+    setLoadingOrders(_.remove(loadingOrders, (completingId) => completingId === orderId))
+  }
 
   const statusIcons = {
     DRAFT: <IconClock size={16} color={useMantineColor('orange')} />,
@@ -78,8 +135,11 @@ const DashboardOrders = () => {
   const renderOrders = (orders: any[]) => {
     if (!orders) return
     return orders.map((order) => {
-      const totalPrice = order.orderItems.reduce((total, item) => total + item.price * item.qty, 0)
+      const isCurrentlyCompleted = isCompleted(order.id)
+      const isCurrentlyLoading = isOrderLoading(order.id)
+      const totalPrice = calculateTotal(order)
       const totalDisplay = BRL.format(totalPrice)
+      const itemsQty = order.orderItems.length
       return (
         <Card key={order.id} shadow="md" radius="sm" mt="sm" withBorder>
           <Stack>
@@ -95,7 +155,14 @@ const DashboardOrders = () => {
                   </Group>
 
                   {/* Whatsapp */}
-                  <Group style={{ gap: 4 }} align="center">
+                  <Group
+                    style={{ gap: 4, cursor: order.status === OrderStatus.DRAFT ? 'pointer' : 'auto' }}
+                    align="center"
+                    onClick={() =>
+                      order.status === OrderStatus.DRAFT &&
+                      openWhatsapp(order.customerPhone, buildWhatsappMessage(order))
+                    }
+                  >
                     <IconBrandWhatsapp size={18} />
                     <Text size="sm" c="dimmed">
                       {order.customerPhone}
@@ -117,16 +184,27 @@ const DashboardOrders = () => {
             <Group>
               <Stack>
                 <Group>
+                  <Group style={{ gap: 4 }} align="center">
+                    <IconTruckDelivery size={18} />
+                    <Text size="xs">
+                      <strong>Entrega: </strong> {dayjs.utc(order.deliveryDate).format('DD/MM/YYYY')}
+                    </Text>
+                  </Group>
+                  <Group style={{ gap: 4 }} align="center">
+                    <IconReceipt2 size={18} />
+                    <Text size="xs">
+                      <strong>Comercial: </strong> {dayjs.utc(order.commercialDate).format('DD/MM/YYYY')}
+                    </Text>
+                  </Group>
+                </Group>
+                <Group>
                   <Text size="xs">
-                    <strong>Data de Entrega:</strong> {dayjs.utc(order.deliveryDate).format('DD/MM/YYYY')}
+                    <strong>Produtos: </strong> {itemsQty}
                   </Text>
                   <Text size="xs">
-                    <strong>Data Comercial:</strong> {dayjs.utc(order.commercialDate).format('DD/MM/YYYY')}
+                    <strong>Valor Total: </strong> {totalDisplay}
                   </Text>
                 </Group>
-                <Text size="xs">
-                  <strong>Valor Total: </strong> {totalDisplay}
-                </Text>
               </Stack>
             </Group>
 
@@ -147,15 +225,14 @@ const DashboardOrders = () => {
                       variant: 'light',
                       color: 'matcha',
                       size: 'xs',
-                      disabled: completedOrders.includes(order.id),
+                      disabled: isCurrentlyCompleted,
+                      loading: isCurrentlyLoading,
                     }}
                     iconColor="matcha"
-                    durationMs={700}
-                    onLongPress={() => {
-                      if (completedOrders.includes(order.id)) return
-                      // Send request to Complete order to BE
-                      setCompletedOrders([...completedOrders, order.id])
-                    }}
+                    durationMs={600}
+                    onLongPress={() =>
+                      handleOrderConfirmation(order.id).then(() => (order.status = OrderStatus.CONFIRMED))
+                    }
                   >
                     Confirmar
                   </LongPressButton>
@@ -163,6 +240,7 @@ const DashboardOrders = () => {
                     size="xs"
                     variant="light"
                     color="blue"
+                    loading={isCurrentlyLoading}
                     leftSection={<IconPencil size={18} />}
                     onClick={() => {
                       alert(`Edit order ${order.id}`)
@@ -175,16 +253,13 @@ const DashboardOrders = () => {
                       variant: 'light',
                       color: 'red',
                       size: 'xs',
-                      disabled: completedOrders.includes(order.id),
+                      disabled: isCurrentlyCompleted,
+                      loading: isCurrentlyLoading,
                     }}
                     iconColor="red"
                     iconLongPressed={<IconX />}
-                    durationMs={700}
-                    onLongPress={() => {
-                      if (completedOrders.includes(order.id)) return
-                      // Send request to Complete order to BE
-                      setCompletedOrders([...completedOrders, order.id])
-                    }}
+                    durationMs={600}
+                    onLongPress={() => handleOrderCancel(order.id).then(() => (order.status = OrderStatus.CANCELLED))}
                   >
                     Cancelar
                   </LongPressButton>
@@ -245,8 +320,6 @@ const DashboardOrders = () => {
         confirmedOrders={renderOrders(data?.entries[OrderStatus.CONFIRMED])}
         cancelledOrders={renderOrders(data?.entries[OrderStatus.CANCELLED])}
       />
-      {/* {renderOrders(data?.entries[OrderStatus.DRAFT])} */}
-      {/* {renderOrders(data?.entries[OrderStatus.CONFIRMED])} */}
     </Group>
   )
 }
