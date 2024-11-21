@@ -1,10 +1,9 @@
 'use client'
-
 import dayjs from '@/app/api/common/dayjs'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/components/common/LongPressButton'
-import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
+import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { useMantineColor } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text } from '@mantine/core'
@@ -18,11 +17,10 @@ import {
   IconKey,
   IconPencil,
 } from '@tabler/icons-react'
-import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import useSWR from 'swr'
 
-const fetcher = async ([url, authRedirectUrl]: string[]) => {
+const fetcher = async (url: string) => {
   const ordersPromise = Object.entries(OrderStatus).map(async ([key, value]) => {
     const qs = new URLSearchParams({
       orderBy__desc: 'createdAt',
@@ -30,10 +28,10 @@ const fetcher = async ([url, authRedirectUrl]: string[]) => {
     })
     const response = await fetch(`${url}?${qs}`)
     const body = await response.json()
-    handleResponseError(body, authRedirectUrl)
+    handleResponseError(body)
     return {
       status: key,
-      data: body.data,
+      data: body.data || { entries: [] },
     }
   })
 
@@ -56,8 +54,7 @@ const badgeColor = {
 }
 
 const DashboardOrders = () => {
-  const url = usePathname()
-  const { data, error, isLoading } = useSWR(['/api/order', url], fetcher)
+  const { data, error, isLoading } = useSWR('/api/order', fetcher)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
   const [completedOrders, setCompletedOrders] = useState<Array<string>>([])
 
@@ -66,10 +63,6 @@ const DashboardOrders = () => {
     CONFIRMED: <IconCheck size={16} color={useMantineColor('matcha')} />,
     CANCELLED: <IconX size={16} color={useMantineColor('gray')} />,
   }
-
-  // useEffect(() => {
-  //   console.log(`data`, JSON.stringify(data))
-  // })
 
   const toggleOrderItems = (orderId: string) => {
     setExpandedOrder((prev) => (prev === orderId ? null : orderId))
@@ -234,7 +227,10 @@ const DashboardOrders = () => {
   }
 
   if (isLoading) return <DefaultLoadingOverlay visible={isLoading} />
-  if (error) showErrorToast('Problema ao ler pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
+  if (error) {
+    console.log(`error`, error)
+    // showErrorToast('Problema ao ler pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
+  }
 
   return (
     <Stack>

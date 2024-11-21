@@ -22,8 +22,11 @@ const setUserCookie = async (authRedirectUrl?: string) => {
   const response = await fetch('/api/auth/me')
   const responseBody = await response.json()
   // If no token, invalid/expired token
-  const isError = handleResponseError(responseBody, authRedirectUrl)
-  if (isError) return
+  const isError = handleResponseError(responseBody)
+  if (isError) {
+    redirectLogin(authRedirectUrl)
+    return
+  }
   const newUser = responseBody.data
   if (newUser) Cookies.set(AuthCookieKeys.USER, JSON.stringify(newUser))
   return newUser
