@@ -1,5 +1,5 @@
 import { Tabs, TextInput, Select, Group, Button, Badge } from '@mantine/core'
-import React, { Dispatch, useEffect, useState } from 'react'
+import React, { Dispatch, useState } from 'react'
 import { IconSearch } from '@tabler/icons-react'
 
 type IProps = {
