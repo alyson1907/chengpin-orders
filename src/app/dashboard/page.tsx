@@ -4,12 +4,13 @@ import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/components/common/LongPressButton'
+import EditOrderModal from '@/app/dashboard/orders/EditOrderModal'
 import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
-import { useMantineColor } from '@/app/helpers/hooks'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
 import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
   IconCheck,
   IconX,
@@ -95,7 +96,7 @@ Por favor, me responda confirmando se o pedido está correto, assim podemos comb
 }
 
 const badgeColor = {
-  DRAFT: 'orange',
+  DRAFT: 'yellow',
   CONFIRMED: 'matcha',
   CANCELLED: 'grey',
 }
@@ -107,6 +108,8 @@ const statusTranslation = {
 }
 
 const DashboardOrders = () => {
+  const [isEditOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false)
+  const [editingOrder, setEditingOrder] = useState(null)
   const [filter, setFilter] = useState({
     searchCustomerKey: '',
     searchCustomerName: '',
@@ -145,9 +148,9 @@ const DashboardOrders = () => {
   }
 
   const statusIcons = {
-    DRAFT: <IconClock size={16} color={useMantineColor('orange')} />,
-    CONFIRMED: <IconCheck size={16} color={useMantineColor('matcha')} />,
-    CANCELLED: <IconX size={16} color={useMantineColor('gray')} />,
+    DRAFT: <IconClock size={16} color={'white'} />,
+    CONFIRMED: <IconCheck size={16} color={'white'} />,
+    CANCELLED: <IconX size={16} color={'white'} />,
   }
 
   const toggleOrderItems = (orderId: string) => {
@@ -197,7 +200,7 @@ const DashboardOrders = () => {
                   </Text>
                 </Group>
                 <Box>
-                  <Badge leftSection={statusIcons[order.status]} color={badgeColor[order.status]} variant="outline">
+                  <Badge leftSection={statusIcons[order.status]} color={badgeColor[order.status]} variant="filled">
                     {statusTranslation[order.status]}
                   </Badge>
                 </Box>
@@ -244,7 +247,7 @@ const DashboardOrders = () => {
                 <Group>
                   <LongPressButton
                     buttonProps={{
-                      variant: 'light',
+                      variant: 'outline',
                       color: 'matcha',
                       size: 'xs',
                       disabled: isCurrentlyCompleted,
@@ -260,19 +263,20 @@ const DashboardOrders = () => {
                   </LongPressButton>
                   <Button
                     size="xs"
-                    variant="light"
+                    variant="outline"
                     color="blue"
                     loading={isCurrentlyLoading}
                     leftSection={<IconPencil size={18} />}
                     onClick={() => {
-                      alert(`Edit order ${order.id}`)
+                      setEditingOrder(order)
+                      openEdit()
                     }}
                   >
                     Alterar
                   </Button>
                   <LongPressButton
                     buttonProps={{
-                      variant: 'light',
+                      variant: 'outline',
                       color: 'red',
                       size: 'xs',
                       disabled: isCurrentlyCompleted,
@@ -324,7 +328,6 @@ const DashboardOrders = () => {
                   </Table.Td>
                 </Table.Tr>
               </Table.Tbody>
-              <Table.Tfoot></Table.Tfoot>
             </Table>
           </Collapse>
         </Card>
@@ -333,10 +336,12 @@ const DashboardOrders = () => {
   }
 
   if (isLoading) return <DefaultLoadingOverlay visible={isLoading} />
-  if (error) showErrorToast('Problema ao ler pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
+  if (error)
+    showErrorToast('Problema ao carregar pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
 
   return (
     <Group justify="center">
+      {editingOrder && <EditOrderModal order={editingOrder} opened={isEditOpened} onClose={closeEdit} />}
       <OrdersTabs
         applyFilters={setFilter}
         draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}
