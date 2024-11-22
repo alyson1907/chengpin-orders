@@ -201,11 +201,11 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
                   <Table.Td>{item.availabilityName}</Table.Td>
                   <Table.Td>
                     <NumberInput
-                      description={`Max: ${availability.qty}`}
+                      description={`Max: ${availability?.qty || 0}`}
                       w={'75px'}
                       value={item.qty}
-                      min={1}
-                      max={availability.qty}
+                      min={0}
+                      max={availability?.qty || 0}
                       step={1}
                       stepHoldDelay={200}
                       stepHoldInterval={15}

@@ -106,7 +106,7 @@ const CheckoutPage = () => {
   const sizes = useResolveSizes(resolveSizes) as SizesType
   const router = useRouter()
   const [deliveryDate, setDeliveryDate] = useState(new Date())
-  const [commercialDate, setCommercialDate] = useState<Date | null>(null)
+  const [commercialDate, setCommercialDate] = useState<Date>(new Date())
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -160,6 +160,7 @@ const CheckoutPage = () => {
       customerPhone: values.phone,
       orderItems: cart.items.map((item) => ({ id: item.id, qty: item.buyingQty })),
     }
+    console.log(body)
     setIsLoading(true)
     const response = await fetch('/api/order', {
       method: 'POST',
@@ -196,7 +197,7 @@ const CheckoutPage = () => {
                 withAsterisk
                 {...form.getInputProps('deliveryDate')}
                 onChange={(value) => {
-                  const date = dayjs(value).toDate()
+                  const date = dayjs.utc(value).toDate()
                   form.setFieldValue('deliveryDate', date)
                   form.setFieldValue('commercialDate', date)
                   setDeliveryDate(date)
@@ -215,7 +216,7 @@ const CheckoutPage = () => {
                 {...form.getInputProps('commercialDate')}
                 value={commercialDate}
                 onChange={(value) => {
-                  const date = dayjs(value).toDate()
+                  const date = dayjs.utc(value).toDate()
                   setCommercialDate(date)
                   form.setFieldValue('commercialDate', date)
                 }}
@@ -254,10 +255,11 @@ const CheckoutPage = () => {
               mt="2px"
               key={form.key('phone')}
               label="Whatsapp (celular)"
-              placeholder="(15) 9999-3333"
+              placeholder="(15) 99999-3333"
               component={IMaskInput}
               mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
               withAsterisk
+              type="number"
               {...form.getInputProps('phone')}
             />
           </form>
