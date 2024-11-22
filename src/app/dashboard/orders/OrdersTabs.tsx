@@ -32,10 +32,6 @@ const OrdersTabs = ({
     setFilter((prev) => ({ ...prev, [field]: value }))
   }
 
-  useEffect(() => {
-    console.log(JSON.stringify(filter))
-  }, [filter])
-
   const renderFilter = () => (
     <form
       onSubmit={(e) => {

@@ -160,7 +160,6 @@ const CheckoutPage = () => {
       customerPhone: values.phone,
       orderItems: cart.items.map((item) => ({ id: item.id, qty: item.buyingQty })),
     }
-    console.log(body)
     setIsLoading(true)
     const response = await fetch('/api/order', {
       method: 'POST',

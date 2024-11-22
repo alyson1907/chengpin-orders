@@ -159,7 +159,6 @@ const DashboardOrders = () => {
 
   const renderOrders = (orders: any[]) => {
     if (!orders) return
-    console.log(orders.map((r) => r.customerPhone))
     return orders.map((order) => {
       const isCurrentlyCompleted = isCompleted(order.id)
       const isCurrentlyLoading = isOrderLoading(order.id)
