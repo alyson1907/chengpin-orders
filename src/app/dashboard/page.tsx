@@ -9,7 +9,7 @@ import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
-import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text } from '@mantine/core'
+import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCheck,
@@ -25,7 +25,7 @@ import {
 } from '@tabler/icons-react'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 
 const fetcher = async ([url, filter]: [
   string,
@@ -108,15 +108,15 @@ const statusTranslation = {
 }
 
 const DashboardOrders = () => {
-  const [isEditOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false)
-  const [editingOrder, setEditingOrder] = useState(null)
   const [filter, setFilter] = useState({
     searchCustomerKey: '',
     searchCustomerName: '',
     orderBy: '',
     orderDirection: '',
   })
-  const { data, error, isLoading } = useSWR(['/api/order', filter], fetcher)
+  const { data, error, isLoading, mutate } = useSWR(['/api/order', filter], fetcher)
+  const [isEditOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false)
+  const [editingOrder, setEditingOrder] = useState(null)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
   const [loadingOrders, setLoadingOrders] = useState<Array<string>>([])
   const [completedOrders, setCompletedOrders] = useState<Array<string>>([])
@@ -124,8 +124,8 @@ const DashboardOrders = () => {
   const isOrderLoading = (orderId: string) => loadingOrders.includes(orderId)
 
   useEffect(() => {
-    mutate('/api/order')
-  }, [filter])
+    mutate()
+  }, [filter, mutate])
 
   const handleOrderConfirmation = async (orderId: string) => {
     if (isCompleted(orderId)) return showErrorToast('Pedido Confirmado', `Esse pedido já está confirmado`)
@@ -180,23 +180,27 @@ const DashboardOrders = () => {
                   </Group>
 
                   {/* Whatsapp */}
-                  <Group
-                    style={{ gap: 4, cursor: order.status === OrderStatus.DRAFT ? 'pointer' : 'auto' }}
-                    align="center"
-                    onClick={() =>
-                      order.status === OrderStatus.DRAFT &&
-                      openWhatsapp(order.customerPhone, buildWhatsappMessage(order))
-                    }
-                  >
-                    <IconBrandWhatsapp size={18} />
-                    <Text size="sm" c="dimmed">
-                      {order.customerPhone}
-                    </Text>
-                  </Group>
+                  <Tooltip label="Abrir Whatsapp com pedido" withArrow>
+                    <Group
+                      style={{ gap: 4, cursor: order.status === OrderStatus.DRAFT ? 'pointer' : 'auto' }}
+                      align="center"
+                      onClick={() => {
+                        if (order.status !== OrderStatus.DRAFT) return
+                        const wppMsg = buildWhatsappMessage(order)
+                        navigator.clipboard.writeText(wppMsg)
+                        openWhatsapp(order.customerPhone, wppMsg)
+                      }}
+                    >
+                      <IconBrandWhatsapp size={18} />
+                      <Text size="sm" c="dimmed">
+                        {order.customerPhone}
+                      </Text>
+                    </Group>
+                  </Tooltip>
 
                   {/* Order Date */}
                   <Text size="sm">
-                    <strong>Realizado em:</strong> {dayjs.utc(order.createdAt).format(`DD/MM/YYYY - HH:mm (dddd)`)}
+                    <strong>Realizado em:</strong> {dayjs(order.createdAt).format(`DD/MM/YYYY - HH:mm (dddd)`)}
                   </Text>
                 </Group>
                 <Box>
@@ -212,7 +216,7 @@ const DashboardOrders = () => {
                   <Group style={{ gap: 4 }} align="center">
                     <IconTruckDelivery size={18} />
                     <Text size="xs">
-                      <strong>Entrega: </strong> {dayjs.utc(order.deliveryDate).format('DD/MM/YYYY')}
+                      <strong>Entrega: </strong> {dayjs(order.deliveryDate).format('DD/MM/YYYY')}
                     </Text>
                   </Group>
                   <Group style={{ gap: 4 }} align="center">
@@ -341,7 +345,16 @@ const DashboardOrders = () => {
 
   return (
     <Group justify="center">
-      {editingOrder && <EditOrderModal order={editingOrder} opened={isEditOpened} onClose={closeEdit} />}
+      {editingOrder && (
+        <EditOrderModal
+          order={editingOrder}
+          opened={isEditOpened}
+          closeOnEscape={true}
+          close={closeEdit}
+          mutate={mutate}
+          onClose={closeEdit}
+        />
+      )}
       <OrdersTabs
         applyFilters={setFilter}
         draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}

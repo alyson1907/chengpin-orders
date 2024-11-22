@@ -8,7 +8,7 @@ const orderBaseSchema = z.object({
   commercialDate: z.string().date(),
   customerKey: z.string().max(6),
   customerName: z.string(),
-  customerPhone: z.string().max(14),
+  customerPhone: z.string().max(15),
   status: z.nativeEnum(OrderStatus).optional(),
 })
 

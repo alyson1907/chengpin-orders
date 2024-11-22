@@ -13,17 +13,19 @@ import {
 } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import dayjs from '@/app/api/common/dayjs'
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { IMaskInput } from 'react-imask'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
 import useSWR from 'swr'
 import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
-import { showErrorToast } from '@/app/helpers/handle-request-error'
+import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
 
 type IProps = {
   order: any
+  close: () => void
+  mutate: any
 } & ModalProps
 
 const fetcher = async (url: string) => {
@@ -33,6 +35,14 @@ const fetcher = async (url: string) => {
   const res = await fetch(`${url}?${qs}`)
   const body = await res.json()
   return body.data.entries
+}
+
+const sendOrderUpdate = async (orderId: string, body: Record<string, any>, mutate: any) => {
+  const res = await fetch(`/api/order/${orderId}`, { method: 'PUT', body: JSON.stringify(body) })
+  const resBody = await res.json()
+  handleResponseError(resBody)
+  mutate()
+  return resBody
 }
 
 const buildOrderUpdateRequest = (editedOrder, editedOrderItems) => {
@@ -52,13 +62,13 @@ const reduceAvailablesSelect = (availables) => {
   return availables.map((a) => ({ value: a.id, label: `${a.product.name} (${a.name}) ` }))
 }
 
-const EditOrderModal = ({ order, ...props }: IProps) => {
+const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
   const { data: availables, error, isLoading } = useSWR('/api/availability', fetcher)
   const availablesSelectData = useMemo(() => reduceAvailablesSelect(availables), [availables])
   const [editingOrder, setEditingOrder] = useState<any>()
   const [editingItems, setEditingItems] = useState<Array<any>>()
   const [itemToAdd, setItemToAdd] = useState<string | null>(null)
-
+  const [isUpdating, setIsUpdating] = useState(false)
   useEffect(() => {
     const editingOrder = { ...order }
     const editingItems = [...order.orderItems]
@@ -78,10 +88,18 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
     })
     setEditingOrder(editingOrder)
     setEditingItems(editingItems)
-  }, [order])
+  }, [order, props.opened])
 
   const handleOrderChangeValue = (key, value) => {
     setEditingOrder({ ...editingOrder, [key]: value })
+  }
+
+  const handleOrderUpdateSubmit = async () => {
+    setIsUpdating(true)
+    const body = buildOrderUpdateRequest(editingOrder, editingItems)
+    await sendOrderUpdate(order.id, body, mutate)
+    setIsUpdating(false)
+    close()
   }
 
   const renderEditOrder = (editingOrder) => {
@@ -91,40 +109,36 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
         <Group>
           <Group>
             <InputBase
+              form="edit-order-and-items-form"
               label="Chave"
               placeholder="0000"
               value={editingOrder?.customerKey}
               component={IMaskInput}
               mask={[{ mask: '0000' }]}
-              onChange={(e) => {
-                e.preventDefault()
-                const event = e as ChangeEvent<HTMLInputElement>
-                handleOrderChangeValue('customerKey', event.target.value)
-              }}
+              onAccept={(value) => handleOrderChangeValue('customerKey', value)}
             />
 
             <TextInput
+              form="edit-order-and-items-form"
               label="Nome"
               value={editingOrder?.customerName}
               onChange={(e) => handleOrderChangeValue('customerName', e.target.value)}
             />
 
             <InputBase
+              form="edit-order-and-items-form"
               key={'phone'}
               label="Whatsapp"
-              placeholder="(15) 9999-3333"
+              placeholder="(15) 9999-0000"
               value={editingOrder?.customerPhone}
               component={IMaskInput}
-              mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
-              onChange={(e) => {
-                e.preventDefault()
-                const event = e as ChangeEvent<HTMLInputElement>
-                handleOrderChangeValue('customerPhone', event.target.value)
-              }}
+              mask={[{ mask: '(00) 00000-0000' }, { mask: '(00) 0000-0000' }]}
+              onAccept={(value) => handleOrderChangeValue('customerPhone', value)}
             />
           </Group>
           <Group>
             <DateInput
+              form="edit-order-and-items-form"
               valueFormat="DD/MM/YYYY (ddd)"
               label="Data de entrega"
               placeholder="Data de entrega"
@@ -136,6 +150,7 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
               }}
             />
             <DateInput
+              form="edit-order-and-items-form"
               valueFormat="DD/MM/YYYY (ddd)"
               label="Data comercial"
               placeholder="Data comercial"
@@ -201,6 +216,7 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
                   <Table.Td>{item.availabilityName}</Table.Td>
                   <Table.Td>
                     <NumberInput
+                      form="edit-order-and-items-form"
                       description={`Max: ${availability?.qty || 0}`}
                       w={'75px'}
                       value={item.qty}
@@ -250,42 +266,50 @@ const EditOrderModal = ({ order, ...props }: IProps) => {
   }
   return (
     <Modal {...props} size="xl" closeOnClickOutside={false}>
-      {renderEditOrder(editingOrder)}
-      {renderEditItems(editingItems)}
-      <Group justify="space-between" mt="md">
-        <form
-          style={{ flex: 1, display: 'flex', flexGrow: 1 }}
-          id="add-item-to-order-form"
-          onSubmit={(e) => {
-            e.preventDefault()
-            addItem(itemToAdd)
-          }}
-        >
-          <Group w="100%">
-            <Select
-              w={300}
-              placeholder="Adicionar item..."
-              data={availablesSelectData}
-              nothingFoundMessage="Não encontrado..."
-              onChange={(value) => setItemToAdd(value)}
-              searchable
-            />
-            <Button leftSection={<IconPlus />} type="submit">
-              Adicionar Item
-            </Button>
-          </Group>
-        </form>
-        <Button
-          leftSection={<IconDeviceFloppy />}
-          onClick={() => {
-            const body = buildOrderUpdateRequest(editingOrder, editingItems)
-            console.log(`order.id`, order.id)
-            console.log(`body`, body)
-          }}
-        >
-          Salvar
-        </Button>
-      </Group>
+      <form
+        id="edit-order-and-items-form"
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleOrderUpdateSubmit()
+        }}
+      >
+        {renderEditOrder(editingOrder)}
+        {renderEditItems(editingItems)}
+        <Group justify="space-between" mt="md">
+          <form
+            id="add-item-to-order-form"
+            style={{ flex: 1, display: 'flex', flexGrow: 1 }}
+            onSubmit={(e) => {
+              e.preventDefault()
+              addItem(itemToAdd)
+            }}
+          >
+            <Group w="100%">
+              <Select
+                form="add-item-to-order-form"
+                w={300}
+                placeholder="Adicionar item..."
+                data={availablesSelectData}
+                nothingFoundMessage="Não encontrado..."
+                onChange={(value) => setItemToAdd(value)}
+                searchable
+              />
+              <Button leftSection={<IconPlus />} form="add-item-to-order-form" type="submit">
+                Adicionar Item
+              </Button>
+            </Group>
+          </form>
+          <Button
+            loading={isUpdating}
+            leftSection={<IconDeviceFloppy />}
+            form="edit-order-and-items-form"
+            type="submit"
+          >
+            Salvar
+          </Button>
+        </Group>
+      </form>
     </Modal>
   )
 }

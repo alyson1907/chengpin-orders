@@ -136,7 +136,7 @@ const CheckoutPage = () => {
         customerKey: customerKey.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        phone: phone.trim().replaceAll(' ', ''),
+        phone: phone,
       }
     },
   })
@@ -188,7 +188,7 @@ const CheckoutPage = () => {
             <Group>
               <DateInput
                 size={sizes.forms.dateInput}
-                contentEditable={false}
+                contentEditable={true}
                 valueFormat="DD/MM/YYYY (ddd)"
                 label="Data de entrega"
                 placeholder="Data de entrega"
@@ -205,7 +205,7 @@ const CheckoutPage = () => {
               />
               <DateInput
                 size={sizes.forms.dateInput}
-                contentEditable={false}
+                contentEditable={true}
                 valueFormat="DD/MM/YYYY (ddd)"
                 label="Data comercial"
                 placeholder="Data comercial"
@@ -230,8 +230,9 @@ const CheckoutPage = () => {
               component={IMaskInput}
               mask={[{ mask: '0000' }]}
               withAsterisk
-              {...form.getInputProps('customerKey')}
               type="number"
+              {...form.getInputProps('customerKey')}
+              onAccept={(value) => form.setFieldValue('customerKey', value)}
             />
 
             <InputBase
@@ -256,10 +257,10 @@ const CheckoutPage = () => {
               label="Whatsapp (celular)"
               placeholder="(15) 99999-3333"
               component={IMaskInput}
-              mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
+              mask={[{ mask: '(00) 00000-0000' }, { mask: '(00) 0000-0000' }]}
               withAsterisk
-              type="number"
               {...form.getInputProps('phone')}
+              onAccept={(value) => form.setFieldValue('phone', value)}
             />
           </form>
         </Box>

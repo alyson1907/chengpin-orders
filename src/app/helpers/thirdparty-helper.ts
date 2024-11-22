@@ -5,4 +5,5 @@ export const openWhatsapp = (phone: string, text: string) => {
     text,
   })
   window.open(`https://api.whatsapp.com/send/?${qs}`)
+  window.focus()
 }
