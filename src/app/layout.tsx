@@ -13,8 +13,8 @@ import { DatesProvider } from '@mantine/dates'
 import { ReactNode, Suspense, useEffect } from 'react'
 import { usePathname, redirect } from 'next/navigation'
 import CatalogPage from '@/app/catalog/CatalogPage'
-import ShoppingCartProvider from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
-import LayoutContextProvider from '@/app/components/layout/LayoutContextProvider'
+import ShoppingCartProvider from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import LayoutContextProvider from '@/app/catalog/layout/LayoutContextProvider'
 
 const getLayout = (url: string, children: ReactNode) => {
   if (url.startsWith('/catalog'))

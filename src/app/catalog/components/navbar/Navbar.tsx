@@ -6,7 +6,7 @@ import { notifications } from '@mantine/notifications'
 import { Category } from '@prisma/client'
 import { IconBook, IconExclamationMark } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 
 const fetcher = (url: string) => {
   const qs = new URLSearchParams({

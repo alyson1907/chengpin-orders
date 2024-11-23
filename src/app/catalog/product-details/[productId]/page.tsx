@@ -27,11 +27,11 @@ import { ProductAvailability } from '@prisma/client'
 import React from 'react'
 import { notifications } from '@mantine/notifications'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
-import CustomNumberInput from '@/app/components/common/CustomNumberInput'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import CustomNumberInput from '@/app/common/CustomNumberInput'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
-import { ShoppingCartContext } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({

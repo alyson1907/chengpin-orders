@@ -1,12 +1,12 @@
+import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
+import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
+import { PaginationDto } from '@/app/api/common/types/common-response'
+import { Category } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
 import { ErrorKey } from '../common/error/errors.enum'
 import { createCategoryBodySchema, updateCategoryBodySchema } from './validation-schemas'
-import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
-import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
-import { PaginationDto } from '@/app/api/common/types/common-response'
-import { Category } from '@prisma/client'
-import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
 
 const createCategories = async (req: NextRequest) => {
   const { body } = await parseReq(req)
@@ -17,6 +17,7 @@ const createCategories = async (req: NextRequest) => {
 
   const newCategory = {
     name: body.name,
+    visible: body.visible,
   }
   const created = await prisma.category.create({
     data: newCategory,

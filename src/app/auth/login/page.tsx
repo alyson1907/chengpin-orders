@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { useForm } from '@mantine/form'
 import { TextInput, PasswordInput, Button, Box, Paper, Text, Group, Stack, Title } from '@mantine/core'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { redirect, useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/auth-actions'
 

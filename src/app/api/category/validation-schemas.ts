@@ -7,6 +7,7 @@ export const categorySchema = z.object({
 
 export const createCategoryBodySchema = z.object({
   name: z.string(),
+  visible: z.boolean(),
 })
 
 export const updateCategoryBodySchema = z.object({

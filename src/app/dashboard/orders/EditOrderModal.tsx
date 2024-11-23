@@ -18,9 +18,9 @@ import { IMaskInput } from 'react-imask'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
 import useSWR from 'swr'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
-import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
+import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 
 type IProps = {
   order: any

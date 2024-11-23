@@ -1,9 +1,9 @@
 'use client'
 
-import Header from '@/app/components/catalog/header/Header'
-import { Navbar } from '@/app/components/catalog/navbar/Navbar'
-import ShoppingCart from '@/app/components/catalog/shopping-cart/ShoppingCart'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import Header from '@/app/catalog/components/header/Header'
+import { Navbar } from '@/app/catalog/components/navbar/Navbar'
+import ShoppingCart from '@/app/catalog/components/shopping-cart/ShoppingCart'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 import { isScreenSmaller, useBreakpoint } from '@/app/helpers/hooks'
 import { AppShell } from '@mantine/core'
 import { usePathname } from 'next/navigation'

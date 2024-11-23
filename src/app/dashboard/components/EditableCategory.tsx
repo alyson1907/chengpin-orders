@@ -1,32 +1,33 @@
 import { handleResponseError } from '@/app/helpers/handle-request-error'
-import { ActionIcon, Text, Group, Collapse, TextInput, Box, Switch, Tooltip } from '@mantine/core'
+import { isNotValid } from '@/app/helpers/validate-helper'
+import { ActionIcon, Badge, Box, Collapse, Group, Switch, Text, TextInput, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { z, ZodSchema } from 'zod'
+import { z } from 'zod'
 
 type IProps = {
   category: {
     id: string
     name: string
     visible: boolean
+    categoryProduct: any[]
   }
   isEditable: boolean
   selected?: boolean
   onClick?: () => void
-  onUpdate?: () => void
+  afterUpdate?: () => void
 }
-const isNotValid = (schema: ZodSchema, value: any) => !schema.safeParse(value).success
 
 const EditableCategory = ({
   category,
   selected = false,
   isEditable,
   onClick = () => {},
-  onUpdate = () => {},
+  afterUpdate = () => {},
 }: IProps) => {
-  const [isOpenEditControls, { toggle: toggleEditControls }] = useDisclosure(false)
+  const [isOpenEditControls, { toggle: toggleEditControls, close: closeEditControls }] = useDisclosure(false)
   const [isCategoryVisible, setIsCategoryVisible] = useState(category.visible)
   const [switchForm, setForm] = useState<HTMLFormElement | null>(null)
 
@@ -39,7 +40,7 @@ const EditableCategory = ({
       categoryName: category.name,
     },
     validate: {
-      categoryName: (value) => isNotValid(z.string().min(1), value) && 'Não pode ser vazio',
+      categoryName: (value) => isNotValid(value, z.string().min(1)) && 'Não pode ser vazio',
     },
     transformValues: ({ categoryName }) => ({ categoryName: categoryName.trim() }),
   })
@@ -57,7 +58,7 @@ const EditableCategory = ({
     const res = await fetch('/api/category', { method: 'PATCH', body: JSON.stringify(body) })
     const resBody = await res.json()
     handleResponseError(resBody)
-    onUpdate()
+    afterUpdate()
   }
 
   const renderEditControls = (isEditable: boolean) => {
@@ -67,6 +68,7 @@ const EditableCategory = ({
           id={`update-category-${category.id}`}
           onSubmit={async (e) => {
             e.preventDefault()
+            closeEditControls()
             await sendCategoryUpdates()
           }}
         >
@@ -104,6 +106,9 @@ const EditableCategory = ({
             onClick={onClick}
           >
             {category.name}
+            <Badge variant="transparent" styles={{ root: { cursor: 'pointer' } }}>
+              {category.categoryProduct.length}
+            </Badge>
           </Text>
         </Tooltip>
         {renderEditControls(isEditable)}

@@ -1,9 +1,9 @@
 'use client'
 import { checkAuth } from '@/app/auth/auth-actions'
-import { DefaultLoadingOverlay } from '@/app/components/common/DefaultLoadingOverlay'
-import DashboardHeader from '@/app/components/dashboard/DashboardHeader'
-import DashboardNavbar from '@/app/components/dashboard/DashboardNavbar'
-import { AppShell } from '@mantine/core'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
+import DashboardHeader from '@/app/dashboard/components/DashboardHeader'
+import DashboardNavbar from '@/app/dashboard/components/DashboardNavbar'
+import { AppShell, ScrollArea } from '@mantine/core'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
@@ -19,7 +19,7 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
     <AppShell
       header={{ height: { base: 60, sm: 60, md: 80 }, offset: true }}
       navbar={{
-        width: { sm: 200 },
+        width: { sm: 250 },
         breakpoint: 'sm',
         collapsed: { mobile: isNavHidden, desktop: isNavHidden },
       }}
@@ -32,7 +32,9 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
       </AppShell.Header>
 
       <AppShell.Navbar>
-        <DashboardNavbar />
+        <AppShell.Section grow component={ScrollArea}>
+          <DashboardNavbar />
+        </AppShell.Section>
       </AppShell.Navbar>
 
       <AppShell.Main>{children}</AppShell.Main>

@@ -1,29 +1,29 @@
 'use client'
-import '@mantine/dates/styles.css'
-import React, { useContext, useEffect, useState } from 'react'
-import { IMaskInput } from 'react-imask'
+import dayjs from '@/app/api/common/dayjs'
+import { ShoppingCartContext, ShoppingCartType } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
+import { handleResponseError } from '@/app/helpers/handle-request-error'
+import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
+import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { isNotValid } from '@/app/helpers/validate-helper'
 import {
   AspectRatio,
   Box,
   Button,
   Container,
   Group,
+  Image,
   InputBase,
+  MantineSize,
   Stack,
   Stepper,
   Text,
   Title,
-  Image,
   TitleOrder,
-  MantineSize,
 } from '@mantine/core'
-import { useForm } from '@mantine/form'
 import { DateInput } from '@mantine/dates'
-import { ShoppingCartContext, ShoppingCartType } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
-import { z } from 'zod'
-import dayjs from '@/app/api/common/dayjs'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
-import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import '@mantine/dates/styles.css'
+import { useForm } from '@mantine/form'
 import {
   IconCheck,
   IconChecklist,
@@ -33,9 +33,10 @@ import {
   IconLeaf,
   IconShoppingBag,
 } from '@tabler/icons-react'
-import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
-import { handleResponseError } from '@/app/helpers/handle-request-error'
+import { useContext, useEffect, useState } from 'react'
+import { IMaskInput } from 'react-imask'
+import { z } from 'zod'
 
 type SizesType = {
   text: MantineSize
@@ -92,10 +93,6 @@ const resolveSizes = (currentBp: number) => {
 
 const mobilePhoneRegex = /(?:([1-9]{2})|([0-9]{3})?)\ (\d{4,5})\-(\d{4})/i
 const totalValue = (cart: ShoppingCartType) => cart.items.reduce((acc, item) => acc + item.price * item.buyingQty, 0)
-const isNotValid = (value: any, schema: z.Schema) => {
-  const isValid = schema.safeParse(value).success
-  return !isValid
-}
 
 const CheckoutPage = () => {
   const [activeStep, setActiveStep] = useState(0)

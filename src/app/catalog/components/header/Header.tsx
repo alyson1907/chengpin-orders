@@ -1,14 +1,14 @@
 import { Group, Burger, Image, useMantineColorScheme, Tooltip, Title, TitleOrder, Indicator } from '@mantine/core'
 import { Parisienne } from 'next/font/google'
 import { IconChevronLeft, IconMoonStars, IconPlant, IconShoppingCart, IconSun } from '@tabler/icons-react'
-import ButtonSquareIcon from '../../common/ButtonSquareIcon'
+import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
+import btnSquareStyles from '@/app/common/ButtonSquareIcon.module.css'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
 import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
-import btnSquareStyles from '../../common/ButtonSquareIcon.module.css'
 import styles from './Header.module.css'
-import { ShoppingCartContext } from '@/app/components/catalog/shopping-cart/ShoppingCartProvider'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 
 type IProps = {
   isBurgerOpen?: boolean

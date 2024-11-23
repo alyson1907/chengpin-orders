@@ -1,4 +1,4 @@
-import ButtonSquareIcon from '@/app/components/common/ButtonSquareIcon'
+import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 import { Anchor, Group, Tooltip, useMantineColorScheme } from '@mantine/core'
 import { IconSun, IconMoonStars } from '@tabler/icons-react'
 

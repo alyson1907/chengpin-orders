@@ -3,7 +3,7 @@ import ProductCard from './ProductCard'
 import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { LayoutContext } from '@/app/components/layout/LayoutContextProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 import { showErrorToast } from '@/app/helpers/handle-request-error'
 
 const fetcher = async ([url, activeCategoryId]: [string, string]) => {
