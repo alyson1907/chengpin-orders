@@ -18,9 +18,7 @@ const DashboardHeader = () => {
     <Group justify="center" w="100%" h="100%">
       <Group>
         <Anchor href={'/dashboard'}>Pedidos</Anchor>
-        <Anchor href={'/dashboard/categories'}>Categorias</Anchor>
         <Anchor href={'/dashboard/products'}>Produtos</Anchor>
-        <Anchor href={'/dashboard/availables'}>Disponíveis à Venda</Anchor>
       </Group>
       <Group>{renderDarkModeToggle()}</Group>
     </Group>

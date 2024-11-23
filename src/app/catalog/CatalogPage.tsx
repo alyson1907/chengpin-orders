@@ -34,7 +34,7 @@ const CatalogPage = ({ children }: PropsWithChildren) => {
     <AppShell
       header={{ height: { base: 60, sm: 60, md: 80 }, collapsed: headerHidden, offset: !headerHidden }}
       navbar={{
-        width: { sm: 200 },
+        width: { sm: 300 },
         breakpoint: 'sm',
         collapsed: { mobile: navHidden, desktop: navHidden },
       }}

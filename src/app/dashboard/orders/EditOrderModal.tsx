@@ -95,6 +95,8 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
   }
 
   const handleOrderUpdateSubmit = async () => {
+    if (!editingItems?.length)
+      return showErrorToast('Quantidade Mínima de Produtos', 'O pedido deve conter ao menos 1 produto')
     setIsUpdating(true)
     const body = buildOrderUpdateRequest(editingOrder, editingItems)
     await sendOrderUpdate(order.id, body, mutate)
@@ -167,7 +169,7 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
     )
   }
 
-  const addItem = (itemId) => {
+  const addItem = (itemId: any) => {
     if (!itemId || !editingItems || editingItems.some((e) => e.availabilityId === itemId)) return
     const availability = availables.find((a) => a.id === itemId)
     if (!availability) return showErrorToast('Falha ao adicionar item', 'Item não encontrado')
@@ -237,7 +239,7 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
                   <Table.Td>{BRL.format(item.price)}</Table.Td>
                   <Table.Td>{BRL.format(item.qty * item.price)}</Table.Td>
                   <Table.Td>
-                    <ButtonSquareIcon icon={<IconTrash size={16} onClick={() => removeItem(item.availabilityId)} />} />
+                    <ButtonSquareIcon icon={<IconTrash size={16} />} onClick={() => removeItem(item.availabilityId)} />
                   </Table.Td>
                 </Table.Tr>
               )
@@ -277,29 +279,31 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
         {renderEditOrder(editingOrder)}
         {renderEditItems(editingItems)}
         <Group justify="space-between" mt="md">
-          <form
-            id="add-item-to-order-form"
-            style={{ flex: 1, display: 'flex', flexGrow: 1 }}
-            onSubmit={(e) => {
-              e.preventDefault()
-              addItem(itemToAdd)
-            }}
-          >
-            <Group w="100%">
-              <Select
-                form="add-item-to-order-form"
-                w={300}
-                placeholder="Adicionar item..."
-                data={availablesSelectData}
-                nothingFoundMessage="Não encontrado..."
-                onChange={(value) => setItemToAdd(value)}
-                searchable
-              />
-              <Button leftSection={<IconPlus />} form="add-item-to-order-form" type="submit">
-                Adicionar Item
-              </Button>
-            </Group>
-          </form>
+          <Group>
+            <Select
+              w={300}
+              placeholder="Adicionar item..."
+              data={availablesSelectData}
+              nothingFoundMessage="Não encontrado..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addItem(itemToAdd)
+                }
+              }}
+              onChange={(value) => setItemToAdd(value)}
+              searchable
+            />
+            <Button
+              leftSection={<IconPlus />}
+              onClick={(e) => {
+                e.preventDefault()
+                addItem(itemToAdd)
+              }}
+            >
+              Adicionar Item
+            </Button>
+          </Group>
           <Button
             loading={isUpdating}
             leftSection={<IconDeviceFloppy />}

@@ -46,9 +46,14 @@ export const useResolveSizes = (fn: (currentBp: number) => Record<string, any>) 
   return useMemo(() => fn(bp), [bp, fn])
 }
 
-export const useMantineColor = (colorName: string) => {
+export const useMantineColor = (colorName: string, invertShade = false) => {
   const theme = useMantineTheme()
-  const colorScheme = useMantineColorScheme()
-  const isDark = colorScheme.colorScheme === 'dark'
-  return isDark ? theme.colors[colorName][4] : theme.colors[colorName][8]
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
+  const darkThemeColor = theme.colors[colorName][4]
+  const lightThemeColor = theme.colors[colorName][8]
+  if (invertShade) {
+    return isDark ? lightThemeColor : darkThemeColor
+  }
+  return isDark ? darkThemeColor : lightThemeColor
 }

@@ -252,18 +252,17 @@ const DashboardOrders = () => {
                   <LongPressButton
                     buttonProps={{
                       variant: 'outline',
-                      color: 'matcha',
+                      color: 'red',
                       size: 'xs',
                       disabled: isCurrentlyCompleted,
                       loading: isCurrentlyLoading,
                     }}
-                    iconColor="matcha"
+                    iconColor="red"
+                    iconLongPressed={<IconX />}
                     durationMs={600}
-                    onLongPress={() =>
-                      handleOrderConfirmation(order.id).then(() => (order.status = OrderStatus.CONFIRMED))
-                    }
+                    onLongPress={() => handleOrderCancel(order.id).then(() => (order.status = OrderStatus.CANCELLED))}
                   >
-                    Confirmar
+                    Cancelar
                   </LongPressButton>
                   <Button
                     size="xs"
@@ -281,17 +280,18 @@ const DashboardOrders = () => {
                   <LongPressButton
                     buttonProps={{
                       variant: 'outline',
-                      color: 'red',
+                      color: 'matcha',
                       size: 'xs',
                       disabled: isCurrentlyCompleted,
                       loading: isCurrentlyLoading,
                     }}
-                    iconColor="red"
-                    iconLongPressed={<IconX />}
+                    iconColor="matcha"
                     durationMs={600}
-                    onLongPress={() => handleOrderCancel(order.id).then(() => (order.status = OrderStatus.CANCELLED))}
+                    onLongPress={() =>
+                      handleOrderConfirmation(order.id).then(() => (order.status = OrderStatus.CONFIRMED))
+                    }
                   >
-                    Cancelar
+                    Confirmar
                   </LongPressButton>
                 </Group>
               )}

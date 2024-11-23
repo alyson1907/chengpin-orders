@@ -226,13 +226,13 @@ const CheckoutPage = () => {
               mt="2px"
               key={form.key('customerKey')}
               label="Chave do Comprador"
-              placeholder="1234"
+              placeholder="0000"
               component={IMaskInput}
               mask={[{ mask: '0000' }]}
               withAsterisk
               type="number"
+              // onAccept={(value) => form.setFieldValue('customerKey', value)}
               {...form.getInputProps('customerKey')}
-              onAccept={(value) => form.setFieldValue('customerKey', value)}
             />
 
             <InputBase
@@ -260,7 +260,7 @@ const CheckoutPage = () => {
               mask={[{ mask: '(00) 00000-0000' }, { mask: '(00) 0000-0000' }]}
               withAsterisk
               {...form.getInputProps('phone')}
-              onAccept={(value) => form.setFieldValue('phone', value)}
+              // onAccept={(value) => form.setFieldValue('phone', value)}
             />
           </form>
         </Box>
