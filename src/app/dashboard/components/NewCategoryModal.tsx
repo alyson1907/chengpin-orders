@@ -2,7 +2,7 @@ import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { isNotValid } from '@/app/helpers/validate-helper'
 import { Button, Group, Modal, ModalProps, Switch, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
 import { z } from 'zod'
 
@@ -55,8 +55,13 @@ const NewCategoryModal = ({ afterCreate = () => {}, ...props }: IProps) => {
         />
         <Group mt="lg" justify="flex-end">
           <Switch label="Ativa?" {...form.getInputProps('visible')} checked={form.getValues().visible} />
-          <Button loading={isLoading} leftSection={<IconDeviceFloppy />} form="create-new-category-form" type="submit">
-            Salvar
+          <Button
+            loading={isLoading}
+            leftSection={<IconPlus size={18} />}
+            form="create-new-category-form"
+            type="submit"
+          >
+            Criar
           </Button>
         </Group>
       </form>

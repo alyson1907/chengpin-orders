@@ -90,10 +90,14 @@ const EditableProduct = () => {
   const renderAvailabilityTable = () => {
     return (
       <Table>
-        <Table.Th>Tamanho</Table.Th>
-        <Table.Th>Preço</Table.Th>
-        <Table.Th>Quantidade</Table.Th>
-        {isEditingTable && <Table.Th>Remover</Table.Th>}
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Tamanho</Table.Th>
+            <Table.Th>Preço</Table.Th>
+            <Table.Th>Quantidade</Table.Th>
+            {isEditingTable && <Table.Th>Remover</Table.Th>}
+          </Table.Tr>
+        </Table.Thead>
         <Table.Tbody>
           {availability.map((item) => (
             <Table.Tr key={item.id}>
@@ -160,7 +164,7 @@ const EditableProduct = () => {
     <Card shadow="md" radius="sm" mt="sm" withBorder>
       <Group p={16}>
         <Group>
-          <Image src={product.coverImg} width={50} height={50} radius="md" alt="" />
+          <Image src={product.coverImg} width={50} height={50} radius="sm" alt={product.name} />
           <Box>
             <Text fw={700} size="lg">
               {product.name}

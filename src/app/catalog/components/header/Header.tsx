@@ -1,14 +1,14 @@
-import { Group, Burger, Image, useMantineColorScheme, Tooltip, Title, TitleOrder, Indicator } from '@mantine/core'
-import { Parisienne } from 'next/font/google'
-import { IconChevronLeft, IconMoonStars, IconPlant, IconShoppingCart, IconSun } from '@tabler/icons-react'
+import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 import btnSquareStyles from '@/app/common/ButtonSquareIcon.module.css'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
+import { Burger, Group, Image, Indicator, Title, TitleOrder, Tooltip, useMantineColorScheme } from '@mantine/core'
+import { IconChevronLeft, IconMoonStars, IconPlant, IconShoppingCart, IconSun } from '@tabler/icons-react'
+import { Parisienne } from 'next/font/google'
 import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
 import styles from './Header.module.css'
-import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
-import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 
 type IProps = {
   isBurgerOpen?: boolean
@@ -58,7 +58,7 @@ const Header = ({
   const router = useRouter()
 
   const renderDarkModeToggle = () => (
-    <Tooltip label="Light/Dark">
+    <Tooltip label="Claro/Escuro">
       <ButtonSquareIcon
         size={sizes.btn.container}
         styles={{ color: isDark ? 'yellow' : 'grey' }}

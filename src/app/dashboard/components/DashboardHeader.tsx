@@ -1,12 +1,12 @@
 import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 import { Anchor, Group, Tooltip, useMantineColorScheme } from '@mantine/core'
-import { IconSun, IconMoonStars } from '@tabler/icons-react'
+import { IconMoonStars, IconSun } from '@tabler/icons-react'
 
 const DashboardHeader = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const isDark = colorScheme == 'dark'
   const renderDarkModeToggle = () => (
-    <Tooltip label="Light/Dark">
+    <Tooltip label="Claro/Escuro">
       <ButtonSquareIcon
         styles={{ color: isDark ? 'yellow' : 'grey' }}
         onClick={toggleColorScheme}

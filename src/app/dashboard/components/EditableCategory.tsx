@@ -97,20 +97,20 @@ const EditableCategory = ({
   return (
     <Group>
       <Box w="100%">
-        <Tooltip label={category.name}>
-          <Text
-            size="sm"
-            lineClamp={1}
-            styles={{ root: { cursor: 'pointer', borderBottom: selected ? '2px solid pink' : '' } }}
-            {...(!isCategoryVisible && { c: 'dimmed', size: 'xs' })}
-            onClick={onClick}
-          >
-            {category.name}
-            <Badge variant="transparent" styles={{ root: { cursor: 'pointer' } }}>
-              {category.categoryProduct.length}
-            </Badge>
-          </Text>
-        </Tooltip>
+        <Group
+          justify="space-between"
+          onClick={onClick}
+          styles={{ root: { cursor: 'pointer', borderBottom: selected ? '2px solid pink' : '' } }}
+        >
+          <Tooltip label={category.name}>
+            <Text size="sm" lineClamp={1} {...(!isCategoryVisible && { c: 'dimmed', size: 'xs' })}>
+              {category.name}
+            </Text>
+          </Tooltip>
+          <Badge variant="transparent" styles={{ root: { cursor: 'pointer' } }}>
+            {category.categoryProduct.length}
+          </Badge>
+        </Group>
         {renderEditControls(isEditable)}
       </Box>
     </Group>
