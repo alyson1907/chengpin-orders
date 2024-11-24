@@ -1,12 +1,14 @@
 'use client'
-import ProductModal from '@/app/dashboard/products/ProductModal'
+import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
   ActionIcon,
+  AspectRatio,
   Box,
   Button,
   Card,
   Collapse,
+  Flex,
   Group,
   Image,
   NumberInput,
@@ -17,67 +19,22 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconEdit, IconTrash, IconX } from '@tabler/icons-react'
-import { useState } from 'react'
+import { Dispatch, useState } from 'react'
 
-const product = {
-  id: '671eb95f25795b7453439aad',
-  name: 'Cactocásia',
-  description: 'Dynamic',
-  coverImg: 'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',
-  imgs: [
-    'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg',
-    'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',
-    'https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg',
-    'https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_.jpg',
-    'https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg',
-  ],
-  availability: [
-    {
-      id: '671eb95f25795b7453439ab0',
-      name: 'Camada 10x8',
-      productId: '671eb95f25795b7453439aad',
-      price: 10.99,
-      qty: 25,
-    },
-    {
-      id: '671eb95f25795b7453439ab2',
-      name: 'Pote 14',
-      productId: '671eb95f25795b7453439aad',
-      price: 14.99,
-      qty: 24,
-    },
-    {
-      id: '671eb95f25795b7453439aaf',
-      name: 'Pote 15',
-      productId: '671eb95f25795b7453439aad',
-      price: 9.99,
-      qty: 24,
-    },
-    {
-      id: '671eb95f25795b7453439aae',
-      name: 'Pote 9',
-      productId: '671eb95f25795b7453439aad',
-      price: 8.99,
-      qty: 11,
-    },
-    {
-      id: '671eb95f25795b7453439ab1',
-      name: 'Unidade',
-      productId: '671eb95f25795b7453439aad',
-      price: 12.99,
-      qty: 25,
-    },
-  ],
+type IProps = {
+  product: Record<string, any>
+  expandedProductId: string | null
+  setExpandedProductId: Dispatch<string | null>
 }
 
-const EditableProduct = () => {
+const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
-  const [isTableExpanded, { toggle: toggleTableExpanded }] = useDisclosure(false)
   const [isCreateProduct, setIsCreateProduct] = useState(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [availability, setAvailability] = useState(product.availability)
+  const isTableExpanded = expandedProductId === product.id
 
-  const handleTableChange = (id, field, value) => {
+  const handleTableChange = (id: string, field, value) => {
     setAvailability((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
@@ -162,25 +119,32 @@ const EditableProduct = () => {
 
   return (
     <Card shadow="md" radius="sm" mt="sm" withBorder>
-      <Group p={16}>
-        <Group>
-          <Image src={product.coverImg} width={50} height={50} radius="sm" alt={product.name} />
+      <Group p="md" align="flex-start">
+        <Flex flex={1}>
+          <AspectRatio ratio={3 / 4}>
+            <Image src={product.coverImg} width={'100%'} height={'100%'} radius="sm" alt={product.name} />
+          </AspectRatio>
+        </Flex>
+        <Flex flex={5}>
           <Box>
-            <Text fw={700} size="lg">
-              {product.name}
+            <Text fw={700}>{product.name}</Text>
+            <Text size="sm" lineClamp={2}>
+              {product.description}
             </Text>
-            <Text size="sm">{product.description}</Text>
           </Box>
-        </Group>
-        <Button
-          leftSection={<IconEdit size={16} />}
-          onClick={() => {
-            setIsCreateProduct(false)
-            openProductModal()
-          }}
-        >
-          Alterar
-        </Button>
+        </Flex>
+        <Flex flex={6} justify={'flex-end'}>
+          <Button
+            size="xs"
+            leftSection={<IconEdit size={16} />}
+            onClick={() => {
+              setIsCreateProduct(false)
+              openProductModal()
+            }}
+          >
+            Alterar
+          </Button>
+        </Flex>
       </Group>
 
       {/* Availability Table Section */}
@@ -189,7 +153,7 @@ const EditableProduct = () => {
           leftSection={isTableExpanded ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
           variant="subtle"
           size="xs"
-          onClick={toggleTableExpanded}
+          onClick={() => (isTableExpanded ? setExpandedProductId(null) : setExpandedProductId(product.id))}
         >
           {isTableExpanded ? 'Esconder' : 'Mostrar'}
         </Button>
@@ -215,7 +179,7 @@ const EditableProduct = () => {
         </Collapse>
       </Box>
 
-      <ProductModal
+      <CreateProductModal
         product={product}
         isCreateProduct={isCreateProduct}
         opened={isModalOpen}

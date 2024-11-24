@@ -1,5 +1,5 @@
 import { isNotValid } from '@/app/helpers/validate-helper'
-import { Button, Modal, ModalProps, TextInput, Textarea } from '@mantine/core'
+import { Box, Button, Modal, ModalProps, TextInput, Textarea } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { z } from 'zod'
 
@@ -15,7 +15,12 @@ const emptyProduct = {
   coverImg: '',
 }
 
-const ProductModal = ({ product = emptyProduct, isCreateProduct = false, close = () => {}, ...props }: IProps) => {
+const CreateProductModal = ({
+  product = emptyProduct,
+  isCreateProduct = false,
+  close = () => {},
+  ...props
+}: IProps) => {
   const form = useForm({
     initialValues: {
       name: product.name,
@@ -33,27 +38,30 @@ const ProductModal = ({ product = emptyProduct, isCreateProduct = false, close =
   })
 
   return (
-    <Modal title={isCreateProduct ? 'Novo Produto' : 'Editar Produto'} size="lg" centered {...props}>
+    <Modal title={isCreateProduct ? 'Novo Produto' : 'Alterar Produto'} size="lg" centered {...props}>
       <form
         onSubmit={form.onSubmit((values) => {
           console.log(values) // Replace with update logic
           close()
         })}
       >
-        <TextInput label="Name" placeholder="Enter product name" {...form.getInputProps('name')} />
-        <Textarea
-          label="Descrição"
-          placeholder="A Orquídea Pimposa é originária dos..."
-          {...form.getInputProps('description')}
-          mt="md"
-        />
-        <TextInput label="Cover Image URL" placeholder="Enter image URL" {...form.getInputProps('coverImg')} mt="md" />
-        <Button type="submit" fullWidth mt="md">
-          Save Changes
-        </Button>
+        <Box>
+          <TextInput label="URL da Image de Capa" placeholder="Enter image URL" {...form.getInputProps('coverImg')} />
+          <TextInput mt="sm" label="Name" placeholder="Enter product name" {...form.getInputProps('name')} />
+          <Textarea
+            mt="sm"
+            label="Descrição"
+            placeholder="A Orquídea Pimposa é originária dos..."
+            {...form.getInputProps('description')}
+            autosize
+          />
+          <Button type="submit" fullWidth mt="md">
+            Save Changes
+          </Button>
+        </Box>
       </form>
     </Modal>
   )
 }
 
-export default ProductModal
+export default CreateProductModal
