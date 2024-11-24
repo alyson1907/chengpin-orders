@@ -12,16 +12,16 @@ import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
 import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
+  IconBrandWhatsapp,
   IconCheck,
-  IconX,
   IconChevronDown,
   IconChevronUp,
-  IconBrandWhatsapp,
   IconClock,
   IconKey,
   IconPencil,
-  IconTruckDelivery,
   IconReceipt2,
+  IconTruckDelivery,
+  IconX,
 } from '@tabler/icons-react'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
@@ -180,7 +180,7 @@ const DashboardOrders = () => {
                   </Group>
 
                   {/* Whatsapp */}
-                  <Tooltip label="Abrir Whatsapp com pedido" withArrow>
+                  <Tooltip label="Abrir Whatsapp" withArrow>
                     <Group
                       style={{ gap: 4, cursor: order.status === OrderStatus.DRAFT ? 'pointer' : 'auto' }}
                       align="center"
@@ -245,7 +245,7 @@ const DashboardOrders = () => {
                 leftSection={expandedOrder === order.id ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
                 onClick={() => toggleOrderItems(order.id)}
               >
-                {expandedOrder === order.id ? 'Hide Items' : 'Show Items'}
+                {expandedOrder === order.id ? 'Esconder' : 'Mostrar'}
               </Button>
               {order.status === OrderStatus.DRAFT && (
                 <Group>

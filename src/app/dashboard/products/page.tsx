@@ -1,8 +1,7 @@
-'use client'
-import { Box } from '@mantine/core'
+import EditableProduct from '@/app/dashboard/products/EditableProduct'
 
 const DashboardProducts = () => {
-  return <Box></Box>
+  return <EditableProduct />
 }
 
 export default DashboardProducts

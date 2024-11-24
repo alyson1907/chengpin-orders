@@ -1,3 +1,8 @@
+import dayjs from '@/app/api/common/dayjs'
+import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
+import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
+import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
   Button,
   Group,
@@ -12,15 +17,10 @@ import {
   Title,
 } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
-import dayjs from '@/app/api/common/dayjs'
+import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from 'react'
 import { IMaskInput } from 'react-imask'
-import { BRL } from '@/app/helpers/NumberFormatter.helper'
-import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
 import useSWR from 'swr'
-import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
-import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
-import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 
 type IProps = {
   order: any
@@ -227,6 +227,7 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
                       step={1}
                       stepHoldDelay={200}
                       stepHoldInterval={15}
+                      allowDecimal={false}
                       onChange={(value) => {
                         const prev = [...editingItems]
                         const edited = prev.map((e) =>
