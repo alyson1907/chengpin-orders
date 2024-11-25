@@ -1,9 +1,9 @@
-import { NextRequest } from 'next/server'
-import { UnauthorizedError } from '@/app/api/common/error/common-errors'
-import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { AuthCookieKeys } from '@/app/api/common/auth/auth-cookie-keys.enum'
 import jwtModule from '@/app/api/common/auth/jwt'
 import clsModule from '@/app/api/common/cls'
-import { AuthCookieKeys } from '@/app/api/common/enum/auth-cookie-keys.enum'
+import { UnauthorizedError } from '@/app/api/common/error/common-errors'
+import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { NextRequest } from 'next/server'
 
 export const authMiddleware = (handler: (req: NextRequest, context: any) => Promise<any> | undefined) => {
   return (req: NextRequest, context: any) => {

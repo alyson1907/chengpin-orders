@@ -1,6 +1,6 @@
 'use client'
 import { isScreenSmaller, useResolveSizes } from '@/app/helpers/hooks'
-import { AppShell, Text, Image, Stack, Title, Button, TitleOrder } from '@mantine/core'
+import { AppShell, Button, Image, Stack, Text, Title, TitleOrder } from '@mantine/core'
 import { IconHome } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 

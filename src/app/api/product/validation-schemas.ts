@@ -9,7 +9,7 @@ const productSchema = z.object({
 })
 
 export const createProductBodySchema = productSchema.extend({
-  availability: z.array(productAvailabilitySchema),
+  availability: z.array(productAvailabilitySchema).optional(),
   categories: z.array(z.object({ id: z.string().length(24) })),
 })
 

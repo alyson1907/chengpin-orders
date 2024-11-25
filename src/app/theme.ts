@@ -1,4 +1,5 @@
-import { Button, createTheme } from '@mantine/core'
+import { Button, createTheme, LoadingOverlay } from '@mantine/core'
+import { Dropzone } from '@mantine/dropzone'
 
 /*Overriding light/dark color schemas
 @see https://stackoverflow.com/questions/78279141/how-to-change-body-bg-color-for-light-and-dark-mode-mantine-ui */
@@ -81,40 +82,18 @@ const theme = createTheme({
     Button: Button.extend({
       defaultProps: {
         variant: 'filled',
-        loaderProps: { type: 'dots' },
       },
     }),
-    // Paper: Paper.extend({
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // }),
-    // Divider: Divider.extend({
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // }),
-    // AppShell: {
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // },
-
-    // AppShellHeader: {
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // },
-    // AppShellMain: {
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // },
-    // AppShellFooter: {
-    //   defaultProps: {
-    //     bd: '1 solid var(--mantine-color-matcha-2)',
-    //   },
-    // },
+    LoadingOverlay: LoadingOverlay.extend({
+      defaultProps: {
+        loaderProps: { color: 'pink' },
+      },
+    }),
+    Dropzone: Dropzone.extend({
+      defaultProps: {
+        loaderProps: { color: 'pink' },
+      },
+    }),
   },
 })
 

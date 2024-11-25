@@ -1,4 +1,4 @@
-import { AuthCookieKeys } from '@/app/api/common/enum/auth-cookie-keys.enum'
+import { AuthCookieKeys } from '@/app/api/common/auth/auth-cookie-keys.enum'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
 import Cookies from 'js-cookie'
 import { redirect } from 'next/navigation'

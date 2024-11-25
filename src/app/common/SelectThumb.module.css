@@ -1,0 +1,12 @@
+.imageThumbContainer {
+  position: relative;
+  cursor: pointer;
+  transition: 200ms;
+  &:hover:not(.selected) {
+    scale: 1.1;
+  }
+}
+
+.selected {
+  scale: 1.2;
+}

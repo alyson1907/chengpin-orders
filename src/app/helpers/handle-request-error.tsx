@@ -1,4 +1,4 @@
-import { AuthCookieKeys } from '@/app/api/common/enum/auth-cookie-keys.enum'
+import { AuthCookieKeys } from '@/app/api/common/auth/auth-cookie-keys.enum'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
 import { notifications } from '@mantine/notifications'
 import { IconExclamationMark } from '@tabler/icons-react'

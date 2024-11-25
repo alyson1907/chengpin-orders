@@ -32,14 +32,18 @@ const DashboardProducts = () => {
     showErrorToast('Problema ao consultar lista de produtos', 'Verifique sua conexão')
   }
 
-  return data.entries.map((product: any) => (
-    <EditableProduct
-      key={product.id}
-      product={product}
-      expandedProductId={expandedProductId}
-      setExpandedProductId={setExpandedProductId}
-    />
-  ))
+  return (
+    <>
+      {data.entries.map((product: any) => (
+        <EditableProduct
+          key={product.id}
+          product={product}
+          expandedProductId={expandedProductId}
+          setExpandedProductId={setExpandedProductId}
+        />
+      ))}
+    </>
+  )
 }
 
 export default DashboardProducts

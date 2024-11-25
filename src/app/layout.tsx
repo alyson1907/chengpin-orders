@@ -1,20 +1,21 @@
 /* eslint-disable @next/next/no-page-custom-font */
 'use client'
-import './globals.css'
-import '@mantine/core/styles.css'
-import '@mantine/notifications/styles.css'
-import '@mantine/core/styles.css'
 import '@mantine/carousel/styles.css'
+import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
-import { ColorSchemeScript, MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
-import theme from './theme'
-import { DatesProvider } from '@mantine/dates'
-import { ReactNode, Suspense, useEffect } from 'react'
-import { usePathname, redirect } from 'next/navigation'
+import '@mantine/dropzone/styles.css'
+import '@mantine/notifications/styles.css'
+import './globals.css'
+
 import CatalogPage from '@/app/catalog/CatalogPage'
 import ShoppingCartProvider from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
 import LayoutContextProvider from '@/app/catalog/layout/LayoutContextProvider'
+import { ColorSchemeScript, MantineProvider } from '@mantine/core'
+import { DatesProvider } from '@mantine/dates'
+import { Notifications } from '@mantine/notifications'
+import { redirect, usePathname } from 'next/navigation'
+import { ReactNode, Suspense, useEffect } from 'react'
+import theme from './theme'
 
 const getLayout = (url: string, children: ReactNode) => {
   if (url.startsWith('/catalog'))

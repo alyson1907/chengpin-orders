@@ -1,10 +1,10 @@
 'use client'
-import React, { useState } from 'react'
-import { useForm } from '@mantine/form'
-import { TextInput, PasswordInput, Button, Box, Paper, Text, Group, Stack, Title } from '@mantine/core'
-import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
-import { redirect, useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/auth-actions'
+import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
+import { Box, Button, Group, Paper, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core'
+import { useForm } from '@mantine/form'
+import { redirect, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 export default function LoginPage() {
   const [isLoading, setisLoading] = useState(false)
@@ -21,10 +21,9 @@ export default function LoginPage() {
     },
   })
 
-  const handleSubmit = async () => {
+  const handleSubmit = async ({ username, password }) => {
     setLoginError(null)
     setisLoading(true)
-    const { username, password } = form.getValues()
     const isError = await login(username, password)
     // const isError = await login('admin', 'chengpin123')
     setisLoading(false)
@@ -47,7 +46,7 @@ export default function LoginPage() {
         <Stack>
           <Title order={2}>Login</Title>
 
-          <form onSubmit={form.onSubmit(() => handleSubmit())}>
+          <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack>
               <TextInput label="Usuário" placeholder="Meu usuário" withAsterisk {...form.getInputProps('username')} />
               <PasswordInput label="Senha" placeholder="Minha senha" withAsterisk {...form.getInputProps('password')} />
