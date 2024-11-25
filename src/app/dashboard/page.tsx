@@ -6,10 +6,11 @@ import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/common/LongPressButton'
 import EditOrderModal from '@/app/dashboard/orders/EditOrderModal'
 import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
+import { copyToClipboard } from '@/app/helpers/browser-helper'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
-import { Badge, Box, Button, Card, Collapse, Group, Stack, Table, Text, Tooltip } from '@mantine/core'
+import { Badge, Box, Button, Card, Collapse, Group, SimpleGrid, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconBrandWhatsapp,
@@ -187,7 +188,7 @@ const DashboardOrders = () => {
                       onClick={() => {
                         if (order.status !== OrderStatus.DRAFT) return
                         const wppMsg = buildWhatsappMessage(order)
-                        navigator.clipboard.writeText(wppMsg)
+                        copyToClipboard(wppMsg)
                         openWhatsapp(order.customerPhone, wppMsg)
                       }}
                     >
@@ -211,30 +212,26 @@ const DashboardOrders = () => {
               </Group>
             </Group>
             <Group>
-              <Stack>
-                <Group>
-                  <Group style={{ gap: 4 }} align="center">
-                    <IconTruckDelivery size={18} />
-                    <Text size="xs">
-                      <strong>Entrega: </strong> {dayjs(order.deliveryDate).format('DD/MM/YYYY')}
-                    </Text>
-                  </Group>
-                  <Group style={{ gap: 4 }} align="center">
-                    <IconReceipt2 size={18} />
-                    <Text size="xs">
-                      <strong>Comercial: </strong> {dayjs.utc(order.commercialDate).format('DD/MM/YYYY')}
-                    </Text>
-                  </Group>
-                </Group>
-                <Group>
+              <SimpleGrid cols={2}>
+                <Group style={{ gap: 4 }} align="center">
+                  <IconTruckDelivery size={18} />
                   <Text size="xs">
-                    <strong>Produtos: </strong> {itemsQty}
-                  </Text>
-                  <Text size="xs">
-                    <strong>Valor Total: </strong> {totalDisplay}
+                    <strong>Entrega: </strong> {dayjs(order.deliveryDate).format('DD/MM/YYYY')}
                   </Text>
                 </Group>
-              </Stack>
+                <Group style={{ gap: 4 }} align="center">
+                  <IconReceipt2 size={18} />
+                  <Text size="xs">
+                    <strong>Comercial: </strong> {dayjs.utc(order.commercialDate).format('DD/MM/YYYY')}
+                  </Text>
+                </Group>
+                <Text size="xs">
+                  <strong>Produtos: </strong> {itemsQty}
+                </Text>
+                <Text size="xs">
+                  <strong>Valor Total: </strong> {totalDisplay}
+                </Text>
+              </SimpleGrid>
             </Group>
 
             {/* Actions */}
