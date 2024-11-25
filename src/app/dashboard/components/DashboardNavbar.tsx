@@ -29,13 +29,13 @@ const DashboardNavbar = () => {
   const { data, error, isLoading, mutate } = useSWR<TData>('/api/category', fetcher)
   const [isEditEnabled, { toggle }] = useDisclosure(false)
   const [isNewCategoryOpen, { open: openNewCategory, close: closeNewCategory }] = useDisclosure(false)
-  const { setSelectedCategory } = useContext(DashboardLayoutContext)
+  const { selectedCategory, setSelectedCategory } = useContext(DashboardLayoutContext)
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading || selectedCategory) return
     const { id: categoryId } = data?.entries.find((c) => c.visible)
     setSelectedCategory(categoryId)
-  }, [data?.entries, isLoading, setSelectedCategory])
+  }, [data?.entries, isLoading, selectedCategory, setSelectedCategory])
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) showErrorToast('Problema ao carregar categorias', 'Por favor, verifique a conexão')
@@ -76,6 +76,7 @@ const DashboardNavbar = () => {
           <EditableCategory
             key={category.id}
             category={category}
+            selected={selectedCategory === category.id}
             isEditable={isEditEnabled}
             onClick={() => {
               setSelectedCategory(category.id)

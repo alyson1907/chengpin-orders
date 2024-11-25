@@ -97,13 +97,15 @@ const EditableCategory = ({
   return (
     <Group>
       <Box w="100%">
-        <Group
-          justify="space-between"
-          onClick={onClick}
-          styles={{ root: { cursor: 'pointer', borderBottom: selected ? '2px solid pink' : '' } }}
-        >
+        <Group justify="space-between" onClick={onClick} styles={{ root: { cursor: 'pointer' } }}>
           <Tooltip label={category.name}>
-            <Text size="sm" lineClamp={1} {...(!isCategoryVisible && { c: 'dimmed', size: 'xs' })}>
+            <Text
+              size="sm"
+              lineClamp={1}
+              style={{ borderBottom: selected ? '1px solid pink' : '' }}
+              truncate
+              {...(!isCategoryVisible && { c: 'dimmed', size: 'xs' })}
+            >
               {category.name}
             </Text>
           </Tooltip>

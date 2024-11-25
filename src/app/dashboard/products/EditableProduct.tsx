@@ -29,7 +29,6 @@ type IProps = {
 
 const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
-  const [isCreateProduct, setIsCreateProduct] = useState(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [availability, setAvailability] = useState(product.availability)
   const isTableExpanded = expandedProductId === product.id
@@ -134,14 +133,7 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
           </Box>
         </Flex>
         <Flex flex={6} justify={'flex-end'}>
-          <Button
-            size="xs"
-            leftSection={<IconEdit size={16} />}
-            onClick={() => {
-              setIsCreateProduct(false)
-              openProductModal()
-            }}
-          >
+          <Button size="xs" leftSection={<IconEdit size={16} />} onClick={() => openProductModal()}>
             Alterar
           </Button>
         </Flex>
@@ -181,7 +173,6 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
 
       <CreateProductModal
         product={product}
-        isCreateProduct={isCreateProduct}
         opened={isModalOpen}
         onClose={closeProductModal}
         close={closeProductModal}

@@ -10,7 +10,6 @@ import { z } from 'zod'
 
 type IProps = {
   product?: any
-  isCreateProduct: boolean
   close: () => void
 } & ModalProps
 
@@ -28,20 +27,10 @@ const uploadImages = async (formData: FormData) => {
   return imgUrls as string[]
 }
 
-const CreateProductModal = ({
-  product = emptyProduct,
-  isCreateProduct = false,
-  close = () => {},
-  ...props
-}: IProps) => {
+const CreateProductModal = ({ product = emptyProduct, close = () => {}, ...props }: IProps) => {
+  const isCreateProduct = product === emptyProduct
   const [isLoadingDropzone, setIsLoadingDropzone] = useState(false)
-  const [images, setImages] = useState<string[]>([
-    'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg',
-    'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',
-    'https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg',
-    'https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_.jpg',
-    'https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg',
-  ])
+  const [images, setImages] = useState<string[]>([...product.imgs])
   const [selectedIdx, setSelectedIdx] = useState(0)
   const form = useForm({
     initialValues: {
