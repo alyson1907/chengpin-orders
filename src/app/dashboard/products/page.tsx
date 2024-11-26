@@ -8,7 +8,7 @@ import { Button, Group } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPlus } from '@tabler/icons-react'
 import { useContext, useState } from 'react'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 const fetcher = async ([url, categoryId]: [string, string]) => {
   const empty = {
@@ -34,7 +34,7 @@ const sendCreateProduct = async (body: Record<string, any>) => {
 }
 const DashboardProducts = () => {
   const { selectedCategory } = useContext(DashboardLayoutContext)
-  const { data, error, isLoading, mutate } = useSWR(['/api/product', selectedCategory], fetcher)
+  const { data, error, isLoading, mutate: mutateProduct } = useSWR(['/api/product', selectedCategory], fetcher)
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
   const [isCreateProductOpen, { open: openCreateProduct, close: closeCreateProduct }] = useDisclosure(false)
 
@@ -50,7 +50,8 @@ const DashboardProducts = () => {
         onClose={closeCreateProduct}
         onSave={async (body) => {
           await sendCreateProduct(body)
-          mutate()
+          mutateProduct()
+          mutate(['/api/category', { orderBy__desc: 'visible' }])
           close()
         }}
       />
@@ -65,6 +66,10 @@ const DashboardProducts = () => {
           product={product}
           expandedProductId={expandedProductId}
           setExpandedProductId={setExpandedProductId}
+          afterUpdate={() => {
+            mutateProduct()
+            mutate(['/api/category', { orderBy__desc: 'visible' }])
+          }}
         />
       ))}
     </>

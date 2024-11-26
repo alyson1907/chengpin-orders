@@ -26,6 +26,7 @@ type IProps = {
   product: Record<string, any>
   expandedProductId: string | null
   setExpandedProductId: Dispatch<string | null>
+  afterUpdate: () => void
 }
 
 const sendUpdateProduct = async (id: string, body: any) => {
@@ -35,10 +36,11 @@ const sendUpdateProduct = async (id: string, body: any) => {
   return resBody.data
 }
 
-const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
+const EditableProduct = ({ product, expandedProductId, setExpandedProductId, afterUpdate = () => {} }: IProps) => {
   const isTableExpanded = expandedProductId === product.id
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [availability, setAvailability] = useState(product.availability)
 
   const handleTableChange = (id: string, field, value) => {
@@ -47,8 +49,11 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
 
   const handleSaveTableChanges = () => {
     // Add your save logic here
+    setIsLoading(true)
     console.log(`handleSaveTableChanges`, availability)
+    afterUpdate()
     setIsEditingTable(false)
+    setIsLoading(false)
   }
 
   const renderAvailabilityTable = () => {
@@ -133,6 +138,7 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
         onSave={async (body) => {
           await sendUpdateProduct(product.id, body)
           closeProductModal()
+          afterUpdate()
         }}
       />
       <Group p="md" align="flex-start">
@@ -179,7 +185,12 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
                 <Button size="xs" leftSection={<IconX size={16} />} onClick={() => setIsEditingTable(false)}>
                   Cancelar
                 </Button>
-                <Button size="xs" leftSection={<IconDeviceFloppy size={16} />} onClick={handleSaveTableChanges}>
+                <Button
+                  size="xs"
+                  leftSection={<IconDeviceFloppy size={16} />}
+                  loading={isLoading}
+                  onClick={handleSaveTableChanges}
+                >
                   Salvar
                 </Button>
               </Group>
