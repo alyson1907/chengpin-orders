@@ -12,7 +12,7 @@ type IProps = {
 
 const placeholder = () => {
   return (
-    <Group justify="center" w="100%">
+    <Group justify="center" w="100%" p="sm">
       <Stack align="center">
         <IconGhost color="grey" />
         <Text c="grey">Aguardando imagens...</Text>

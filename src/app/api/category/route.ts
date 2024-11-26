@@ -8,6 +8,7 @@ import prisma from '../../../../prisma/prisma'
 import { ErrorKey } from '../common/error/errors.enum'
 import { createCategoryBodySchema, updateCategoryBodySchema } from './validation-schemas'
 
+const categoryInclude = { categoryProduct: { include: { product: true } } }
 const createCategories = async (req: NextRequest) => {
   const { body } = await parseReq(req)
   const data = createCategoryBodySchema.parse(body)
@@ -31,7 +32,7 @@ const getCategories = async (req: NextRequest): Promise<PaginationDto<Category>>
   const total = await prisma.category.count(filter)
   const categories = await prisma.category.findMany({
     ...filter,
-    include: { categoryProduct: { include: { product: true } } },
+    include: categoryInclude,
   })
   return {
     entries: categories,
@@ -53,7 +54,7 @@ const updateCategories = async (req: NextRequest) => {
     prisma.category.update({
       where: { id: newInfo.id },
       data: { name: newInfo.name, visible: newInfo.visible },
-      include: { categoryProduct: { include: { product: true } } },
+      include: categoryInclude,
     })
   )
   return Promise.all(promises)

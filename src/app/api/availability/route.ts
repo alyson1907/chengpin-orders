@@ -4,14 +4,15 @@ import {
   updateProductAvailabilityBodySchema,
 } from '@/app/api/availability/validation-schemas'
 import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
-import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
-import { NextRequest } from 'next/server'
-import prisma from '../../../../prisma/prisma'
 import { NotFoundError } from '@/app/api/common/error/common-errors'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
 import { PaginationDto } from '@/app/api/common/types/common-response'
 import { Prisma } from '@prisma/client'
+import { NextRequest } from 'next/server'
+import prisma from '../../../../prisma/prisma'
 
+const availabilityInclude = { product: true }
 const createAvailability = async (req: NextRequest) => {
   const { body } = await parseReq(req)
   const { productId, ...availability } = createProductAvailabilityBodySchema.parse(body)
@@ -21,7 +22,7 @@ const createAvailability = async (req: NextRequest) => {
 
   const created = await prisma.productAvailability.create({
     data: { ...availability, product: { connect: { id: productId } } },
-    include: { product: true },
+    include: availabilityInclude,
   })
   return created
 }
@@ -30,7 +31,7 @@ const getAvailability = async (req: NextRequest) => {
   const { qs } = await parseReq(req)
   const filter = buildPrismaFilter(qs)
   const total = await prisma.productAvailability.count()
-  const result = await prisma.productAvailability.findMany({ ...filter, include: { product: true } })
+  const result = await prisma.productAvailability.findMany({ ...filter, include: availabilityInclude })
   const paginationDto: PaginationDto<TQueryResult> = {
     entries: result,
     total,

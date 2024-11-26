@@ -102,7 +102,7 @@ const EditableCategory = ({
             <Text
               size="sm"
               lineClamp={1}
-              style={{ borderBottom: selected ? '1px solid pink' : '' }}
+              style={{ borderBottom: selected ? '1px solid var(--mantine-color-matcha-5)' : '' }}
               truncate
               {...(!isCategoryVisible && { c: 'dimmed', size: 'xs' })}
             >

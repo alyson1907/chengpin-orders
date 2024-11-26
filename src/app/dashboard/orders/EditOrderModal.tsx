@@ -28,10 +28,8 @@ type IProps = {
   mutate: any
 } & ModalProps
 
-const fetcher = async (url: string) => {
-  const qs = new URLSearchParams({
-    qty__gte: '1',
-  })
+const fetcher = async ([url, filter]: [string, Record<string, string>]) => {
+  const qs = new URLSearchParams(filter)
   const res = await fetch(`${url}?${qs}`)
   const body = await res.json()
   return body.data.entries
@@ -63,7 +61,19 @@ const reduceAvailablesSelect = (availables) => {
 }
 
 const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
-  const { data: availables, error, isLoading } = useSWR('/api/availability', fetcher)
+  const {
+    data: availables,
+    error,
+    isLoading,
+  } = useSWR(
+    [
+      '/api/availability',
+      {
+        qty__gte: '1',
+      },
+    ],
+    fetcher
+  )
   const availablesSelectData = useMemo(() => reduceAvailablesSelect(availables), [availables])
   const [editingOrder, setEditingOrder] = useState<any>()
   const [editingItems, setEditingItems] = useState<Array<any>>()

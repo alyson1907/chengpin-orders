@@ -1,5 +1,6 @@
 'use client'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
+import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
   ActionIcon,
@@ -27,11 +28,18 @@ type IProps = {
   setExpandedProductId: Dispatch<string | null>
 }
 
+const sendUpdateProduct = async (id: string, body: any) => {
+  const res = await fetch('/api/product', { method: 'PUT', body: JSON.stringify({ data: [{ ...body, id }] }) })
+  const resBody = await res.json()
+  handleResponseError(resBody)
+  return resBody.data
+}
+
 const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
+  const isTableExpanded = expandedProductId === product.id
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [availability, setAvailability] = useState(product.availability)
-  const isTableExpanded = expandedProductId === product.id
 
   const handleTableChange = (id: string, field, value) => {
     setAvailability((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
@@ -118,6 +126,15 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
 
   return (
     <Card shadow="md" radius="sm" mt="sm" withBorder>
+      <CreateProductModal
+        product={product}
+        opened={isModalOpen}
+        onClose={closeProductModal}
+        onSave={async (body) => {
+          await sendUpdateProduct(product.id, body)
+          closeProductModal()
+        }}
+      />
       <Group p="md" align="flex-start">
         <Flex flex={1}>
           <AspectRatio ratio={3 / 4}>
@@ -170,13 +187,6 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
           </Group>
         </Collapse>
       </Box>
-
-      <CreateProductModal
-        product={product}
-        opened={isModalOpen}
-        onClose={closeProductModal}
-        close={closeProductModal}
-      />
     </Card>
   )
 }

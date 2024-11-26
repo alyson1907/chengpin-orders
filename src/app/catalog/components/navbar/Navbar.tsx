@@ -1,18 +1,15 @@
-import { Dispatch, useContext, useEffect } from 'react'
-import { Title, Stack, Anchor, Text, Group } from '@mantine/core'
-import styles from './Navbar.module.css'
-import useSWR from 'swr'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
+import { Anchor, Group, Stack, Text, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { Category } from '@prisma/client'
 import { IconBook, IconExclamationMark } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
+import { Dispatch, useContext, useEffect } from 'react'
+import useSWR from 'swr'
+import styles from './Navbar.module.css'
 
-const fetcher = (url: string) => {
-  const qs = new URLSearchParams({
-    orderBy__asc: 'name',
-    visible: 'true',
-  })
+const fetcher = ([url, filter]: [string, Record<string, string>]) => {
+  const qs = new URLSearchParams(filter)
   return fetch(`${url}?${qs}`)
     .then((res) => res.json())
     .then((body) => body?.data?.entries)
@@ -46,7 +43,16 @@ const renderNavButtons = (
   return navButtons
 }
 export const Navbar = () => {
-  const { data, error, isLoading } = useSWR('/api/category', fetcher)
+  const { data, error, isLoading } = useSWR(
+    [
+      '/api/category',
+      {
+        orderBy__asc: 'name',
+        visible: 'true',
+      },
+    ],
+    fetcher
+  )
   const {
     category: { activeCategoryId, setActiveCategoryId },
   } = useContext(LayoutContext)

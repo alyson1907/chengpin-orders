@@ -1,17 +1,17 @@
+import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
+import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
-import { NextRequest } from 'next/server'
-import prisma from '../../../../prisma/prisma'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
+import { PaginationDto } from '@/app/api/common/types/common-response'
 import {
   CreateProductBody,
   createProductBodySchema,
   deleteProductsBodySchema,
   updateProductsBodySchema,
 } from '@/app/api/product/validation-schemas'
-import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
-import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
 import { Product } from '@prisma/client'
-import { PaginationDto } from '@/app/api/common/types/common-response'
-import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
+import { NextRequest } from 'next/server'
+import prisma from '../../../../prisma/prisma'
 
 const fetchCategories = async (categories: CreateProductBody['categories']) => {
   const categoryIds = categories.map(({ id }) => id)
@@ -26,6 +26,7 @@ const fetchCategories = async (categories: CreateProductBody['categories']) => {
   }
 }
 
+const productInclude = { availability: true, categoryProduct: { include: { category: true } } }
 const createProduct = async (req: NextRequest): Promise<Product> => {
   const { body } = await parseReq(req)
   const data = createProductBodySchema.parse(body)
@@ -53,10 +54,7 @@ const createProduct = async (req: NextRequest): Promise<Product> => {
         create: categories.map(({ id }) => ({ category: { connect: { id } } })),
       },
     },
-    include: {
-      availability: true,
-      categoryProduct: true,
-    },
+    include: productInclude,
   })
   return created
 }
@@ -65,7 +63,10 @@ const getProducts = async (req: NextRequest): Promise<PaginationDto<Product>> =>
   const { qs } = await parseReq(req)
   const filter = buildPrismaFilter(qs)
   const total = await prisma.product.count()
-  const products = await prisma.product.findMany({ ...filter, include: { availability: true } })
+  const products = await prisma.product.findMany({
+    ...filter,
+    include: productInclude,
+  })
   return {
     entries: products,
     total,
@@ -76,12 +77,35 @@ const getProducts = async (req: NextRequest): Promise<PaginationDto<Product>> =>
 const updateProducts = async (req: NextRequest): Promise<Product[]> => {
   const { body } = await parseReq(req)
   const { data } = updateProductsBodySchema.parse(body)
-  const promises = data.flatMap(({ id, ...data }) =>
-    prisma.product.update({
-      where: { id },
-      data,
+
+  const allCategories = data.flatMap((p) => p.categories.map(({ id }) => id))
+  const foundCategories = await prisma.category.findMany({
+    where: { id: { in: allCategories } },
+  })
+  if (allCategories.length !== foundCategories.length)
+    throw new NotFoundError(
+      ErrorKey.MISSING_ENTITIES,
+      { receivedCategories: allCategories, foundCategories },
+      'Some categories were not found'
+    )
+
+  const promises = await prisma.$transaction(async (trx) => {
+    const promises = data.flatMap(async ({ id, categories, ...data }) => {
+      await trx.categoryProduct.deleteMany({ where: { productId: id } })
+      await trx.categoryProduct.createMany({
+        data: categories.map((category) => ({ productId: id, categoryId: category.id })),
+      })
+      const updated = await trx.product.update({
+        where: { id },
+        data,
+        include: productInclude,
+      })
+      return updated
     })
-  )
+
+    const result = await Promise.all(promises)
+    return result
+  })
   return Promise.all(promises)
 }
 
@@ -110,5 +134,5 @@ const deleteProducts = async (req: NextRequest): Promise<Product[]> => {
 
 export const POST = middlewares(createProduct)
 export const GET = middlewaresWithoutAuth(getProducts)
-export const PATCH = middlewares(updateProducts)
+export const PUT = middlewares(updateProducts)
 export const DELETE = middlewares(deleteProducts)

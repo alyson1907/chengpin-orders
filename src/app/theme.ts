@@ -77,6 +77,18 @@ const theme = createTheme({
       '#C50E82',
       '#AD1374',
     ],
+    'pastel-pink': [
+      '#fff1f3',
+      '#ffe2e7',
+      '#ffd4db',
+      '#ffc5cf',
+      '#ffb7c3',
+      '#ffa8b7',
+      '#ff98ac',
+      '#ff89a0',
+      '#ff7895',
+      '#fc678a',
+    ],
   },
   components: {
     Button: Button.extend({
@@ -86,12 +98,12 @@ const theme = createTheme({
     }),
     LoadingOverlay: LoadingOverlay.extend({
       defaultProps: {
-        loaderProps: { color: 'pink' },
+        loaderProps: { color: 'bright-pink' },
       },
     }),
     Dropzone: Dropzone.extend({
       defaultProps: {
-        loaderProps: { color: 'pink' },
+        loaderProps: { color: 'bright-pink' },
       },
     }),
   },

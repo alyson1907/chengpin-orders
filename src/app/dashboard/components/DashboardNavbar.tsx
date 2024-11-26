@@ -15,18 +15,24 @@ type TData = {
   totalFiltered: number
 }
 
-const fetcher = async (url: string) => {
-  const qs = new URLSearchParams({
-    orderBy__desc: 'visible',
-  })
+const fetcher = async ([url, filter]: [string, Record<string, string>]) => {
+  const qs = new URLSearchParams(filter)
   const res = await fetch(`${url}?${qs}`)
   const body = await res.json()
   handleResponseError(body)
-  return body.data
+  return body.data as TData
 }
 
 const DashboardNavbar = () => {
-  const { data, error, isLoading, mutate } = useSWR<TData>('/api/category', fetcher)
+  const { data, error, isLoading, mutate } = useSWR(
+    [
+      '/api/category',
+      {
+        orderBy__desc: 'visible',
+      },
+    ],
+    fetcher
+  )
   const [isEditEnabled, { toggle }] = useDisclosure(false)
   const [isNewCategoryOpen, { open: openNewCategory, close: closeNewCategory }] = useDisclosure(false)
   const { selectedCategory, setSelectedCategory } = useContext(DashboardLayoutContext)
