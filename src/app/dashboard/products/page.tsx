@@ -1,14 +1,14 @@
 'use client'
-import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { DashboardLayoutContext } from '@/app/dashboard/layout/DashboardLayoutContextProvider'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
 import EditableProduct from '@/app/dashboard/products/EditableProduct'
+import { refreshCaregoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
-import { Button, Group } from '@mantine/core'
+import { Button, Center, Group, Loader } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPlus } from '@tabler/icons-react'
 import { useContext, useState } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 
 const fetcher = async ([url, categoryId]: [string, string]) => {
   const empty = {
@@ -34,11 +34,16 @@ const sendCreateProduct = async (body: Record<string, any>) => {
 }
 const DashboardProducts = () => {
   const { selectedCategory } = useContext(DashboardLayoutContext)
-  const { data, error, isLoading, mutate: mutateProduct } = useSWR(['/api/product', selectedCategory], fetcher)
+  const { data, error, isLoading } = useSWR(['/api/product', selectedCategory], fetcher)
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
   const [isCreateProductOpen, { open: openCreateProduct, close: closeCreateProduct }] = useDisclosure(false)
 
-  if (isLoading) return <DefaultLoadingOverlay />
+  if (isLoading)
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    )
   if (error) {
     showErrorToast('Problema ao consultar lista de produtos', 'Verifique sua conexão')
   }
@@ -50,9 +55,9 @@ const DashboardProducts = () => {
         onClose={closeCreateProduct}
         onSave={async (body) => {
           await sendCreateProduct(body)
-          mutateProduct()
-          mutate(['/api/category', { orderBy__desc: 'visible' }])
-          close()
+          refreshProductsList()
+          refreshCaregoriesNavbar()
+          closeCreateProduct()
         }}
       />
       <Group justify="flex-end">
@@ -60,16 +65,12 @@ const DashboardProducts = () => {
           Novo Produto
         </Button>
       </Group>
-      {data.entries.map((product: any) => (
+      {data?.entries.map((product: any) => (
         <EditableProduct
           key={product.id}
           product={product}
           expandedProductId={expandedProductId}
           setExpandedProductId={setExpandedProductId}
-          afterUpdate={() => {
-            mutateProduct()
-            mutate(['/api/category', { orderBy__desc: 'visible' }])
-          }}
         />
       ))}
     </>

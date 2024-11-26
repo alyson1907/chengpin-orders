@@ -1,4 +1,4 @@
-import { Button, createTheme, LoadingOverlay } from '@mantine/core'
+import { Button, createTheme, Loader, LoadingOverlay } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
 
 /*Overriding light/dark color schemas
@@ -100,6 +100,9 @@ const theme = createTheme({
       defaultProps: {
         loaderProps: { color: 'bright-pink' },
       },
+    }),
+    Loader: Loader.extend({
+      defaultProps: { color: 'bright-pink', type: 'dots' },
     }),
     Dropzone: Dropzone.extend({
       defaultProps: {

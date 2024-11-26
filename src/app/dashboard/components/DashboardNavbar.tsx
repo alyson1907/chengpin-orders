@@ -1,9 +1,8 @@
-import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import EditableCategory from '@/app/dashboard/components/EditableCategory'
 import NewCategoryModal from '@/app/dashboard/components/NewCategoryModal'
 import { DashboardLayoutContext } from '@/app/dashboard/layout/DashboardLayoutContextProvider'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
-import { ActionIcon, Group, Stack, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, Center, Group, Loader, Stack, Title, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPencil, IconPencilOff, IconPlus } from '@tabler/icons-react'
 import { useContext, useEffect } from 'react'
@@ -43,7 +42,12 @@ const DashboardNavbar = () => {
     setSelectedCategory(categoryId)
   }, [data?.entries, isLoading, selectedCategory, setSelectedCategory])
 
-  if (isLoading) return <DefaultLoadingOverlay />
+  if (isLoading)
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    )
   if (error) showErrorToast('Problema ao carregar categorias', 'Por favor, verifique a conexão')
 
   const renderControls = () => {

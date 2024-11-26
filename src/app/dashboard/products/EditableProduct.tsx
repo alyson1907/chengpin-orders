@@ -1,5 +1,6 @@
 'use client'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
+import { refreshCaregoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
@@ -26,7 +27,6 @@ type IProps = {
   product: Record<string, any>
   expandedProductId: string | null
   setExpandedProductId: Dispatch<string | null>
-  afterUpdate: () => void
 }
 
 const sendUpdateProduct = async (id: string, body: any) => {
@@ -36,7 +36,7 @@ const sendUpdateProduct = async (id: string, body: any) => {
   return resBody.data
 }
 
-const EditableProduct = ({ product, expandedProductId, setExpandedProductId, afterUpdate = () => {} }: IProps) => {
+const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
   const isTableExpanded = expandedProductId === product.id
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -51,7 +51,6 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId, aft
     // Add your save logic here
     setIsLoading(true)
     console.log(`handleSaveTableChanges`, availability)
-    afterUpdate()
     setIsEditingTable(false)
     setIsLoading(false)
   }
@@ -138,7 +137,8 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId, aft
         onSave={async (body) => {
           await sendUpdateProduct(product.id, body)
           closeProductModal()
-          afterUpdate()
+          refreshProductsList()
+          refreshCaregoriesNavbar()
         }}
       />
       <Group p="md" align="flex-start">

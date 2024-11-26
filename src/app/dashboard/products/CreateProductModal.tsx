@@ -41,39 +41,49 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
   const isCreateProduct = product === emptyProduct
   const [isLoadingDropzone, setIsLoadingDropzone] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [images, setImages] = useState<string[]>([])
+  // const [images, setImages] = useState<string[]>([])
   const [selectedIdx, setSelectedIdx] = useState(0)
   const form = useForm({
+    mode: 'uncontrolled',
     initialValues: {
       coverImg: product.coverImg,
       name: product.name,
       description: product.description,
       categoryId: product?.categoryProduct[0]?.category.id,
+      images: new Array<string>(),
     },
     validate: {
       name: (value) => isNotValid(value, z.string().min(1)) && 'Nome é obrigatório',
       description: (value) => isNotValid(value, z.string().min(1)) && 'Descrição é obrigatório',
       categoryId: (value) => isNotValid(value, z.string().min(1)) && 'Categoria é obrigatória',
+      images: (value) => isNotValid(value, z.array(z.string()).min(1)),
+      coverImg: (value) => isNotValid(value, z.string().min(1)),
     },
     transformValues: (values) => ({
       name: values.name.trim(),
       description: values.description.trim(),
       coverImg: values.coverImg,
       categoryId: values.categoryId,
+      images: values.images,
     }),
   })
 
   useEffect(() => {
-    if (product.imgs) setImages(product.imgs)
-  }, [product.imgs])
+    if (product.imgs) form.setFieldValue('images', product.imgs)
+  }, [form, product.imgs])
 
   const selectImgThumbnail = (idx: number) => {
+    const images = form.getValues().images
     setSelectedIdx(idx)
     form.setFieldValue('coverImg', images[idx])
   }
 
   const removeImgThumbnail = (idx: number) => {
-    setImages(images.filter((_, i) => i !== idx))
+    const images = form.getValues().images
+    form.setFieldValue(
+      'images',
+      images.filter((_, i) => i !== idx)
+    )
     if (idx < selectedIdx) setSelectedIdx(selectedIdx - 1)
     if (selectedIdx === idx) {
       setSelectedIdx(0)
@@ -82,11 +92,11 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
   }
 
   const handleSubmit = async (
-    values: { name: any; description: any; coverImg: any; categoryId: string },
+    values: { name: any; description: any; coverImg: any; categoryId: string; images: string[] },
     event?: React.FormEvent<HTMLFormElement>
   ) => {
     event?.preventDefault()
-    const { coverImg, name, description, categoryId } = values
+    const { coverImg, name, description, categoryId, images } = values
     const body = {
       name,
       description,
@@ -98,8 +108,10 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
         },
       ],
     }
+    console.log(body)
     setIsSaving(true)
     await onSave(body)
+    // form.reset()
     setIsSaving(false)
   }
 
@@ -110,7 +122,6 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
 
   return (
     <Modal title={isCreateProduct ? 'Novo Produto' : 'Alterar Produto'} size="lg" centered {...props}>
-      <DefaultLoadingOverlay visible={isSaving} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Center>
           <DropzoneImage
@@ -118,10 +129,11 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
             loading={isLoadingDropzone}
             onDrop={async (files: FileWithPath[]) => {
               setIsLoadingDropzone(true)
+              const images = form.getValues().images
               const formData = new FormData()
               files.forEach((file) => formData.append('file', file))
               const imgUrls = await uploadImages(formData)
-              setImages([...images, ...imgUrls])
+              form.setFieldValue('images', [...images, ...imgUrls])
               if (!!form.getValues().coverImg) form.setFieldValue('coverImg', images[0])
               setIsLoadingDropzone(false)
             }}
@@ -132,10 +144,14 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
         <Text size="xs" c="dimmed">
           (As demais imagens também serão exibidas no catálogo)
         </Text>
+        <Text size="xs" c="var(--mantine-color-red-7)" hidden={!form.errors.images}>
+          Ao menos 1 imagem é necessária
+        </Text>
+
         <SelectThumb
           mt="md"
           justify="flex-start"
-          imageUrls={images}
+          imageUrls={form.getValues().images}
           selectedIdx={selectedIdx}
           onThumbSelect={selectImgThumbnail}
           onThumbRemove={removeImgThumbnail}

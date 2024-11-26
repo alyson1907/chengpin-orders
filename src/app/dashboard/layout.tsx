@@ -29,7 +29,6 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
         padding="md"
       >
         <DefaultLoadingOverlay visible={isCheckingAuth} />
-
         <AppShell.Header>
           <DashboardHeader />
         </AppShell.Header>

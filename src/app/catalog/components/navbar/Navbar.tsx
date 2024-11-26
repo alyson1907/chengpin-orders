@@ -53,6 +53,7 @@ export const Navbar = () => {
     ],
     fetcher
   )
+
   const {
     category: { activeCategoryId, setActiveCategoryId },
   } = useContext(LayoutContext)

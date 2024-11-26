@@ -14,7 +14,7 @@ const defaultProvided: TDashboardLayoutContext = {
 export const DashboardLayoutContext = createContext(defaultProvided)
 
 const DashboardLayoutContextProvider = ({ children }: PropsWithChildren) => {
-  const [selectedCategory, setSelectedCategory] = useState(defaultProvided.selectedCategory)
+  const [selectedCategory, setSelectedCategory] = useState('')
   const provided: TDashboardLayoutContext = {
     selectedCategory,
     setSelectedCategory,
