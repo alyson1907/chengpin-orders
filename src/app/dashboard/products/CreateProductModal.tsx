@@ -41,7 +41,6 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
   const isCreateProduct = product === emptyProduct
   const [isLoadingDropzone, setIsLoadingDropzone] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  // const [images, setImages] = useState<string[]>([])
   const [selectedIdx, setSelectedIdx] = useState(0)
   const form = useForm({
     mode: 'uncontrolled',
@@ -108,10 +107,8 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
         },
       ],
     }
-    console.log(body)
     setIsSaving(true)
     await onSave(body)
-    // form.reset()
     setIsSaving(false)
   }
 

@@ -1,7 +1,7 @@
 'use client'
 import CurrencyNumberInput from '@/app/common/CurrencyNumberInput'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
-import { refreshCaregoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
+import { refreshCategoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { isNotValid } from '@/app/helpers/validate-helper'
@@ -31,7 +31,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { Dispatch, useState } from 'react'
+import { Dispatch, useEffect, useState } from 'react'
 import { z } from 'zod'
 
 type IProps = {
@@ -51,7 +51,8 @@ type TAvailability = {
 const sendUpdateProduct = async (id: string, body: any) => {
   const res = await fetch('/api/product', { method: 'PUT', body: JSON.stringify({ data: [{ ...body, id }] }) })
   const resBody = await res.json()
-  handleResponseError(resBody)
+  const isError = handleResponseError(resBody)
+  if (isError) refreshProductsList()
   return resBody.data
 }
 
@@ -63,6 +64,9 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
   const [availability, setAvailability] = useState<TAvailability[]>(product.availability)
   const [errors, setErrors] = useState<Record<string, string | false>[]>([])
 
+  useEffect(() => {
+    if (product.id === '67451de3a62160830c18d19e') console.log(`availability`, availability)
+  })
   const resetAvailabilities = () => {
     setAvailability(product.availability)
     setErrors([])
@@ -103,11 +107,6 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
     const createdAvailabilities = availability.filter((a) => a.id.startsWith('new-item'))
     const updatedAvailabilities = availability.filter((a) => product.availability.map(({ id }) => id).includes(a.id))
     const removedAvailabilities = product.availability.filter((pa) => !availability.some((a) => a.id === pa.id))
-
-    console.log(`\n\ncreated`, createdAvailabilities)
-    console.log(`removed`, removedAvailabilities)
-    console.log(`updated`, updatedAvailabilities)
-
     const createBody = {
       availabilities: createdAvailabilities.map((a) => ({
         productId: product.id,
@@ -127,6 +126,7 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
     const deleteBody = {
       availabilities: removedAvailabilities.map((a) => a.id),
     }
+
     const createdRes = await fetch('/api/availability', { method: 'POST', body: JSON.stringify(createBody) })
     const updatedRes = await fetch('/api/availability', { method: 'PUT', body: JSON.stringify(updateBody) })
     const deletedRes = await fetch('/api/availability', { method: 'DELETE', body: JSON.stringify(deleteBody) })
@@ -137,6 +137,7 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
     const isErrorUpdated = handleResponseError(updatedBody)
     const isErrorDeleted = handleResponseError(deletedBody)
     if (isErrorCreated || isErrorUpdated || isErrorDeleted) refreshProductsList()
+    setAvailability([...createdBody.data, ...updatedBody.data])
     setIsEditingTable(false)
     setIsLoading(false)
   }
@@ -241,9 +242,8 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
         onClose={closeProductModal}
         onSave={async (body) => {
           await sendUpdateProduct(product.id, body)
+          refreshCategoriesNavbar()
           closeProductModal()
-          refreshProductsList()
-          refreshCaregoriesNavbar()
         }}
       />
       <Group p="md" align="flex-start">

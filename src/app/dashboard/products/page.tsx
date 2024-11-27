@@ -2,7 +2,7 @@
 import { DashboardLayoutContext } from '@/app/dashboard/layout/DashboardLayoutContextProvider'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
 import EditableProduct from '@/app/dashboard/products/EditableProduct'
-import { refreshCaregoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
+import { refreshCategoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { Button, Center, Group, Loader } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -29,12 +29,13 @@ const fetcher = async ([url, categoryId]: [string, string]) => {
 const sendCreateProduct = async (body: Record<string, any>) => {
   const res = await fetch('/api/product', { method: 'POST', body: JSON.stringify(body) })
   const resBody = await res.json()
-  handleResponseError(resBody)
+  const isError = handleResponseError(resBody)
+  if (isError) refreshProductsList()
   return resBody
 }
 const DashboardProducts = () => {
   const { selectedCategory } = useContext(DashboardLayoutContext)
-  const { data, error, isLoading } = useSWR(['/api/product', selectedCategory], fetcher)
+  const { data, error, isLoading } = useSWR(['/api/product', selectedCategory], fetcher, { refreshInterval: 1000 })
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
   const [isCreateProductOpen, { open: openCreateProduct, close: closeCreateProduct }] = useDisclosure(false)
 
@@ -55,8 +56,7 @@ const DashboardProducts = () => {
         onClose={closeCreateProduct}
         onSave={async (body) => {
           await sendCreateProduct(body)
-          refreshProductsList()
-          refreshCaregoriesNavbar()
+          refreshCategoriesNavbar()
           closeCreateProduct()
         }}
       />

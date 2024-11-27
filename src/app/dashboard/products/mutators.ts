@@ -1,6 +1,6 @@
 import { mutate } from 'swr'
 
-export const refreshCaregoriesNavbar = () => {
+export const refreshCategoriesNavbar = () => {
   mutate((key) => Array.isArray(key) && key[0] === '/api/category', undefined, { revalidate: true })
 }
 
