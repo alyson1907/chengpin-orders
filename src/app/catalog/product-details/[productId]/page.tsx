@@ -1,37 +1,37 @@
 'use client'
-import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
-import {
-  Container,
-  Grid,
-  Paper,
-  Image,
-  Group,
-  Badge,
-  Text,
-  Title,
-  Stack,
-  Button,
-  Divider,
-  AspectRatio,
-  useMantineTheme,
-  useMantineColorScheme,
-  Popover,
-  Alert,
-} from '@mantine/core'
-import { Carousel } from '@mantine/carousel'
-import Autoplay from 'embla-carousel-autoplay'
-import { IconCheck, IconExclamationCircle, IconExclamationMark, IconShoppingCart } from '@tabler/icons-react'
-import { notFound, useParams } from 'next/navigation'
-import useSWR from 'swr'
-import { ProductAvailability } from '@prisma/client'
-import React from 'react'
-import { notifications } from '@mantine/notifications'
-import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
+import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
 import CustomNumberInput from '@/app/common/CustomNumberInput'
 import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { isScreenLarger, useResolveSizes } from '@/app/helpers/hooks'
-import { ShoppingCartContext } from '@/app/catalog/components/shopping-cart/ShoppingCartProvider'
-import { LayoutContext } from '@/app/catalog/layout/LayoutContextProvider'
+import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { Carousel } from '@mantine/carousel'
+import {
+  Alert,
+  AspectRatio,
+  Badge,
+  Button,
+  Container,
+  Divider,
+  Grid,
+  Group,
+  Image,
+  Paper,
+  Popover,
+  Stack,
+  Text,
+  Title,
+  useMantineColorScheme,
+  useMantineTheme,
+} from '@mantine/core'
+import { notifications } from '@mantine/notifications'
+import { ProductAvailability } from '@prisma/client'
+import { IconCheck, IconExclamationCircle, IconExclamationMark, IconShoppingCart } from '@tabler/icons-react'
+import Autoplay from 'embla-carousel-autoplay'
+import { EmblaCarouselType } from 'embla-carousel-react'
+import { notFound, useParams } from 'next/navigation'
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
+import useSWR from 'swr'
 
 const fetcher = async ([url, productId]: [string, string]) => {
   const qs = new URLSearchParams({
@@ -137,6 +137,7 @@ const ProductDetailsPage = () => {
 
   const autoplay = useRef(Autoplay({ delay: 5000 }))
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [embla, setEmbla] = useState<EmblaCarouselType | null>(null)
   const { productId } = useParams<{ productId: string }>()
   const sizes = useResolveSizes(resolveSizes)
   // Data
@@ -218,6 +219,10 @@ const ProductDetailsPage = () => {
     setIsQuantityError(false)
   }, [selected, addQty])
 
+  useEffect(() => {
+    setTimeout(() => embla && embla.reInit(), 300)
+  }, [embla])
+
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
     notifications.show({
@@ -237,6 +242,7 @@ const ProductDetailsPage = () => {
         <Grid.Col span={sizes.grid.col1}>
           <Paper shadow="md" p="md">
             <Carousel
+              getEmblaApi={setEmbla}
               onSlideChange={setCurrentSlide}
               plugins={[autoplay.current]}
               onMouseEnter={autoplay.current.stop}
