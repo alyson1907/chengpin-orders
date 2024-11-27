@@ -31,7 +31,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { Dispatch, useEffect, useState } from 'react'
+import { Dispatch, useState } from 'react'
 import { z } from 'zod'
 
 type IProps = {
@@ -64,9 +64,6 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
   const [availability, setAvailability] = useState<TAvailability[]>(product.availability)
   const [errors, setErrors] = useState<Record<string, string | false>[]>([])
 
-  useEffect(() => {
-    if (product.id === '67451de3a62160830c18d19e') console.log(`availability`, availability)
-  })
   const resetAvailabilities = () => {
     setAvailability(product.availability)
     setErrors([])

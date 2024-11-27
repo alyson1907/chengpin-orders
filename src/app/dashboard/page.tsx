@@ -2,7 +2,6 @@
 import dayjs from '@/app/api/common/dayjs'
 import { HttpStatus } from '@/app/api/common/enum/http-status.enum'
 import { OrderStatus } from '@/app/api/order/order-status.enum'
-import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import LongPressButton from '@/app/common/LongPressButton'
 import EditOrderModal from '@/app/dashboard/orders/EditOrderModal'
 import OrdersTabs from '@/app/dashboard/orders/OrdersTabs'
@@ -10,7 +9,21 @@ import { copyToClipboard } from '@/app/helpers/browser-helper'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import { openWhatsapp } from '@/app/helpers/thirdparty-helper'
-import { Badge, Box, Button, Card, Collapse, Group, SimpleGrid, Stack, Table, Text, Tooltip } from '@mantine/core'
+import {
+  Badge,
+  Box,
+  Button,
+  Card,
+  Center,
+  Collapse,
+  Group,
+  Loader,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  Tooltip,
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconBrandWhatsapp,
@@ -28,9 +41,24 @@ import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-const fetcher = async ([url, filter]: [
+const countFetcher = async ([url, filter]: [
   string,
   { searchCustomerKey: string; searchCustomerName: string; orderBy: string; orderDirection: string }
+]) => {
+  const baseFilter = {}
+  if (filter.searchCustomerKey) baseFilter['customerKey__contains'] = filter.searchCustomerKey
+  if (filter.searchCustomerName) baseFilter['customerName__contains'] = filter.searchCustomerName
+  const qs = new URLSearchParams(baseFilter)
+  const res = await fetch(`${url}?${qs}`)
+  const resbody = await res.json()
+  handleResponseError(resbody)
+  return resbody.data
+}
+
+const fetcher = async ([url, filter, pagination]: [
+  string,
+  { searchCustomerKey: string; searchCustomerName: string; orderBy: string; orderDirection: string },
+  Record<string, { skip: number; take: number }>
 ]) => {
   const searchCustomerKey = filter.searchCustomerKey
   const searchCustomerName = filter.searchCustomerName
@@ -39,8 +67,11 @@ const fetcher = async ([url, filter]: [
   const orderFilter = { [`orderBy__${orderDirection}`]: orderBy }
 
   const ordersPromise = Object.entries(OrderStatus).map(async ([key, value]) => {
+    const paginationFilter = pagination[value]
     const baseFilter = {
       ...orderFilter,
+      skip: paginationFilter.skip.toString(),
+      take: paginationFilter.take.toString(),
       status: value,
     }
     if (searchCustomerKey) baseFilter['customerKey__contains'] = searchCustomerKey
@@ -51,7 +82,7 @@ const fetcher = async ([url, filter]: [
     handleResponseError(body)
     return {
       status: key,
-      data: body.data || { entries: [] },
+      data: body.data || { entries: [], total: 0, totalFiltered: 0 },
     }
   })
 
@@ -62,7 +93,6 @@ const fetcher = async ([url, filter]: [
 
   const result = {
     entries: formattedOrders,
-    total: parseInt(orders[0].data?.total) || 0,
   }
   return result
 }
@@ -110,13 +140,43 @@ const statusTranslation = {
 }
 
 const DashboardOrders = () => {
+  const [activeTab, setActiveTab] = useState<string | null>('draft')
+  const perPage = 30
+  const [draftPage, setDraftPage] = useState(1)
+  const [confirmedPage, setConfirmedPage] = useState(1)
+  const [cancelledPage, setCancelledPage] = useState(1)
   const [filter, setFilter] = useState({
     searchCustomerKey: '',
     searchCustomerName: '',
     orderBy: '',
     orderDirection: '',
   })
-  const { data, error, isLoading, mutate } = useSWR(['/api/order', filter], fetcher)
+  const {
+    data: count,
+    isLoading: isLoadingCount,
+    mutate: mutateCount,
+  } = useSWR(['/api/order/status/count', filter], countFetcher)
+  const { data, error, isLoading, mutate } = useSWR(
+    [
+      '/api/order',
+      filter,
+      {
+        DRAFT: {
+          skip: (draftPage - 1) * perPage,
+          take: perPage,
+        },
+        CONFIRMED: {
+          skip: (confirmedPage - 1) * perPage,
+          take: perPage,
+        },
+        CANCELLED: {
+          skip: (cancelledPage - 1) * perPage,
+          take: perPage,
+        },
+      },
+    ],
+    fetcher
+  )
   const [isEditOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false)
   const [editingOrder, setEditingOrder] = useState(null)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
@@ -127,7 +187,8 @@ const DashboardOrders = () => {
 
   useEffect(() => {
     mutate()
-  }, [filter, mutate])
+    mutateCount()
+  }, [filter, mutate, mutateCount])
 
   const handleOrderConfirmation = async (orderId: string) => {
     if (isCompleted(orderId)) return showErrorToast('Pedido Confirmado', `Esse pedido já está confirmado`)
@@ -337,32 +398,51 @@ const DashboardOrders = () => {
     })
   }
 
-  if (isLoading) return <DefaultLoadingOverlay visible={isLoading} />
+  if (isLoading || isLoadingCount)
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    )
   if (error)
     showErrorToast('Problema ao carregar pedidos', 'Houve um problema ao consultar os pedidos. Verifique a conexão')
 
   return (
-    <Group justify="center">
-      {editingOrder && (
-        <EditOrderModal
-          order={editingOrder}
-          opened={isEditOpened}
-          closeOnEscape={true}
-          close={closeEdit}
-          mutate={mutate}
-          onClose={closeEdit}
+    <Stack p="xl" align="center">
+      <Group>
+        {editingOrder && (
+          <EditOrderModal
+            order={editingOrder}
+            opened={isEditOpened}
+            closeOnEscape={true}
+            close={closeEdit}
+            mutate={mutate}
+            onClose={closeEdit}
+          />
+        )}
+        <OrdersTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          applyFilters={setFilter}
+          draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}
+          confirmedOrders={renderOrders(data?.entries[OrderStatus.CONFIRMED])}
+          cancelledOrders={renderOrders(data?.entries[OrderStatus.CANCELLED])}
+          draftQty={count.totalFilteredDraft}
+          confirmedQty={count.totalFilteredConfirmed}
+          cancelledQty={count.totalFilteredCancelled}
+          draftTotal={count.totalDraft}
+          confirmedTotal={count.totalConfirmed}
+          cancelledTotal={count.totalCancelled}
+          draftPage={draftPage}
+          confirmedPage={confirmedPage}
+          cancelledPage={cancelledPage}
+          perPage={perPage}
+          draftOnPageChange={setDraftPage}
+          confirmedOnPageChange={setConfirmedPage}
+          cancelledOnPageChange={setCancelledPage}
         />
-      )}
-      <OrdersTabs
-        applyFilters={setFilter}
-        draftOrders={renderOrders(data?.entries[OrderStatus.DRAFT])}
-        confirmedOrders={renderOrders(data?.entries[OrderStatus.CONFIRMED])}
-        cancelledOrders={renderOrders(data?.entries[OrderStatus.CANCELLED])}
-        draftQty={data?.entries[OrderStatus.DRAFT]?.length || 0}
-        confirmedQty={data?.entries[OrderStatus.CONFIRMED]?.length || 0}
-        cancelledQty={data?.entries[OrderStatus.CANCELLED]?.length || 0}
-      />
-    </Group>
+      </Group>
+    </Stack>
   )
 }
 
