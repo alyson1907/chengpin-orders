@@ -1,8 +1,10 @@
 'use client'
+import CurrencyNumberInput from '@/app/common/CurrencyNumberInput'
 import CreateProductModal from '@/app/dashboard/products/CreateProductModal'
 import { refreshCaregoriesNavbar, refreshProductsList } from '@/app/dashboard/products/mutators'
 import { handleResponseError } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { isNotValid } from '@/app/helpers/validate-helper'
 import {
   ActionIcon,
   AspectRatio,
@@ -20,13 +22,30 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconEdit, IconTrash, IconX } from '@tabler/icons-react'
+import {
+  IconChevronDown,
+  IconChevronUp,
+  IconDeviceFloppy,
+  IconEdit,
+  IconPlus,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react'
 import { Dispatch, useState } from 'react'
+import { z } from 'zod'
 
 type IProps = {
   product: Record<string, any>
   expandedProductId: string | null
   setExpandedProductId: Dispatch<string | null>
+}
+
+type TAvailability = {
+  id: string
+  name: string
+  productId: string
+  price: number
+  qty: number
 }
 
 const sendUpdateProduct = async (id: string, body: any) => {
@@ -38,19 +57,86 @@ const sendUpdateProduct = async (id: string, body: any) => {
 
 const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: IProps) => {
   const isTableExpanded = expandedProductId === product.id
+  const [isLoading, setIsLoading] = useState(false)
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [availability, setAvailability] = useState(product.availability)
+  const [availability, setAvailability] = useState<TAvailability[]>(product.availability)
+  const [errors, setErrors] = useState<Record<string, string | false>[]>([])
 
-  const handleTableChange = (id: string, field, value) => {
-    setAvailability((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  const resetAvailabilities = () => {
+    setAvailability(product.availability)
+    setErrors([])
+    setIsEditingTable(false)
   }
 
-  const handleSaveTableChanges = () => {
-    // Add your save logic here
+  const addEmptyRow = () => {
+    const empty = {
+      id: 'new-item-' + new Date().toISOString(),
+      name: '',
+      productId: product.id,
+      price: 0,
+      qty: 0,
+    }
+    setAvailability([...availability, empty])
+  }
+
+  const handleTableChange = (id: string, field, value) => {
+    setAvailability(availability.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
+
+  const validate = (availability: TAvailability[]) => {
+    const errors = availability.map((a) => ({
+      name: isNotValid(a.name, z.string().min(1)) && 'Tamanho obrigatório',
+      price: isNotValid(a.price, z.number().gt(0)) && 'Preço inválido',
+      qty: isNotValid(a.qty, z.number().int().gte(0)) && 'Quantidade inválida',
+    }))
+    setErrors(errors)
+    return errors
+  }
+
+  const sendTableChanges = async () => {
+    const validated = validate(availability)
+    const someErrorFound = validated.some((e) => Object.values(e).some((isError) => isError))
+    if (someErrorFound) return
+
     setIsLoading(true)
-    console.log(`handleSaveTableChanges`, availability)
+    const createdAvailabilities = availability.filter((a) => a.id.startsWith('new-item'))
+    const updatedAvailabilities = availability.filter((a) => product.availability.map(({ id }) => id).includes(a.id))
+    const removedAvailabilities = product.availability.filter((pa) => !availability.some((a) => a.id === pa.id))
+
+    console.log(`\n\ncreated`, createdAvailabilities)
+    console.log(`removed`, removedAvailabilities)
+    console.log(`updated`, updatedAvailabilities)
+
+    const createBody = {
+      availabilities: createdAvailabilities.map((a) => ({
+        productId: product.id,
+        name: a.name,
+        qty: a.qty,
+        price: a.price,
+      })),
+    }
+    const updateBody = {
+      availabilities: updatedAvailabilities.map((a) => ({
+        id: a.id,
+        name: a.name,
+        qty: a.qty,
+        price: a.price,
+      })),
+    }
+    const deleteBody = {
+      availabilities: removedAvailabilities.map((a) => a.id),
+    }
+    const createdRes = await fetch('/api/availability', { method: 'POST', body: JSON.stringify(createBody) })
+    const updatedRes = await fetch('/api/availability', { method: 'PUT', body: JSON.stringify(updateBody) })
+    const deletedRes = await fetch('/api/availability', { method: 'DELETE', body: JSON.stringify(deleteBody) })
+    const createdBody = await createdRes.json()
+    const updatedBody = await updatedRes.json()
+    const deletedBody = await deletedRes.json()
+    const isErrorCreated = handleResponseError(createdBody)
+    const isErrorUpdated = handleResponseError(updatedBody)
+    const isErrorDeleted = handleResponseError(deletedBody)
+    if (isErrorCreated || isErrorUpdated || isErrorDeleted) refreshProductsList()
     setIsEditingTable(false)
     setIsLoading(false)
   }
@@ -67,28 +153,28 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {availability.map((item) => (
+          {availability.map((item, idx) => (
             <Table.Tr key={item.id}>
               <Table.Td>
                 {isEditingTable ? (
-                  <TextInput value={item.name} onChange={(e) => handleTableChange(item.id, 'name', e.target.value)} />
+                  <TextInput
+                    value={item.name}
+                    onChange={(e) => handleTableChange(item.id, 'name', e.target.value)}
+                    error={errors[idx] && errors[idx].name}
+                  />
                 ) : (
                   item.name
                 )}
               </Table.Td>
               <Table.Td>
                 {isEditingTable ? (
-                  <NumberInput
+                  <CurrencyNumberInput
                     w={'90px'}
                     value={item.price}
-                    min={0}
-                    step={1}
-                    stepHoldDelay={200}
-                    stepHoldInterval={15}
-                    decimalSeparator=","
-                    decimalScale={2}
-                    hideControls
-                    onChange={(value) => handleTableChange(item.id, 'price', value)}
+                    onChange={(value) => {
+                      handleTableChange(item.id, 'price', value || 0)
+                    }}
+                    error={errors[idx] && errors[idx].price}
                   />
                 ) : (
                   `${BRL.format(item.price)}`
@@ -104,7 +190,10 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
                     stepHoldDelay={200}
                     stepHoldInterval={15}
                     allowDecimal={false}
+                    allowNegative={false}
+                    defaultValue={0}
                     onChange={(value) => handleTableChange(item.id, 'qty', value)}
+                    error={errors[idx] && errors[idx].qty}
                   />
                 ) : (
                   item.qty
@@ -114,7 +203,7 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
                 <Table.Td>
                   <ActionIcon
                     size="sm"
-                    onClick={() => setAvailability((prev) => prev.filter((i) => i.id !== item.id))}
+                    onClick={() => setAvailability(availability.filter((i) => i.id !== item.id))}
                     color="red"
                   >
                     <IconTrash size={16} />
@@ -125,6 +214,22 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
           ))}
         </Table.Tbody>
       </Table>
+    )
+  }
+
+  const renderTableControls = () => {
+    return (
+      <Group justify="flex-end">
+        <Button size="xs" loading={isLoading} bg="indigo" leftSection={<IconPlus size={16} />} onClick={addEmptyRow}>
+          Adicionar
+        </Button>
+        <Button size="xs" loading={isLoading} leftSection={<IconX size={16} />} onClick={resetAvailabilities}>
+          Cancelar
+        </Button>
+        <Button size="xs" loading={isLoading} leftSection={<IconDeviceFloppy size={16} />} onClick={sendTableChanges}>
+          Salvar
+        </Button>
+      </Group>
     )
   }
 
@@ -178,23 +283,13 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
             <Switch
               label="Habilitar edição"
               checked={isEditingTable}
-              onChange={(e) => setIsEditingTable(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked
+                if (!checked) resetAvailabilities()
+                setIsEditingTable(checked)
+              }}
             />
-            {isEditingTable && (
-              <Group justify="flex-end">
-                <Button size="xs" leftSection={<IconX size={16} />} onClick={() => setIsEditingTable(false)}>
-                  Cancelar
-                </Button>
-                <Button
-                  size="xs"
-                  leftSection={<IconDeviceFloppy size={16} />}
-                  loading={isLoading}
-                  onClick={handleSaveTableChanges}
-                >
-                  Salvar
-                </Button>
-              </Group>
-            )}
+            {isEditingTable && renderTableControls()}
           </Group>
         </Collapse>
       </Box>

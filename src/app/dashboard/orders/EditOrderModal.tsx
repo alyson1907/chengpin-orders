@@ -1,9 +1,9 @@
 import dayjs from '@/app/api/common/dayjs'
-import ButtonSquareIcon from '@/app/common/ButtonSquareIcon'
 import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
 import { handleResponseError, showErrorToast } from '@/app/helpers/handle-request-error'
 import { BRL } from '@/app/helpers/NumberFormatter.helper'
 import {
+  ActionIcon,
   Button,
   Group,
   InputBase,
@@ -250,7 +250,9 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
                   <Table.Td>{BRL.format(item.price)}</Table.Td>
                   <Table.Td>{BRL.format(item.qty * item.price)}</Table.Td>
                   <Table.Td>
-                    <ButtonSquareIcon icon={<IconTrash size={16} />} onClick={() => removeItem(item.availabilityId)} />
+                    <ActionIcon size="sm" onClick={() => removeItem(item.availabilityId)} color="red">
+                      <IconTrash size={16} />
+                    </ActionIcon>
                   </Table.Td>
                 </Table.Tr>
               )
@@ -274,7 +276,7 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
-    showErrorToast('Problema ao coletar produos disponíveis', 'Verifique sua conexão')
+    showErrorToast('Problema ao coletar produtos disponíveis', 'Verifique sua conexão')
     return <></>
   }
   return (
@@ -306,6 +308,7 @@ const EditOrderModal = ({ order, close, mutate, ...props }: IProps) => {
               searchable
             />
             <Button
+              loading={isUpdating}
               leftSection={<IconPlus />}
               onClick={(e) => {
                 e.preventDefault()

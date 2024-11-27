@@ -8,8 +8,12 @@ export const productAvailabilitySchema = z.object({
   qty: z.number().int().gte(0),
 })
 
-export const createProductAvailabilityBodySchema = productAvailabilitySchema.extend({
-  productId: idSchema,
+export const createProductAvailabilityBodySchema = z.object({
+  availabilities: z.array(
+    productAvailabilitySchema.extend({
+      productId: idSchema,
+    })
+  ),
 })
 
 export const updateProductAvailabilityBodySchema = z.object({

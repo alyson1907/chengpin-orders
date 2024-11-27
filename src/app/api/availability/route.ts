@@ -11,19 +11,35 @@ import { PaginationDto } from '@/app/api/common/types/common-response'
 import { Prisma } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import prisma from '../../../../prisma/prisma'
-
+// productId, ...availability
 const availabilityInclude = { product: true }
-const createAvailability = async (req: NextRequest) => {
+const createAvailabilities = async (req: NextRequest) => {
   const { body } = await parseReq(req)
-  const { productId, ...availability } = createProductAvailabilityBodySchema.parse(body)
-  const product = await prisma.product.findFirst({ where: { id: productId } })
-  if (!product)
-    throw new NotFoundError(ErrorKey.MISSING_ENTITIES, productId, 'No product found to relate the availability')
-
-  const created = await prisma.productAvailability.create({
-    data: { ...availability, product: { connect: { id: productId } } },
-    include: availabilityInclude,
+  const { availabilities } = createProductAvailabilityBodySchema.parse(body)
+  const receivedProductIds = availabilities.map(({ productId }) => productId)
+  const foundProducts = await prisma.product.findMany({
+    where: { id: { in: receivedProductIds } },
   })
+  const notFound = availabilities.filter((a) => !foundProducts.map(({ id }) => id).includes(a.productId))
+  if (notFound.length)
+    throw new NotFoundError(
+      ErrorKey.MISSING_ENTITIES,
+      { receivedProductIds, notFoundProductIds: notFound.map(({ productId }) => productId) },
+      'No product found to relate the availability'
+    )
+
+  const created = await prisma.$transaction(async (trx) => {
+    const promises = availabilities.flatMap(async ({ productId, ...availability }) => {
+      const created = await trx.productAvailability.create({
+        data: { ...availability, product: { connect: { id: productId } } },
+        include: availabilityInclude,
+      })
+      return created
+    })
+    const allCreated = await Promise.all(promises)
+    return allCreated
+  })
+
   return created
 }
 const getAvailability = async (req: NextRequest) => {
@@ -73,7 +89,7 @@ const deleteAvailability = async (req: NextRequest) => {
   return prisma.productAvailability.deleteMany({ where: { id: { in: availabilities } } })
 }
 
-export const POST = middlewares(createAvailability)
+export const POST = middlewares(createAvailabilities)
 export const GET = middlewaresWithoutAuth(getAvailability)
 export const PUT = middlewares(updateAvailability)
 export const DELETE = middlewares(deleteAvailability)

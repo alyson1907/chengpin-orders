@@ -66,6 +66,7 @@ const fetcher = async ([url, filter]: [
   }
   return result
 }
+
 const confirmOrder = async (orderId: string) => fetch(`/api/order/confirm/${orderId}`, { method: 'POST' })
 const cancelOrder = async (orderId: string) => fetch(`/api/order/cancel/${orderId}`, { method: 'POST' })
 const calculateTotal = (order: any) =>

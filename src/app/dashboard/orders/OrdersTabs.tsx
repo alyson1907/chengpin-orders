@@ -1,6 +1,6 @@
-import { Tabs, TextInput, Select, Group, Button, Badge } from '@mantine/core'
-import React, { Dispatch, useState } from 'react'
+import { Badge, Button, Group, Select, Tabs, TextInput } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
+import React, { Dispatch, useState } from 'react'
 
 type IProps = {
   draftOrders: React.ReactNode
