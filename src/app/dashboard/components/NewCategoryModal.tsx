@@ -13,6 +13,7 @@ type IProps = {
 const NewCategoryModal = ({ afterCreate = () => {}, ...props }: IProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm({
+    mode: 'uncontrolled',
     initialValues: {
       name: '',
       visible: true,

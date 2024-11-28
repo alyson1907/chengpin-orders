@@ -1,21 +1,34 @@
-import { Paper, Title, Image, Text, Group, Badge, Stack, Box, Container } from '@mantine/core'
-import styles from './ProductCard.module.css'
-import React, { Dispatch, useState } from 'react'
-import { BRL } from '@/app/helpers/NumberFormatter.helper'
-import { Product, ProductAvailability } from '@prisma/client'
 import { DefaultLoadingOverlay } from '@/app/common/DefaultLoadingOverlay'
+import { BRL } from '@/app/helpers/NumberFormatter.helper'
+import { Badge, Box, Container, Group, Image, Paper, Stack, Text, Title } from '@mantine/core'
+import { Product, ProductAvailability } from '@prisma/client'
+import { Dispatch, useState } from 'react'
+import styles from './ProductCard.module.css'
 
 type IProps = {
   productInfo: Product & { availability: ProductAvailability[] }
   selectProduct: Dispatch<any>
 }
 
-const renderAvailableBadges = (availability) => {
-  return availability.map(({ name }, idx: number) => (
+const renderAvailableBadges = (availability: any[]) => {
+  const displayAmount = 4
+  const head = availability.slice(0, displayAmount)
+  const tail = availability.slice(displayAmount, availability.length)
+  const badges = head.map(({ name }, idx: number) => (
     <Badge key={idx} size="sm" variant="outline" m={0} style={{ cursor: 'pointer' }}>
       {name}
     </Badge>
   ))
+  return (
+    <>
+      {badges}
+      {!!tail.length && (
+        <Text size="xs" c="dimmed">
+          +{tail.length} tamanhos
+        </Text>
+      )}
+    </>
+  )
 }
 
 const truncateDescription = (text: string) => {

@@ -41,7 +41,7 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
   const isCreateProduct = product === emptyProduct
   const [isLoadingDropzone, setIsLoadingDropzone] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [selectedIdx, setSelectedIdx] = useState(0)
+  const [selectedIdx, setSelectedIdx] = useState(-1)
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -71,6 +71,10 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
     if (product.imgs) form.setFieldValue('images', product.imgs)
   }, [form, product.imgs])
 
+  useEffect(() => {
+    console.log(form.getTransformedValues())
+  })
+
   const selectImgThumbnail = (idx: number) => {
     const images = form.getValues().images
     setSelectedIdx(idx)
@@ -94,6 +98,7 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
     values: { name: any; description: any; coverImg: any; categoryId: string; images: string[] },
     event?: React.FormEvent<HTMLFormElement>
   ) => {
+    console.log(`handleSubmit`, JSON.stringify(values))
     event?.preventDefault()
     const { coverImg, name, description, categoryId, images } = values
     const body = {
@@ -111,6 +116,10 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
     await onSave(body)
     setIsSaving(false)
   }
+
+  useEffect(() => {
+    console.log(form.errors)
+  })
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
@@ -131,7 +140,6 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
               files.forEach((file) => formData.append('file', file))
               const imgUrls = await uploadImages(formData)
               form.setFieldValue('images', [...images, ...imgUrls])
-              if (!!form.getValues().coverImg) form.setFieldValue('coverImg', images[0])
               setIsLoadingDropzone(false)
             }}
           />
@@ -143,6 +151,9 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
         </Text>
         <Text size="xs" c="var(--mantine-color-red-7)" hidden={!form.errors.images}>
           Ao menos 1 imagem é necessária
+        </Text>
+        <Text size="xs" c="var(--mantine-color-red-7)" hidden={!form.errors.coverImg}>
+          Defina a foto de capa
         </Text>
 
         <SelectThumb

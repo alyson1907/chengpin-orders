@@ -28,16 +28,19 @@ const createCategories = async (req: NextRequest) => {
 
 const getCategories = async (req: NextRequest): Promise<PaginationDto<Category>> => {
   const { qs } = await parseReq(req)
-  const filter = buildPrismaFilter(qs)
-  const total = await prisma.category.count(filter)
+  const { skip, take, ...filter } = buildPrismaFilter(qs)
+  const total = await prisma.category.count()
+  const totalFiltered = await prisma.category.count(filter)
   const categories = await prisma.category.findMany({
     ...filter,
+    skip,
+    take,
     include: categoryInclude,
   })
   return {
     entries: categories,
     total,
-    totalFiltered: categories.length,
+    totalFiltered,
   }
 }
 

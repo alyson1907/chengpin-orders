@@ -31,7 +31,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { Dispatch, useState } from 'react'
+import { Dispatch, useEffect, useState } from 'react'
 import { z } from 'zod'
 
 type IProps = {
@@ -62,7 +62,13 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
   const [isModalOpen, { open: openProductModal, close: closeProductModal }] = useDisclosure(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [availability, setAvailability] = useState<TAvailability[]>(product.availability)
+  const [totalForSale, setTotalForSale] = useState(0)
   const [errors, setErrors] = useState<Record<string, string | false>[]>([])
+
+  useEffect(() => {
+    const totalAvailability = product.availability.reduce((acc, item) => acc + item.qty, 0)
+    setTotalForSale(totalAvailability)
+  }, [product.availability])
 
   const resetAvailabilities = () => {
     setAvailability(product.availability)
@@ -252,9 +258,18 @@ const EditableProduct = ({ product, expandedProductId, setExpandedProductId }: I
         <Flex flex={5}>
           <Box>
             <Text fw={700}>{product.name}</Text>
-            <Text size="sm" lineClamp={2}>
+            <Text mt="sm" size="sm" lineClamp={2}>
               {product.description}
             </Text>
+            {totalForSale === 0 ? (
+              <Text mt="sm" size="sm" c="red">
+                <strong>Estoque:</strong> Sem Estoque
+              </Text>
+            ) : (
+              <Text mt="sm" size="sm">
+                <strong>Estoque:</strong> {totalForSale} à venda
+              </Text>
+            )}
           </Box>
         </Flex>
         <Flex flex={6} justify={'flex-end'}>

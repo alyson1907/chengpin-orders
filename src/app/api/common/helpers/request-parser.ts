@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server'
-import * as _ from 'lodash'
 import { RequestContext } from '@/app/api/common/types/request-context'
+import * as _ from 'lodash'
+import { NextRequest } from 'next/server'
 
 type ParsedRequest = {
   body: any
@@ -34,7 +34,10 @@ export const parseReq = async (req: NextRequest, context?: RequestContext): Prom
 }
 
 const groupFilterClauses = (prismaFilter: Record<string, any>) => {
-  const rootKeys = ['skip', 'take', 'orderBy']
+  const rootKeys = ['orderBy']
+  const pagination = { skip: prismaFilter?.skip || 0, take: prismaFilter?.take || 99999 }
+  delete prismaFilter.skip
+  delete prismaFilter.take
   // All filters that are not "root" are grouped in the `where` clause
   const groupedWhere = Object.entries(prismaFilter).reduce(
     (acc, [field, value]) => {
@@ -43,7 +46,7 @@ const groupFilterClauses = (prismaFilter: Record<string, any>) => {
       acc.where = { ...prevWhere.where, [field]: value }
       return acc
     },
-    { where: {} }
+    { where: {}, ...pagination }
   )
   return groupedWhere
 }
@@ -55,7 +58,8 @@ export const buildPrismaFilter = (qs: Record<string, any>) => {
     const keyParts = key.split(nestedKey)
     assignNestedFilter(prismaFilter, keyParts, qs[key])
   }
-  return groupFilterClauses(prismaFilter)
+  const grouped = groupFilterClauses(prismaFilter)
+  return grouped
 }
 
 const assignNestedFilter = (currentFilter: any, keyParts: string[], value: any) => {

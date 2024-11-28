@@ -45,13 +45,14 @@ const createAvailabilities = async (req: NextRequest) => {
 const getAvailability = async (req: NextRequest) => {
   type TQueryResult = Prisma.ProductAvailabilityGetPayload<{ include: { product: true } }>
   const { qs } = await parseReq(req)
-  const filter = buildPrismaFilter(qs)
+  const { skip, take, ...filter } = buildPrismaFilter(qs)
   const total = await prisma.productAvailability.count()
-  const result = await prisma.productAvailability.findMany({ ...filter, include: availabilityInclude })
+  const totalFiltered = await prisma.productAvailability.count(filter)
+  const result = await prisma.productAvailability.findMany({ ...filter, skip, take, include: availabilityInclude })
   const paginationDto: PaginationDto<TQueryResult> = {
     entries: result,
     total,
-    totalFiltered: result.length,
+    totalFiltered,
   }
   return paginationDto
 }

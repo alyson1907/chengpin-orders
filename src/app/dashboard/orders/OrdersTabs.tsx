@@ -11,9 +11,6 @@ type IProps = {
   draftQty: number
   confirmedQty: number
   cancelledQty: number
-  draftTotal: number
-  confirmedTotal: number
-  cancelledTotal: number
   draftPage: number
   confirmedPage: number
   cancelledPage: number
@@ -35,9 +32,6 @@ const OrdersTabs = ({
   confirmedQty,
   cancelledQty,
   applyFilters,
-  draftTotal = 0,
-  confirmedTotal = 0,
-  cancelledTotal = 0,
   draftPage = 1,
   confirmedPage = 1,
   cancelledPage = 1,
@@ -122,7 +116,7 @@ const OrdersTabs = ({
       <Tabs.Panel value="draft">
         {draftOrders}
         <Group justify="center">
-          <Pagination mt="md" total={Math.ceil(draftTotal / perPage)} value={draftPage} onChange={draftOnPageChange} />
+          <Pagination mt="md" total={Math.ceil(draftQty / perPage)} value={draftPage} onChange={draftOnPageChange} />
         </Group>
       </Tabs.Panel>
       <Tabs.Panel value="confirmed">
@@ -130,7 +124,7 @@ const OrdersTabs = ({
         <Group justify="center">
           <Pagination
             mt="md"
-            total={Math.ceil(confirmedTotal / perPage)}
+            total={Math.ceil(confirmedQty / perPage)}
             value={confirmedPage}
             onChange={confirmedOnPageChange}
           />
@@ -141,7 +135,7 @@ const OrdersTabs = ({
         <Group justify="center">
           <Pagination
             mt="md"
-            total={Math.ceil(cancelledTotal / perPage)}
+            total={Math.ceil(cancelledQty / perPage)}
             value={cancelledPage}
             onChange={cancelledOnPageChange}
           />

@@ -1,20 +1,20 @@
 import { middlewares, middlewaresWithoutAuth } from '@/app/api/common/apply-middlewares'
-import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
-import { createOrderBodySchema } from '@/app/api/order/validation-schemas'
-import { NextRequest } from 'next/server'
-import prisma from '../../../../prisma/prisma'
-import { OrderStatus } from '@/app/api/order/order-status.enum'
+import dayjs from '@/app/api/common/dayjs'
 import { BadRequestError, NotFoundError } from '@/app/api/common/error/common-errors'
 import { ErrorKey } from '@/app/api/common/error/errors.enum'
-import { Prisma } from '@prisma/client'
+import { buildPrismaFilter, parseReq } from '@/app/api/common/helpers/request-parser'
 import { PaginationDto } from '@/app/api/common/types/common-response'
 import {
-  filterItemsNotInAvailables,
-  filterInsufficientStock,
-  findAvailables,
   buildOrderItemsInsert,
+  filterInsufficientStock,
+  filterItemsNotInAvailables,
+  findAvailables,
 } from '@/app/api/order/order-helper'
-import dayjs from '@/app/api/common/dayjs'
+import { OrderStatus } from '@/app/api/order/order-status.enum'
+import { createOrderBodySchema } from '@/app/api/order/validation-schemas'
+import { Prisma } from '@prisma/client'
+import { NextRequest } from 'next/server'
+import prisma from '../../../../prisma/prisma'
 
 const createOrder = async (req: NextRequest) => {
   const { body } = await parseReq(req)
@@ -74,14 +74,15 @@ const createOrder = async (req: NextRequest) => {
 
 const getOrders = async (req: NextRequest) => {
   const { qs } = await parseReq(req)
-  const filter = buildPrismaFilter(qs)
+  const { skip, take, ...filter } = buildPrismaFilter(qs)
   const total = await prisma.order.count()
+  const totalFiltered = await prisma.order.count(filter)
   type TQueryResult = Prisma.OrderGetPayload<{ include: { orderItems: true } }>
-  const result: TQueryResult[] = await prisma.order.findMany({ ...filter, include: { orderItems: true } })
+  const result: TQueryResult[] = await prisma.order.findMany({ ...filter, skip, take, include: { orderItems: true } })
   const response: PaginationDto<TQueryResult> = {
     entries: result,
     total,
-    totalFiltered: result.length,
+    totalFiltered,
   }
   return response
 }

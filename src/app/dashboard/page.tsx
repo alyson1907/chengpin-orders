@@ -141,7 +141,7 @@ const statusTranslation = {
 
 const DashboardOrders = () => {
   const [activeTab, setActiveTab] = useState<string | null>('draft')
-  const perPage = 30
+  const perPage = 5
   const [draftPage, setDraftPage] = useState(1)
   const [confirmedPage, setConfirmedPage] = useState(1)
   const [cancelledPage, setCancelledPage] = useState(1)
@@ -430,9 +430,6 @@ const DashboardOrders = () => {
           draftQty={count.totalFilteredDraft}
           confirmedQty={count.totalFilteredConfirmed}
           cancelledQty={count.totalFilteredCancelled}
-          draftTotal={count.totalDraft}
-          confirmedTotal={count.totalConfirmed}
-          cancelledTotal={count.totalCancelled}
           draftPage={draftPage}
           confirmedPage={confirmedPage}
           cancelledPage={cancelledPage}
