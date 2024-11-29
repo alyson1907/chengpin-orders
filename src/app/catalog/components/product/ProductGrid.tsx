@@ -52,10 +52,6 @@ const ProductGrid = ({ productFilters }: IProps) => {
   }, [productFilters?.perPage, setPerPage])
 
   useEffect(() => {
-    console.log(`page ${page} perPage ${perPage} totalFiltered ${response?.data?.totalFiltered}`)
-  })
-
-  useEffect(() => {
     if (selectedProductId) router.push(`/catalog/product-details/${selectedProductId}`)
   }, [selectedProductId, router])
 

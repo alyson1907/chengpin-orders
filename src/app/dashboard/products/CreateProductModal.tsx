@@ -19,7 +19,8 @@ const emptyProduct = {
   name: '',
   description: '',
   coverImg: '',
-  categoryProduct: [],
+  categoryProduct: new Array<any>(),
+  images: new Array<string>(),
 }
 
 const fetcher = async (url: string) => {
@@ -41,7 +42,7 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
   const isCreateProduct = product === emptyProduct
   const [isLoadingDropzone, setIsLoadingDropzone] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [selectedIdx, setSelectedIdx] = useState(-1)
+  const [coverImgIdx, setCoverImgIdx] = useState(0)
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -49,48 +50,51 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
       name: product.name,
       description: product.description,
       categoryId: product?.categoryProduct[0]?.category.id,
-      images: new Array<string>(),
+      images: new Array<string>(''),
     },
     validate: {
+      coverImg: (value) => isNotValid(value, z.string().min(1)),
       name: (value) => isNotValid(value, z.string().min(1)) && 'Nome é obrigatório',
       description: (value) => isNotValid(value, z.string().min(1)) && 'Descrição é obrigatório',
       categoryId: (value) => isNotValid(value, z.string().min(1)) && 'Categoria é obrigatória',
       images: (value) => isNotValid(value, z.array(z.string()).min(1)),
-      coverImg: (value) => isNotValid(value, z.string().min(1)),
     },
-    transformValues: (values) => ({
-      name: values.name.trim(),
-      description: values.description.trim(),
-      coverImg: values.coverImg,
-      categoryId: values.categoryId,
-      images: values.images,
-    }),
+    transformValues: (values) => {
+      return {
+        coverImg: values.coverImg,
+        name: values.name.trim(),
+        description: values.description.trim(),
+        categoryId: values.categoryId,
+        images: values.images,
+      }
+    },
   })
 
   useEffect(() => {
-    if (product.imgs) form.setFieldValue('images', product.imgs)
-  }, [form, product.imgs])
-
-  useEffect(() => {
-    console.log(form.getTransformedValues())
-  })
+    if (!product?.imgs) return
+    form.setFieldValue('images', product.imgs)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.imgs])
 
   const selectImgThumbnail = (idx: number) => {
     const images = form.getValues().images
-    setSelectedIdx(idx)
     form.setFieldValue('coverImg', images[idx])
+    setCoverImgIdx(idx)
   }
 
   const removeImgThumbnail = (idx: number) => {
-    const images = form.getValues().images
+    const { images } = form.getTransformedValues()
     form.setFieldValue(
       'images',
       images.filter((_, i) => i !== idx)
     )
-    if (idx < selectedIdx) setSelectedIdx(selectedIdx - 1)
-    if (selectedIdx === idx) {
-      setSelectedIdx(0)
+    if (idx < coverImgIdx) {
+      form.setFieldValue('coverImg', images[coverImgIdx - 1])
+      setCoverImgIdx(coverImgIdx - 1)
+    }
+    if (coverImgIdx === idx) {
       form.setFieldValue('coverImg', images[0])
+      setCoverImgIdx(0)
     }
   }
 
@@ -98,7 +102,6 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
     values: { name: any; description: any; coverImg: any; categoryId: string; images: string[] },
     event?: React.FormEvent<HTMLFormElement>
   ) => {
-    console.log(`handleSubmit`, JSON.stringify(values))
     event?.preventDefault()
     const { coverImg, name, description, categoryId, images } = values
     const body = {
@@ -116,10 +119,6 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
     await onSave(body)
     setIsSaving(false)
   }
-
-  useEffect(() => {
-    console.log(form.errors)
-  })
 
   if (isLoading) return <DefaultLoadingOverlay />
   if (error) {
@@ -139,7 +138,9 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
               const formData = new FormData()
               files.forEach((file) => formData.append('file', file))
               const imgUrls = await uploadImages(formData)
-              form.setFieldValue('images', [...images, ...imgUrls])
+              const newImages = [...images, ...imgUrls]
+              form.setFieldValue('images', newImages)
+              if (!form.getValues().coverImg) form.setFieldValue('coverImg', newImages[0])
               setIsLoadingDropzone(false)
             }}
           />
@@ -159,8 +160,8 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
         <SelectThumb
           mt="md"
           justify="flex-start"
-          imageUrls={form.getValues().images}
-          selectedIdx={selectedIdx}
+          imageUrls={form.getTransformedValues().images}
+          selectedIdx={coverImgIdx}
           onThumbSelect={selectImgThumbnail}
           onThumbRemove={removeImgThumbnail}
         />
@@ -180,6 +181,7 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
           </Group>
           <Textarea
             mt="sm"
+            style={{ whiteSpace: 'pre-wrap' }}
             label="Descrição"
             placeholder="A Orquídea Pimposa é originária dos..."
             {...form.getInputProps('description')}
