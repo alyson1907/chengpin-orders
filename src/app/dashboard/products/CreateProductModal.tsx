@@ -50,7 +50,7 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
       name: product.name,
       description: product.description,
       categoryId: product?.categoryProduct[0]?.category.id,
-      images: new Array<string>(''),
+      images: new Array<string>(),
     },
     validate: {
       coverImg: (value) => isNotValid(value, z.string().min(1)),
