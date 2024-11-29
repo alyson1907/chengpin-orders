@@ -38,8 +38,9 @@ const DashboardNavbar = () => {
 
   useEffect(() => {
     if (isLoading || selectedCategory) return
-    const { id: categoryId } = data?.entries.find((c) => c.visible)
-    setSelectedCategory(categoryId)
+    const category = data?.entries.find((c) => c.visible)
+    if (!category) return
+    setSelectedCategory(category.id)
   }, [data?.entries, isLoading, selectedCategory, setSelectedCategory])
 
   if (isLoading)
