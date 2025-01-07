@@ -27,7 +27,7 @@ const DropzoneImage = (props: DropzoneProps) => {
             Upload de imagens
           </Text>
           <Text size="sm" c="dimmed" inline mt={7}>
-            Anexe quantas imagens desejar até 15mb cada
+            Anexe quantas imagens desejar até 4.5mb cada
           </Text>
         </Flex>
       </Stack>
