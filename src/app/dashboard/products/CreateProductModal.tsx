@@ -135,9 +135,12 @@ const CreateProductModal = ({ product = emptyProduct, onSave = async () => {}, .
             onDrop={async (files: FileWithPath[]) => {
               setIsLoadingDropzone(true)
               const images = form.getValues().images
-              const formData = new FormData()
-              files.forEach((file) => formData.append('file', file))
-              const imgUrls = await uploadImages(formData)
+              const imgUrlsPromises = files.map((file) => {
+                const formData = new FormData()
+                formData.append('file', file)
+                return uploadImages(formData)
+              })
+              const imgUrls = (await Promise.all(imgUrlsPromises)).flat()
               const newImages = [...images, ...imgUrls]
               form.setFieldValue('images', newImages)
               if (!form.getValues().coverImg) form.setFieldValue('coverImg', newImages[0])

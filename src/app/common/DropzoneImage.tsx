@@ -7,7 +7,7 @@ const DropzoneImage = (props: DropzoneProps) => {
   return (
     <Dropzone
       onReject={(files) => showErrorToast('Arquivo Rejeitado', `Motivo: ${files[0].errors[0].message}`)}
-      maxSize={15 * 1024 ** 2}
+      maxSize={4.5 * 1024 ** 2}
       accept={IMAGE_MIME_TYPE}
       {...props}
     >
