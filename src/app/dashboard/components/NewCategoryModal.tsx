@@ -51,7 +51,6 @@ const NewCategoryModal = ({ afterCreate = () => {}, ...props }: IProps) => {
           form="create-new-category-form"
           label="Nome"
           placeholder="Orquídeas Pimposas de Plástico..."
-          value={form.values.name}
           {...form.getInputProps('name')}
         />
         <Group mt="lg" justify="flex-end">

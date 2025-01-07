@@ -77,6 +77,7 @@ const EditableCategory = ({
           </Collapse>
           <Group justify="space-between">
             <Switch
+              description="À venda?"
               size="xs"
               variant="transparent"
               checked={isCategoryVisible}
