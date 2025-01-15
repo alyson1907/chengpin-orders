@@ -13,9 +13,23 @@ import LayoutContextProvider from '@/app/catalog/layout/LayoutContextProvider'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import { DatesProvider } from '@mantine/dates'
 import { Notifications } from '@mantine/notifications'
+import { Lexend_Deca, Roboto } from 'next/font/google'
 import { redirect, usePathname } from 'next/navigation'
 import { ReactNode, Suspense, useEffect } from 'react'
 import theme from './theme'
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+  weight: ['100', '300', '400', '500', '700', '900'],
+})
+
+const lexendDeca = Lexend_Deca({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-lexend-deca',
+})
 
 const getLayout = (url: string, children: ReactNode) => {
   if (url.startsWith('/catalog'))
@@ -36,19 +50,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   })
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${lexendDeca.variable} ${roboto.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="http://fonts.googleapis.com/css?family=Roboto:400,900,700,500,300,100"
-          rel="stylesheet"
-          type="text/css"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap"
-          rel="stylesheet"
-        />
         <ColorSchemeScript />
       </head>
       <body>
