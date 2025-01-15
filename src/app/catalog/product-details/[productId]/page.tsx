@@ -275,7 +275,7 @@ const ProductDetailsPage = () => {
           <Stack m="md">
             <Title order={2}>{product.name}</Title>
             {renderStockBadge(totalForSale)}
-            <Text size="md" c="dimmed">
+            <Text size="md" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>
               {product.description}
             </Text>
             <Divider />
