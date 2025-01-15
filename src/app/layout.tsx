@@ -41,6 +41,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
+          href="http://fonts.googleapis.com/css?family=Roboto:400,900,700,500,300,100"
+          rel="stylesheet"
+          type="text/css"
+        />
+        <link
           href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Yrsa:ital,wght@0,300..700;1,300..700&display=swap"
           rel="stylesheet"
         />
